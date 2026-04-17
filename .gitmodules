@@ -1,0 +1,3 @@
+[submodule "cmux"]
+	path = cmux
+	url = https://github.com/manaflow-ai/cmux.git
