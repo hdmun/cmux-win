@@ -1,150 +1,194 @@
-﻿> [!NOTE]
-> 이 문서는 AI 에이전트(Gemini CLI, Claude 등)가 cmux-win 프로젝트를 구현하고 검증하는 데 참고하는 핵심 지침서입니다.
-# 12. ?묒뾽 紐⑸줉 + ?섏〈 愿怨?+ 留덉씪?ㅽ넠
+# 12. Tasks, Milestones, and Gates
 
 > [!IMPORTANT]
-> ??臾몄꽌??WinUI 3 (Windows App SDK) 湲곕컲 **Windows ?ы똿 ?묒뾽 怨꾪쉷**?낅땲??
+> 이 문서는 구현을 실제로 시작할 수 있도록 milestone, 산출물, 검증 기준을 작업 단위로 쪼갠 실행 문서다.
 
-## 留덉씪?ㅽ넠 媛쒖슂
+## 1. milestone 개요
 
-```
-M0: 湲곕컲 ?ㅼ틦?대뵫 + ?⑤━???쒓퀎 ?앸퀎       (湲곕컲)
-M1: ????(WinUI 3 / XAML) + 硫?곗쐢?꾩슦    (?듭떖 援ъ“)
-M2: ?곕???肄붿뼱 (SwapChainPanel) + ?묎렐?? (?듭떖 媛移?
-M3: ?ㅽ뵆由?+ ?ъ씠?쒕컮 (WinUI 3) + IPC 湲곗큹 (UI 諛?TDD)
-M4: 釉뚮씪?곗? ?⑤꼸                          (湲곕뒫 ?뺤옣)
-M5: CLI ?듯빀 + ?붾젅硫뷀듃由?                 (?먮룞??諛??덉젙??
-M6: ?뚮┝ + ?ㅼ젙 + ???듯빀                  (?ъ슜??
-M7: ?낅뜲?댄듃 + 由대━??(?대씪?곕뱶 ?쒕챸 + Inno Setup) (諛고룷)
-```
+| Milestone | 목표 |
+|-----------|------|
+| M0 | bootstrap + 규약 고정 |
+| M1 | app/window shell |
+| M2 | terminal engine |
+| M3 | split/sidebar/IPC foundation |
+| M4 | browser panel |
+| M5 | CLI + automation + crash pipeline |
+| M6 | settings + notifications + shell integration |
+| M7 | release infrastructure |
 
-## 留덉씪?ㅽ넠 ?꾨즺 湲곗? (Definition of Done)
+## 2. milestone progression rule
 
-- 媛?留덉씪?ㅽ넠? **肄붾뱶 + 臾몄꽌 + 寃利?寃쎈줈**媛 ?④퍡 ?덉뼱???꾨즺濡?媛꾩＜?⑸땲??
-- "寃利??먮뒗 理쒖냼???깃났 寃쎈줈, ????ㅽ뙣 寃쎈줈, ?뚮옯??fallback ?뺤씤???ы븿?⑸땲??
-- ?ㅺ퀎 ?섏〈?깆씠 ????ぉ? 援ы쁽 ?꾩뿉 愿??臾몄꽌(`03`, `04`, `08`, `09`)??怨꾩빟 ?뱀뀡??癒쇱? ?좉꺼???⑸땲??
+- M1 착수 전: M0 완료
+- M2 착수 전: M0, M1 완료
+- M3 착수 전: M1, M2 완료
+- M4 착수 전: M1, M3 완료
+- M5 착수 전: M3, M4 완료
+- M6 착수 전: M3, M5 완료
+- M7 착수 전: 기능 범위 잠금 및 release-only backlog 분리 완료
 
-## ?섏〈 愿怨?洹몃옒??諛?二쇱슂 蹂寃쎌젏
+## 3. M0 상세 작업
 
-**二쇱슂 媛쒖꽑??*:
-1. IPC 湲곕컲 TDD 泥닿퀎瑜??꾪빐 M3 ?④퀎?먯꽌 IPC 湲곗큹(ControlServer)瑜?議곌린 ?꾩엯.
-2. ?곕????⑤━???ъ꽦???쒓퀎(Windows Console API???쒓퀎 ??瑜?M0?먯꽌 ?좎젣 ?앸퀎.
-3. WinUI 3 (XAML) 諛?SwapChainPanel 援ъ“ 紐낆떆.
-4. UIA ?묎렐??Accessibility) 諛?Crashpad ?붾젅硫뷀듃由??쒖뒪??異붽?.
+### M0-1. Build bootstrap skeleton
 
-| 留덉씪?ㅽ넠 | 吏곸젒 ?좏뻾 議곌굔 |
-|----------|----------------|
-| **M1** | M0 |
-| **M2** | M0, M1 |
-| **M3** | M1, M2 |
-| **M4** | M0, M1, M3 |
-| **M5** | M1, M3, M4 |
-| **M6** | M0, M2, M3, M5 |
-| **M7** | M0, M4, M6 |
+**산출물**
 
-> 釉뚮씪?곗? ?⑤꼸? M5 ??M6 寃쎈줈瑜??듯빐 媛꾩젒?곸쑝濡쒕룄 M7???ы븿?섏?留? v1 由대━???ㅼ퐫?꾩뿉 紐낆떆?곸쑝濡??ы븿??湲곕뒫?대?濡?M7??吏곸젒 ?좏뻾 議곌굔?먮룄 ?곸뼱 release gate瑜?遺꾨챸???⑸땲??
+- `CMakeLists.txt`
+- `CMakePresets.json`
+- `src\CMakeLists.txt`
+- `cli\CMakeLists.txt`
+- `Directory.Packages.props`
+- `NuGet.config`
 
-## 寃곗젙 寃뚯씠??
+**완료 기준**
 
-| 寃뚯씠??| 留덇컧 ?쒖젏 | ?좉?????寃곗젙 |
-|--------|-----------|----------------|
-| G0 | M0 醫낅즺 ??| ConPTY threading 怨꾩빟, Passthrough fallback, libvterm overlay ?꾨왂, panel lifecycle |
-| G5 | M5-3 ?쒖옉 ??| Crashpad ?섏쭛 諛깆뿏?? 媛쒖씤?뺣낫 怨좎? 湲곕낯 ?뺤콉 |
-| G7 | M7-4 ?쒖옉 ??| WinSparkle vs. ?먯껜 ?낅뜲?댄듃 ?붿쭊, ?쇰뱶/AppCast 諛고룷 諛⑹떇 |
+- `dev-x64`, `dev-arm64` preset 정의
+- configure/build/test entrypoint가 하나로 정리됨
 
-## ?묒뾽 紐⑸줉
+### M0-2. Dependency pinning and overlay ports
 
-### M0: ?꾨줈?앺듃 ?ㅼ틦?대뵫 諛??쒓퀎 ?앸퀎
+**산출물**
 
-| ID | ?묒뾽 | ?섏〈 |
+- `vcpkg.json`
+- `vcpkg-configuration.json`
+- `ports\libvterm\...`
+
+**완료 기준**
+
+- libvterm overlay port 경로 고정
+- vcpkg와 NuGet 책임 분리 완료
+
+### M0-3. Runtime manifest and resources
+
+**산출물**
+
+- `resources\app.manifest`
+- `.rc` resource skeleton
+
+**완료 기준**
+
+- DPI awareness, compatibility, icon/version resource 기준 확정
+
+### M0-4. ADR freeze
+
+**산출물**
+
+- terminal threading contract
+- passthrough fallback contract
+- parser selection rationale
+- panel lifecycle contract
+
+**완료 기준**
+
+- `_workspace\03`, `04`, `06`, `08`, `09`에 교차 참조 가능한 규약이 고정됨
+
+### M0-5. Shared utilities
+
+**산출물**
+
+- logging skeleton
+- string/encoding helper
+- dispatcher helper
+
+**완료 기준**
+
+- background -> UI 경계 처리 유틸 확보
+
+### M0-6. Settings and shortcut schema
+
+**산출물**
+
+- `settings.json` schema draft
+- shortcut scopes and reserved actions
+
+**완료 기준**
+
+- precedence, atomic write, migration 규칙 문서화 완료
+
+### M0-7. Release prework
+
+**산출물**
+
+- signing prerequisites checklist
+- release infra backlog
+
+**완료 기준**
+
+- release-only 작업이 구현 착수 범위에서 분리됨
+
+## 4. M1~M6 핵심 작업
+
+| ID | 작업 | 선행 |
 |----|------|------|
-| M0-1 | CMake + `Microsoft.Windows.CppWinRT` ?ㅼ틦?대뵫, `CMakePresets.json`, x64/ARM64 ?寃??뗭뾽 | - |
-| M0-2 | vcpkg.json ?묒꽦 諛?CI 諛붿씠?덈━ 罹먯떛(Binary Caching) ?ㅼ젙 | M0-1 |
-| M0-3 | DPI ?몄떇 Manifest 諛?`.rc` 由ъ냼??堉덈? ?묒꽦 | M0-1 |
-| M0-4 | **?곕????⑤━???쒓퀎 ?좎젣 ?앸퀎** (ConPTY ?쒖빟, ?고듃 ?뚮뜑留??쒓퀎??臾몄꽌?? | - |
-| M0-5 | 湲곕낯 ?좏떥由ы떚 紐⑤뱢 諛?Logger ?묒꽦 | M0-1 |
-| M0-6 | ?ㅼ젙 ?ㅽ궎留?珥덉븞 諛?湲곕낯 ?⑥텞??湲곕낯媛??뺤쓽 | M0-1 |
-| M0-7 | Azure Trusted Signing 怨꾩젙/Secrets/OIDC ?좏뻾 以鍮?| - |
+| M1-1 | WinUI 3 app + main window bootstrap | M0-1 |
+| M1-2 | WindowManager and window lifecycle | M1-1 |
+| M1-3 | titlebar / backdrop / fallback | M1-1 |
+| M2-1 | ConPTY process and I/O pipeline | M0-4, M1-1 |
+| M2-2 | libvterm wrapper + terminal buffer | M2-1 |
+| M2-3 | Direct2D renderer | M1-1 |
+| M2-4 | SwapChainPanel host integration | M2-3 |
+| M2-5 | IME + UIA | M2-4 |
+| M3-1 | ControlServer foundation | M1-2 |
+| M3-2 | split layout controller + XAML projection | M2-4 |
+| M3-3 | sidebar/workspace state projection | M1-2 |
+| M3-4 | tab/workspace lifecycle rules | M3-2, M3-3 |
+| M3-5 | IPC TDD for split/focus/state conflict | M3-1, M3-4 |
+| M4-1 | browser panel host | M1-1 |
+| M4-2 | omnibar and navigation UX | M4-1 |
+| M4-3 | CDP automation contract | M4-1, M3-1 |
+| M5-1 | `cmux.exe` CLI + capabilities handshake | M3-1 |
+| M5-2 | workspace/panel control commands | M5-1 |
+| M5-3 | crash/log/privacy policy freeze | M0-6 |
+| M5-4 | crash capture integration | M5-3 |
+| M6-1 | NotificationStore + toast | M3-3 |
+| M6-2 | settings persistence and migration | M0-6 |
+| M6-3 | shortcut routing engine | M6-2 |
+| M6-4 | shell integration scripts | M5-1 |
 
-> `M0-4`???곗텧臾쇱? ?⑥닚 硫붾え媛 ?꾨땲??**?⑤━??留ㅽ듃由?뒪 + ?쒖빟 臾몄꽌 + 沅뚯옣 ?대갚 紐⑸줉**?낅땲?? ??臾몄꽌??M2 ?ㅺ퀎 ?낅젰?쇰줈 ?ъ궗?⑸맗?덈떎.
+## 5. validation matrix
 
-### M1: ????(WinUI 3) + 硫?곗쐢?꾩슦
+| Milestone | 필수 검증 |
+|-----------|-----------|
+| M0 | configure/build/test entrypoint 문서화, dependency pinning 경로 고정 |
+| M1 | first window creation, STA enforcement, shutdown order |
+| M2 | terminal output, passthrough fallback, IME, UIA |
+| M3 | split/focus restore, IPC errors, ACL, payload limit |
+| M4 | WebView2 host, CDP errors, session retention |
+| M5 | CLI handshake, command routing, crash/log policy |
+| M6 | settings atomic write, migration backup, toast degrade, shell non-blocking |
 
-| ID | ?묒뾽 | ?섏〈 |
-|----|------|------|
-| M1-1 | WinUI 3 Application 諛?MainWindow XAML 珥덇린??| M0-1 |
-| M1-2 | WindowManager ??硫?곗쐢?꾩슦 ?몄뒪?댁뒪/?쇱슦??ID 愿由?| M1-1 |
-| M1-3 | Mica / DesktopAcrylic 諛깅뱶濡??쒖뒪???듯빀 諛?Titlebar 而ㅼ뒪?곕쭏?댁쭠 | M1-1 |
-| M1-4 | 怨잻PI ???諛??꾨젅?꾩썙???고???醫낆냽??寃利?濡쒖쭅 | M1-1 |
+## 6. gate 정의
 
-### M2: ?곕???肄붿뼱 (Direct2D/SwapChainPanel) + ?묎렐??
+### G0
 
-| ID | ?묒뾽 | ?섏〈 |
-|----|------|------|
-| M2-1 | ConPtyProcess ??ConPTY ?꾨줈?몄뒪 愿由?諛?I/O | M0-1,M0-4 |
-| M2-2 | libvterm ?곕룞 諛?踰꾪띁留?紐⑤뜽 (ITerminalEmulator) | M2-1 |
-| M2-3 | TerminalRenderer ??Direct2D + DirectWrite ?뚮뜑留?濡쒖쭅 | M1-1 |
-| M2-4 | **SwapChainPanel** ?듯빀 ??WinUI 3 XAML ?꾩뿉 怨좎꽦???뚮뜑留??쒕㈃ ?몄뒪??| M2-3 |
-| M2-5 | ?낅젰/IME 泥섎━ 諛??고듃 ?대갚 濡쒖쭅 | M2-4 |
-| M2-6 | **UIA 湲곕컲 ?묎렐??(Accessibility) 吏??* ???곕???踰꾪띁 ?댁슜???ㅽ겕由?由щ뜑???몄텧 | M2-4 |
+- build path 단일화
+- dependency ownership 고정
+- terminal/runtime contracts 확정
+- protocol/schema/error contract 확정
 
-### M3: ?ㅽ뵆由??ъ씠?쒕컮 (WinUI 3) + IPC 湲곗큹 (TDD)
+### G5
 
-| ID | ?묒뾽 | ?섏〈 |
-|----|------|------|
-| M3-1 | **ControlServer 湲곗큹 (Named Pipe)** ??TDD ?먮룞?붾? ?꾪븳 IPC 議곌린 ?꾩엯 | M1-2 |
-| M3-2 | SplitLayout (XAML 湲곕컲 遺꾪븷 而⑦뀒?대꼫 洹몃━?? | M1-1 |
-| M3-3 | ?ъ씠?쒕컮 而댄룷?뚰듃 諛??곹깭 ?쒖떆 UI | M1-1 |
-| M3-4 | Tab 紐⑤뜽 (Workspace/Surface 愿由? 援ы쁽 | M3-2 |
-| M3-5 | IPC 湲곕컲 TDD瑜??듯븳 ?ㅽ뵆由?諛????ъ빱???대룞 ?먮룞???뚯뒪???묒꽦 | M3-1,M3-4|
+- crash / privacy / log redaction 정책 확정
 
-> `M3-5` ?뚯뒪??踰붿쐞?먮뒗 happy path肉??꾨땲??`ACL ?ㅽ뙣`, `unsupported_version`, `IPC? UI ?낅젰 寃쎌웳` 媛숈? 寃쎄퀎/蹂댁븞 耳?댁뒪???ы븿?⑸땲??
+### G7
 
-### M4: 釉뚮씪?곗? ?⑤꼸
+- signing, installer, distribution manifests, updater를 release-only gate로 검토
 
-| ID | ?묒뾽 | ?섏〈 |
-|----|------|------|
-| M4-1 | WebView2 ?몄뒪??濡쒖쭅 異붽? (WinUI 3 `WebView2` 而⑦듃濡??ъ슜) | M1-1 |
-| M4-2 | Omnibar, ?ㅻ줈/?욎쑝濡? ?곹깭 蹂듭썝 UI 援ы쁽 | M4-1 |
-| M4-3 | IPC ?쒖뼱瑜??듯븳 釉뚮씪?곗? ?먮룞??snapshot, eval ?? 吏??| M4-1,M3-1|
+## 7. release-only backlog
 
-### M5: CLI ?듯빀 + ?붾젅硫뷀듃由?
+아래 항목은 구현 착수 범위와 분리한다.
 
-| ID | ?묒뾽 | ?섏〈 |
-|----|------|------|
-| M5-1 | `cmux.exe` CLI ?꾩쟾 援ы쁽 諛?ControlServer V2 ?꾨줈?좎퐳 ?곕룞 | M3-1,M0-6 |
-| M5-2 | Workspace / Surface 議곗옉 IPC 紐낅졊???꾨퉬 | M5-1 |
-| M5-3 | ?щ옒???섏쭛 諛깆뿏???좏깮 + 媛쒖씤?뺣낫 怨좎?/湲곕낯 opt-in ?뺤콉 ?뺤젙 | M0-6 |
-| M5-4 | **Crashpad ?붾젅硫뷀듃由??듯빀** ???꾨줈?뺤뀡 ???щ옒?????ㅽ봽 ?섏쭛 諛?遺꾩꽍 | M1-1,M5-3 |
-| M5-5 | ?щ낵 蹂???낅줈???뚯씠?꾨씪??援ъ텞 (`.pdb` ??`.sym`) | M5-4 |
+- Azure Trusted Signing
+- symbol upload backend
+- Inno Setup polish
+- `winget` manifest
+- `scoop` manifest
+- updater / appcast
 
-### M6: ?뚮┝ + ?ㅼ젙 + ???듯빀
+## 8. 문서와 구현 동기화 규칙
 
-| ID | ?묒뾽 | ?섏〈 |
-|----|------|------|
-| M6-1 | NotificationStore (?뚮┝ ?쇱슦?? 諛?WinUI 3 Toast ?듯빀 | M3-3 |
-| M6-2 | JSON 湲곕컲 ?ㅼ젙 ?쒖뒪??(GhosttyConfig ?쇰? ?명솚) | M0-2,M0-6 |
-| M6-3 | ?⑥텞???쇱슦???붿쭊 (`KeyboardAccelerator` + ?꾩슂 ??`RegisterHotKey`) | M6-2 |
-| M6-4 | PowerShell/CMD/WSL ???듯빀 ?ㅽ겕由쏀듃 諛고룷 | M5-1 |
+기능 구현 시 아래 문서는 함께 수정한다.
 
-### M7: ?낅뜲?댄듃 + 由대━??(?대씪?곕뱶 ?쒕챸)
-
-| ID | ?묒뾽 | ?섏〈 |
-|----|------|------|
-| M7-1 | GitHub Actions ARM64/x64 ?щ줈??由대━??鍮뚮뱶 ?꾩꽦 | M0-2 |
-| M7-2 | **Azure Trusted Signing** ?대씪?곕뱶 ?쒕챸 ?뚯씠?꾨씪???꾩엯 | M7-1,M0-7 |
-| M7-3 | Inno Setup ?ㅽ겕由쏀듃 ?묒꽦 (WebView2, WinAppSDK ?고???醫낆냽???ㅼ튂 ?ы븿) | M7-2 |
-| M7-4 | WinSparkle ?먮뒗 ?먯껜 ?낅뜲?댄듃 ?붿쭊 ?묒옱 (AppCast/?낅뜲?댄듃 ?쇰뱶 ?ы븿) | M7-2,M7-3 |
-| M7-5 | `winget` manifest ?앹꽦 諛?`microsoft/winget-pkgs` ?쒖텧 ?먮룞??蹂댁“ | M7-3 |
-| M7-6 | `scoop` manifest ?묒꽦 諛?`ScoopInstaller/Extras` ?쒖텧 蹂댁“ | M7-3 |
-
-## 6. AI ?먯씠?꾪듃 留덉씪?ㅽ넠 ?꾪솚 泥댄겕由ъ뒪??
-
-?ㅼ쓬 留덉씪?ㅽ넠?쇰줈 ?섏뼱媛湲??꾩뿉 ?먯씠?꾪듃???꾨옒 ?ы빆???ㅼ뒪濡?寃利앺빐???⑸땲??
-
-- [ ] **?뺤쟻 遺꾩꽍**: 紐⑤뱺 ?뚯뒪 肄붾뱶媛 ?꾨줈?앺듃 肄붾뵫 而⑤깽?섏쓣 以?섑븯硫?`lint` ?꾧뎄瑜??듦낵?덈뒗媛?
-- [ ] **而댄뙆???뺤씤**: x64 諛?ARM64 ?꾨━??紐⑤몢?먯꽌 而댄뙆???ㅻ쪟? 寃쎄퀬(Warning)媛 ?녿뒗媛?
-- [ ] **?⑥쐞 ?뚯뒪??*: `M3-5` ?④퀎 ?댄썑, 紐⑤뱺 湲곕뒫 異붽???????대떦?섎뒗 IPC 湲곕컲 ?먮룞???뚯뒪?멸? ?묒꽦 諛??듦낵?섏뿀?붽??
-- [ ] **臾몄꽌 ?꾪뻾??*: 援ы쁽 以?蹂寃쎈맂 API ?ㅽ럺?대굹 ?ㅼ젙 ?ㅺ? `_workspace/` ??愿??臾몄꽌??紐⑤몢 諛섏쁺?섏뿀?붽??
-- [ ] **?⑤━???議?*: macOS ?먮낯(`cmux/`)???듭떖 ?숈옉怨?鍮꾧탳?섏뿬 ?꾨씫?섍굅???섎룄移??딄쾶 蹂寃쎈맂 UX媛 ?녿뒗媛?
-
+- bootstrap 변경: `01`, `11`, `12`
+- protocol 변경: `08`, `12`
+- settings 변경: `09`, `12`
+- panel lifecycle 변경: `03`, `04`, `06`

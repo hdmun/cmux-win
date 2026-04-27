@@ -1,157 +1,128 @@
-﻿> [!NOTE]
-> 이 문서는 AI 에이전트(Gemini CLI, Claude 등)가 cmux-win 프로젝트를 구현하고 검증하는 데 참고하는 핵심 지침서입니다.
-# 11. 鍮뚮뱶 ?쒖뒪??+ 由대━???뚯씠?꾨씪??
+# 11. Build and Release
 
 > [!IMPORTANT]
-> ?꾨옒 ?댁슜? **Windows ?ы똿 紐⑺몴 ?ㅺ퀎**?낅땲?? ?꾩옱 ??μ냼???ㅼ젣 鍮뚮뱶 泥닿퀎??macOS/??以묒떖?대ŉ, ??臾몄꽌??WinUI 3 (Windows App SDK) 湲곕컲 ?섏씠釉뚮━???꾪궎?띿쿂瑜??꾪븳 鍮뚮뱶/由대━??泥닿퀎瑜??뺤쓽?⑸땲??
+> 이 문서는 구현 착수 전에 고정해야 하는 **유일한 Windows 부트스트랩 경로** 를 정의한다. 다른 빌드 경로를 병행 문서화하지 않는다.
 
-## 鍮뚮뱶 ?꾧뎄 諛??섍꼍
+## 1. 유일한 부트스트랩 경로
 
-| ??ぉ | ?꾧뎄/?섍꼍 | 鍮꾧퀬 |
-|------|------|------|
-| **鍮뚮뱶 ?쒖뒪??* | CMake 3.24+ | ?щ줈??IDE 吏?? `Microsoft.Windows.CppWinRT` ?쒖슜 |
-| **?⑦궎吏 愿由?* | vcpkg (留ㅻ땲?섏뒪??紐⑤뱶) | CI ?섍꼍?먯꽌 諛붿씠?덈━ 罹먯떛 吏??|
-| **而댄뙆?쇰윭** | MSVC (Visual Studio 2022+) | C++20, `/std:c++20` |
-| **?寃??꾪궎?띿쿂** | x64, ARM64 | 理쒖떊 Windows ?붾컮?댁뒪 ?꾨꼍 吏??|
-| **IDE** | Visual Studio 2022 | XAML ?붿옄?대꼫, C++/WinRT ?듯빀 |
+v1의 공식 개발/CI 경로는 아래 하나다.
 
-### vcpkg 留ㅻ땲?섏뒪?몄뿉 ?ы븿???듭떖 ?섏〈??
+- **Visual Studio 2022**
+- **CMake Presets**
+- **vcpkg manifest mode**
+- **NuGet central package management**
+- **Windows App SDK bootstrap**
 
-| 踰붿＜ | ?⑦궎吏/?꾨왂 | 鍮꾧퀬 |
-|------|-------------|------|
-| VT ?뚯꽌 | `libvterm` (overlay port 媛?? | 怨듭떇 ?ы듃 遺????`ports/libvterm/` overlay ?먮뒗 vendor ?꾨왂 ?꾩슂 |
-| ?뚯뒪??| `gtest` | CTest ?듯빀 ?꾩젣 |
-| JSON | `nlohmann-json` | V2 IPC / ?ㅼ젙 ?뚯씪 ?뚯떛 |
-| WinUI 蹂댁“ 而⑦듃濡?| `CommunityToolkit.WinUI.Controls` | `GridSplitter` ??WinUI 湲곕낯 誘명룷??而⑦듃濡ㅼ쓣 NuGet/MSBuild濡?異붽? |
-| ?쒖뒪???쇱씠釉뚮윭由?| Direct2D, DirectWrite | vcpkg ??곸씠 ?꾨땲??Windows SDK 留곹겕 ??ぉ |
-| UI ?고???| Windows App SDK, WebView2 | NuGet/MSBuild ?먮뒗 ?ㅼ튂湲?醫낆냽?깆쑝濡?愿由?|
+즉, "Visual Studio 수동 프로젝트" 또는 "별도 hand-written NuGet restore 흐름"은 공식 경로가 아니다.
 
-### ?섏〈???댁긽??怨꾩빟
+## 2. authoritative build files
 
-- `libvterm`????μ냼 ??`ports\libvterm\` overlay port瑜?湲곕낯 寃쎈줈濡??좎??⑸땲??
-- `CommunityToolkit.WinUI.Controls`, Windows App SDK, WebView2 SDK 媛숈? WinUI 怨꾩뿴 ?섏〈?깆? **NuGet/MSBuild restore ?④퀎**?먯꽌 ?댁긽?⑸땲??
-- 踰꾩쟾 怨좎젙???꾩슂??NuGet ?⑦궎吏??以묒븰 愿由??뚯씪(?? `Directory.Packages.props` ?먮뒗 ?숇벑??鍮뚮뱶 ?ㅼ젙)濡?pinning ?⑸땲?? 臾몄꽌?먮쭔 踰꾩쟾???곴퀬 CI?먮뒗 諛섏쁺?섏? ?딅뒗 ?곹깭瑜??덉슜?섏? ?딆뒿?덈떎.
+아래 파일이 버전과 restore의 단일 출처다.
 
-## WinUI 3 / Windows App SDK ?듯빀
+| 파일 | 역할 |
+|------|------|
+| `CMakePresets.json` | configure/build/test entrypoint |
+| `vcpkg.json` | vcpkg dependency manifest |
+| `vcpkg-configuration.json` | baseline / registries / overlay 설정 |
+| `Directory.Packages.props` | NuGet package pinning |
+| `NuGet.config` | NuGet source 정책 |
 
-CMake ?뚯씠?꾨씪???댁뿉??WinUI 3? Windows App SDK瑜?鍮뚮뱶?섍린 ?꾪빐 ?ㅼ쓬 ?붿냼媛 ?ы븿?⑸땲??
+문서에 버전 문자열을 중복해 적지 않는다. **실제 pin은 위 파일이 책임진다.**
 
-- **C++/WinRT 諛?XAML 而댄뙆??*: `Microsoft.Windows.CppWinRT` ?⑦궎吏瑜??곕룞?섏뿬 XAML ?뚯씪??C++ ?ㅻ뜑 諛??뚯뒪濡?蹂?섑븯怨?鍮뚮뱶 ?뚯씠?꾨씪?몄뿉 ?듯빀?⑸땲??
-- **留ㅻ땲?섏뒪??(AppxManifest / Application Manifest)**: Per-Monitor V2 DPI ?몄떇 諛?Windows OS 踰꾩쟾 ?명솚?깆쓣 紐낆떆?섏뿬 ?좊챸???뚮뜑留곸쓣 蹂댁옣?⑸땲??
-- **由ъ냼???뚯씪 (`.rc`)**: ???꾩씠肄? 踰꾩쟾 ?뺣낫 ???먯썝???ы븿?섏뿬 ?덈룄???ㅽ뻾 ?뚯씪??硫뷀??곗씠?곕? 援ъ꽦?⑸땲??
+## 3. dependency ownership
 
-> [!NOTE]
-> CI? 濡쒖뺄 鍮뚮뱶?먯꽌 `cmake --preset release-x64`, `release-arm64`瑜??ъ슜?섎젮硫???μ냼 猷⑦듃??**`CMakePresets.json`** ???덉뼱???⑸땲??
-> 理쒖냼??x64/ARM64??`configurePresets`, `buildPresets`, `testPresets`瑜??뺤쓽?섍퀬, 媛?preset?먯꽌 `VCPKG_TARGET_TRIPLET`? WinUI 3 愿??罹먯떆 蹂?섎? ?④퍡 吏?뺥빀?덈떎.
+| 의존성 | 관리 방식 | authoritative location |
+|--------|-----------|------------------------|
+| libvterm | vcpkg overlay port | `ports\libvterm\` + `vcpkg.json` |
+| nlohmann-json | vcpkg | `vcpkg.json` |
+| gtest | vcpkg | `vcpkg.json` |
+| Microsoft.Windows.CppWinRT | NuGet | `Directory.Packages.props` |
+| Windows App SDK | NuGet | `Directory.Packages.props` |
+| WebView2 SDK | NuGet | `Directory.Packages.props` |
+| CommunityToolkit controls | NuGet | `Directory.Packages.props` |
 
-## ?고???諛고룷 ?꾨왂
+## 4. vendor 금지 정책
 
-諛고룷 ?ш린? ?ъ슜???몄쓽瑜?怨좊젮?섏뿬 ?고???諛고룷 諛⑹떇??寃곗젙?⑸땲??
+아래는 기본적으로 금지한다.
 
-| ?고???| 諛고룷 諛⑹떇 | 鍮꾧퀬 |
-|--------|-----------|------|
-| **Windows App SDK** | **Framework-dependent** | ?ъ슜?먯쓽 ?쒖뒪?쒖뿉 誘몄꽕移???Inno Setup ?ㅼ튂湲곗뿉???먮룞 ?ㅼ슫濡쒕뱶 諛??ㅼ튂 (???⑸웾 理쒖냼??. |
-| **WebView2** | **Evergreen Bootstrapper** | ?쒖뒪?쒖뿉 ?ㅼ튂???고????ъ슜. ?놁쑝硫??ㅼ튂湲곗뿉???먮룞 遺?몄뒪?몃옒???ㅽ뻾. |
+- 임의 zip vendor copy
+- 개발자 로컬 전역 설치 버전에 의존하는 빌드
+- 문서에만 있고 pin file에 없는 package 버전
 
-### ?ㅼ튂 ?ㅽ뙣 ?뺤콉
+## 5. configure/build/test 명령
 
-- WinAppSDK ?먮뒗 WebView2 bootstrap???ㅽ뙣?섎㈃ ?ㅼ튂湲곕뒗 遺遺??ㅼ튂 ?곹깭瑜??④린吏 ?딄퀬 紐낆떆???ㅻ쪟 硫붿떆吏? ?④퍡 醫낅즺?⑸땲??
-- ?ㅼ튂 ?ㅽ뙣瑜?臾댁떆??梨???諛붾줈媛湲곕쭔 ?앹꽦?섎뒗 寃쎈줈???덉슜?섏? ?딆뒿?덈떎.
-- ?ㅼ튂湲?濡쒓렇?먮뒗 ?ㅽ뙣???고???醫낅쪟, 諛섑솚 肄붾뱶, ?ъ떆???덈궡 留곹겕瑜??④퉩?덈떎.
+M0 이후 모든 개발자와 CI는 아래 명령만 사용한다.
 
-## CI 鍮뚮뱶 ?뚯씠?꾨씪??理쒖쟻??
-
-GitHub Actions?먯꽌 x64 諛?ARM64 ?щ줈??而댄뙆?쇱쓣 ?섑뻾?섎ŉ, 鍮뚮뱶 ?띾룄 ?μ긽???꾪빐 **vcpkg 諛붿씠?덈━ 罹먯떛 (Binary Caching)**???꾩엯?⑸땲??
-?대? ?듯빐 留?鍮뚮뱶留덈떎 臾닿굅??C++ ?쇱씠釉뚮윭由?DirectX, WebView2 SDK, gtest ??瑜??ъ뺨?뚯씪?섎뒗 ?쒓컙???덉빟?⑸땲??
-
-### GitHub Actions CI ?뚰겕?뚮줈??(媛쒕뀗)
-
-```yaml
-name: CI
-on: [push, pull_request]
-
-jobs:
-  build:
-    strategy:
-      matrix:
-        arch: [x64, arm64]
-    runs-on: windows-2022
-    env:
-      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}\vcpkg-binary-cache
-      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}\vcpkg-binary-cache,readwrite
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup MSVC
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.arch == 'arm64' && 'amd64_arm64' || 'amd64' }}
-      
-      - name: vcpkg Binary Caching
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}\vcpkg_installed
-            ${{ github.workspace }}\vcpkg-binary-cache
-          key: ${{ runner.os }}-vcpkg-${{ matrix.arch }}-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-${{ matrix.arch }}-
-          
-      - name: Configure & Build (WinUI 3 XAML / CMake)
-        run: |
-          cmake --preset release-${{ matrix.arch }}
-          cmake --build --preset release-${{ matrix.arch }}
-      - name: Run Tests (CTest)
-        run: |
-          ctest --preset release-${{ matrix.arch }} --output-on-failure
+```powershell
+cmake --preset dev-x64
+cmake --build --preset dev-x64
+ctest --preset dev-x64 --output-on-failure
 ```
 
-## 肄붾뱶 ?쒕챸 (Code Signing)
+ARM64는 동일한 패턴으로 `dev-arm64` preset을 사용한다.
 
-SmartScreen 寃쎄퀬瑜?諛⑹??섍퀬 ?좊ː?깆쓣 ?뺣낫?섍린 ?꾪빐 濡쒖뺄 `.pfx` ?몄쬆???뚯씪 湲곕컲 ?쒕챸 ???**?대씪?곕뱶 ?쒕챸 ?뚯씠?꾨씪??*???꾩엯?⑸땲??
+## 6. M0 산출물
 
-- **Azure Trusted Signing (?먮뒗 ?좎궗 ?대씪?곕뱶 ?쒕챸)**: ?섎뱶?⑥뼱 ?좏겙(USB)?대굹 濡쒖뺄 ?몄쬆???뚯씪 ?놁씠 ?대씪?곕뱶 ?댁뿉???덉쟾?섍쾶 愿由щ릺???몄쬆?쒕? ?ъ슜?섏뿬 CI/CD ?뚯씠?꾨씪?몄뿉???먮룞 ?쒕챸.
-- **?μ젏**: ?좏겙 遺꾩떎/?꾨궃 諛⑹?, CI ?쒕쾭??鍮꾨?踰덊샇 ?몄텧 ?놁쓬, ?믪? 蹂댁븞?? 諛고룷 利됱떆 SmartScreen ?좊ː ?띾뱷 媛??
+M0-1과 M0-2가 끝나면 최소 아래가 준비되어야 한다.
 
-> [!NOTE]
-> **?쒕챸 ?뚯씠?꾨씪???좏뻾 以鍮?*:
-> 1. Azure Trusted Signing 怨꾩젙 諛??몄쬆???꾨줈?뚯씪 ?앹꽦
-> 2. GitHub Actions??`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET` ?먮뒗 OIDC federation 援ъ꽦
-> 3. CI ?쒕챸 ?≪뀡(`azure/trusted-signing-action` ?먮뒗 ?숇벑 ?꾧뎄) ?좏깮
-> 4. SmartScreen reputation? 珥덇린 諛고룷?됱씠 ?볦씪 ?뚭퉴吏 蹂꾨룄 愿李?
+- root `CMakeLists.txt`
+- `CMakePresets.json` (`dev-x64`, `dev-arm64`, `ci-x64`, `ci-arm64`)
+- `vcpkg.json`
+- `vcpkg-configuration.json`
+- `Directory.Packages.props`
+- `NuGet.config`
+- `ports\libvterm\`
 
-## ?ㅼ튂 諛?諛고룷
+## 7. 패키징 모델
 
-- **?ㅼ튂 ?꾨줈洹몃옩 (Inno Setup)**: ?꾨젅?꾩썙??醫낆냽??WebView2, WinAppSDK) 泥댄겕 諛??먮룞 ?ㅼ튂 湲곕뒫???ы븿??`setup.exe` ?앹꽦.
-- **?⑦궎吏 留ㅻ땲? 吏??*: 由대━???꾨즺 ??`winget`, `scoop` ?깅줉??吏꾪뻾?섎릺, ?ㅼ젣 ?깅줉? ?몃? ??μ냼 PR 由щ럭媛 ?꾩슂???꾩냽 ?④퀎濡?痍④툒?⑸땲??
-- **?붾젅硫뷀듃由??곕룞 ?щ낵 愿由?*: 由대━??鍮뚮뱶 ??Crashpad ?щ낵(`.pdb` ??`.sym`)??蹂닿??섍퀬 ?낅줈?쒗빀?덈떎.
-  1. ?щ옒???섏쭛 諛깆뿏??Sentry/BugSplat/?먯껜 ?쒕쾭)瑜?癒쇱? ?뺤젙
-  2. ?щ낵 ?낅줈???ㅽ뀦??CI??異붽?
-  3. 媛쒖씤?뺣낫 怨좎?? opt-in/opt-out ?뺤콉???ㅼ젙 臾몄꽌? ?숆린??
-  4. ?꾨줈?뺤뀡 鍮뚮뱶?먯꽌留?Crashpad ?붾젅硫뷀듃由щ? ?쒖꽦??
+v1 배포 경로는 아래로 고정한다.
 
-## 由대━??寃뚯씠??怨꾩빟
+- unpackaged desktop app
+- Windows App SDK bootstrap on launch
+- Inno Setup installer
+- WebView2 Evergreen runtime prerequisite
 
-### AI ?먯씠?꾪듃??蹂댁씪?ы뵆?덉씠??(root CMakeLists.txt)
+MSIX는 연구/후속 단계일 수 있으나 v1 release gate는 아니다.
 
-```cmake
-cmake_minimum_required(VERSION 3.24)
-project(cmux-win LANGUAGES CXX)
+## 8. CI 원칙
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+CI는 아래만 보장한다.
 
-# WinRT 諛?Windows App SDK ?ㅼ젙 (?덉떆)
-add_subdirectory(src)
-add_subdirectory(cli)
+- x64 / ARM64 configure
+- build
+- tests
+- vcpkg binary caching
 
-# vcpkg ?듯빀? ?섍꼍蹂???먮뒗 CMake 紐낅졊以??몄옄濡?泥섎━?⑥쓣 媛??
-```
+release signing / installer publishing은 M7 단계로 분리한다.
 
-### AI ?먯씠?꾪듃 鍮뚮뱶/CI 泥댄겕由ъ뒪??
+## 9. release 인프라 분리
 
-- [ ] **Presets ?좏슚??*: `CMakePresets.json`??媛??꾨━?뗭씠 `vcpkg` ?댁껜???뚯씪???щ컮瑜닿쾶 媛由ы궎?붽??
-- [ ] **?쇱쨷??Triplet) ?쇱튂**: x64 諛?ARM64 鍮뚮뱶 ??vcpkg ?몃┸?뚮┸???꾨줈?앺듃 ?ㅼ젙怨??쇱튂?섎뒗媛?
-- [ ] **NuGet 蹂듭썝**: WinAppSDK ??NuGet ?⑦궎吏媛 鍮뚮뱶 ???먮룞 蹂듭썝?섎룄濡?援ъ꽦?섏뿀?붽??
-- [ ] **留ㅻ땲?섏뒪??蹂묓빀**: `app.manifest`媛 理쒖쥌 諛붿씠?덈━???щ컮瑜닿쾶 ?꾨쿋?⑸릺?덈뒗媛?
-- [ ] **?꾪떚?⑺듃 ?쒕챸**: CI ?④퀎?먯꽌 `signtool` ?먮뒗 ?대씪?곕뱶 ?쒕챸 ?≪뀡???깃났?곸쑝濡??몄텧?섎뒗媛?
+아래 항목은 기능 착수 문서와 분리된 release readiness 항목이다.
 
+- Azure Trusted Signing
+- `winget`
+- `scoop`
+- updater / appcast
+- symbol upload / crash ingestion backend
+
+이 항목들은 M7 전용 gate로 다룬다.
+
+## 10. 실패 정책
+
+- restore 실패를 숨기지 않는다
+- bootstrap prerequisite 누락 시 즉시 fail
+- 부분 설치 상태를 성공처럼 취급하지 않는다
+
+## 11. M0 / M7 검증 기준
+
+### M0
+
+- 새 환경에서 문서 한 곳만 보고 configure/build/test 가능
+- dependency pinning 위치가 중복 없이 명확함
+- libvterm overlay port 경로가 고정됨
+
+### M7
+
+- signing 경로가 CI에서 재현 가능
+- installer가 WinAppSDK/WebView2 prerequisite를 검증
+- release artifact와 symbol upload가 분리되어 관리됨

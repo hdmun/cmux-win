@@ -1,248 +1,112 @@
-﻿> [!NOTE]
-> 이 문서는 AI 에이전트(Gemini CLI, Claude 등)가 cmux-win 프로젝트를 구현하고 검증하는 데 참고하는 핵심 지침서입니다.
-# 08. IPC 諛?CLI ?꾧뎄 (Named Pipe 紐⑤뜕 ?꾪궎?띿쿂)
+# 08. IPC and CLI
 
 > [!IMPORTANT]
-> 蹂?臾몄꽌??cmux-win??濡쒖뺄 IPC ?듭떊怨?CLI ?꾧뎄瑜??꾪븳 **Windows 怨좎쑀 湲곕뒫 以묒떖??Named Pipe ?쒕쾭 ?ㅺ퀎**?낅땲?? 硫붿떆吏 紐⑤뱶(Message Mode)? 鍮꾨룞湲?I/O(ThreadPool/IOCP)瑜??꾩엯?섏뿬 ?깅뒫??洹밸??뷀븯怨? 泥좎???沅뚰븳 愿由?Same-user ACL)瑜??곸슜?⑸땲??
+> 이 문서는 Named Pipe transport, JSON schema, ID 형식, error code를 고정한다. 구현자는 이 문서를 프로토콜 기준으로 사용한다.
 
-## ?꾪궎?띿쿂 ?듭떖 蹂寃??ы빆
+## 1. transport
 
-- **硫붿떆吏 紐⑤뱶(`PIPE_TYPE_MESSAGE`) ?뚯씠??*: ?ㅽ듃由?寃쎄퀎 泥섎━媛 源뚮떎濡쒖슫 諛붿씠??紐⑤뱶 ??? 硫붿떆吏 吏???뚯씠?꾨? ?ъ슜?⑸땲?? ?묒? JSON 紐낅졊? ??踰덉쓽 ?쎄린濡??앸굹怨? ??硫붿떆吏??`ERROR_MORE_DATA` 猷⑦봽濡??댁뼱諛쏆뒿?덈떎.
-- **鍮꾨룞湲?I/O (Windows ThreadPool / IOCP)**: ?대씪?댁뼵???묒냽留덈떎 `std::thread`瑜??앹꽦?섎뒗 鍮꾩슜 ??퉬瑜??쒓굅?섍퀬, ?뺤옣???믪? Windows ?ㅼ씠?곕툕 ?ㅻ젅??? ?먮뒗 IOCP(I/O Completion Port)瑜??ъ슜?섏뿬 由ъ냼?ㅻ? 理쒖쟻?뷀빀?덈떎.
-- **?숈씪 ?ъ슜??而⑦뀓?ㅽ듃 ACL**: 蹂댁븞 媛뺥솕瑜??꾪빐 ?앹꽦?섎뒗 Named Pipe??蹂댁븞 ?붿뒪?щ┰??Security Descriptor)瑜??곸슜?섏뿬, 湲곕낯?곸쑝濡??숈씪 濡쒓렇???ъ슜??而⑦뀓?ㅽ듃留??묎렐 媛?ν븯?꾨줉 ?쒗븳?⑸땲?? 愿由ъ옄/SYSTEM? 沅뚰븳 ?곸듅 ???고쉶?????덉쑝誘濡??덈???寃쎄퀎濡?媛꾩＜?섏? ?딆뒿?덈떎.
-- **?섍꼍蹂?섎? ?듯븳 ?뚯씠???붿뒪而ㅻ쾭由?*: ?⑥씪 ?쒖뒪?????ㅼ쨷 ?몄뒪?댁뒪/?몄뀡 吏?먯쓣 ?꾪빐 `CMUX_PIPE_NAME` ?섍꼍蹂?섎줈 ?뚯씠???붾뱶?ъ씤?몃? ?숈쟻?쇰줈 寃?됲븯怨??좊떦?⑸땲??
+| 항목 | 규칙 |
+|------|------|
+| transport | Named Pipe |
+| mode | `PIPE_TYPE_MESSAGE` + `PIPE_READMODE_MESSAGE` |
+| max payload | 1 MiB |
+| security | same-user ACL |
+| naming | `\\.\pipe\cmux-<session>-<pid>` |
 
-## Named Pipe ?쒕쾭 援ы쁽 ?ㅺ퀎 (`ControlServer`)
+## 2. pipe discovery 순서
 
-### ?뚯씠???앹꽦 諛?蹂댁븞 (ACL) ?곸슜
+CLI는 아래 순서로 대상 pipe를 찾는다.
 
-Named Pipe ?앹꽦 ??`SECURITY_ATTRIBUTES`瑜??듯빐 ?ㅻⅨ ?ъ슜???묎렐??湲곕낯?곸쑝濡?李⑤떒?⑸땲?? ?꾨옒 SDDL? Owner Rights ?덉떆?대ŉ, ?ㅼ젣 援ы쁽?먯꽌??`TokenUser`濡??살? ?꾩옱 ?ъ슜??SID瑜?紐낆떆 ACE濡??ｋ뒗 helper瑜??ъ슜?섎뒗 ?몄씠 ??紐낇솗?⑸땲??
+1. `--pipe`
+2. `CMUX_PIPE_NAME`
+3. `\\.\pipe\cmux-default-<username>` fallback
 
-```cpp
-// ?덉떆: Owner Rights??GA瑜?遺?ы븯??理쒖냼 DACL.
-// ?ㅼ젣 援ы쁽?먯꽌??GetTokenInformation(TokenUser)濡??꾩옱 ?ъ슜??SID瑜?異붿텧??
-// 紐낆떆 ACE瑜?援ъ꽦?섎뒗 helper瑜?沅뚯옣?⑸땲??
-PSECURITY_DESCRIPTOR securityDescriptor = nullptr;
-ConvertStringSecurityDescriptorToSecurityDescriptorW(
-    L"D:(A;;GA;;;OW)",
-    SDDL_REVISION_1,
-    &securityDescriptor,
-    nullptr);
+direct pipe write는 자동 보고용 shell integration에서만 기본 경로로 허용한다.
 
-SECURITY_ATTRIBUTES sa{};
-sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-sa.bInheritHandle = FALSE;
-sa.lpSecurityDescriptor = securityDescriptor;
+## 3. JSON 규칙
 
-HANDLE hPipe = CreateNamedPipeW(
-    pipeName.c_str(),
-    PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, // 鍮꾨룞湲?I/O ?쒖꽦??
-    PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT, // 硫붿떆吏 紐⑤뱶
-    PIPE_UNLIMITED_INSTANCES,
-    8192, 8192, 0, &sa);
+- protocol version: `2`
+- field naming: `snake_case`
+- UTF-8 only
+- request/response는 각각 하나의 complete message
 
-LocalFree(securityDescriptor);
-```
+## 4. ID 규칙
 
-### ACL helper 怨꾩빟
+| 필드 | 형식 |
+|------|------|
+| `window_id` | `window:<uuid>` |
+| `workspace_id` | `workspace:<uuid>` |
+| `pane_id` | `pane:<uuid>` |
+| `surface_id` | `surface:<uuid>` |
+| `notification_id` | `notification:<uuid>` |
 
-```cpp
-std::wstring GetCurrentUserSidString();
-wil::unique_hlocal_security_descriptor BuildSameUserPipeSecurityDescriptor();
-```
+## 5. capabilities handshake
 
-- `BuildSameUserPipeSecurityDescriptor()`???꾩옱 濡쒓렇???ъ슜??SID??`GA`瑜?遺?ы븳 DACL???앹꽦?섍퀬, 愿由ъ옄/SYSTEM ?고쉶 媛?μ꽦? 蹂댁븞 臾몄꽌?먯꽌 蹂꾨룄濡?紐낆떆?⑸땲??
-- helper ?ㅽ뙣???뚯씠???앹꽦 ?ㅽ뙣濡??꾪뙆?섎ŉ, 蹂댁븞 ?붿뒪?щ┰???놁씠 "?쇰떒 ?앹꽦"?섎뒗 寃쎈줈???덉슜?섏? ?딆뒿?덈떎.
-- ?쒕쾭???대씪?댁뼵???묒냽 ?꾩뿉??`ImpersonateNamedPipeClient` ?먮뒗 ?숇벑??寃利앹쑝濡??숈씪 ?ъ슜??而⑦뀓?ㅽ듃瑜??ы솗?명븷 ???덉뒿?덈떎.
-
-### Windows ThreadPool 鍮꾨룞湲??듭떊 (IOCP ?泥?
-
-`OVERLAPPED` 援ъ“泥댁? Windows ThreadPool API(`CreateThreadpoolIo`)瑜??곕룞?섏뿬, ?대깽??湲곕컲 鍮꾨룞湲??듭떊???섑뻾?⑸땲?? ?대씪?댁뼵?멸? ?섎갚 媛??곌껐?섏뼱???ㅻ젅????컻(Thread explosion)??諛쒖깮?섏? ?딆뒿?덈떎.
-
-```cpp
-class PipeConnection {
-public:
-    void StartAccept(HANDLE hPipe) {
-        ZeroMemory(&m_overlapped, sizeof(OVERLAPPED));
-        StartThreadpoolIo(m_tpIo);
-
-        BOOL connected = ConnectNamedPipe(hPipe, &m_overlapped);
-        DWORD err = GetLastError();
-        if (connected || err == ERROR_PIPE_CONNECTED) {
-            CancelThreadpoolIo(m_tpIo);
-            OnConnected();
-        } else if (err != ERROR_IO_PENDING) {
-            CancelThreadpoolIo(m_tpIo);
-        }
-    }
-
-private:
-    static void CALLBACK IoCompletionCallback(PTP_CALLBACK_INSTANCE, PVOID Context, PVOID Overlapped, ULONG IoResult, ULONG_PTR NumberOfBytesTransferred, PTP_IO Io) {
-        auto conn = static_cast<PipeConnection*>(Context);
-        if (IoResult == NO_ERROR) {
-            conn->OnConnected();
-        }
-    }
-
-    HANDLE m_pipe;
-    OVERLAPPED m_overlapped;
-    PTP_IO m_tpIo;
-};
-```
-
-> **二쇱쓽**: `StartThreadpoolIo()`??OVERLAPPED I/O ?몄텧 吏곸쟾??癒쇱? ?ㅽ뻾?댁빞 ?⑸땲?? ?댄썑 ?곌껐???숆린?곸쑝濡??꾨즺?섍굅??利됱떆 ?ㅽ뙣?섎㈃ `CancelThreadpoolIo()`濡?pending 移댁슫?몃? ?섎룎?ㅼ빞 ?⑸땲??
-
-### 硫붿떆吏 ?뚯떛: V2 JSON ?꾨줈?좎퐳 泥섎━
-
-硫붿떆吏 紐⑤뱶(`PIPE_READMODE_MESSAGE`)瑜??ъ슜?섎㈃, ?묒? JSON 紐낅졊? `ReadFile` ??踰덉쑝濡?泥섎━?????덉뒿?덈떎. ?ㅻ쭔 8192諛붿씠?몃? 珥덇낵?섎뒗 硫붿떆吏??`ERROR_MORE_DATA`瑜?泥섎━?섎뒗 ?꾩쟻 猷⑦봽媛 ?꾩슂?⑸땲??
-
-```cpp
-void PipeConnection::OnDataReceived(const std::vector<uint8_t>& buffer) {
-    // 踰꾪띁 ?먯껜媛 ?섎굹???꾩쟾??JSON ?섏씠濡쒕뱶?꾩씠 蹂댁옣??
-    std::string jsonStr(buffer.begin(), buffer.end());
-    auto response = ProcessV2Command(jsonStr);
-    WriteAsync(response);
-}
-```
-
-#### WriteAsync 怨꾩빟
-
-- ?곌껐???숈떆??outstanding write???섎굹留??덉슜?⑸땲??
-- `WriteAsync()`??UTF-8 JSON ?섏씠濡쒕뱶 ?섎굹瑜?硫붿떆吏 寃쎄퀎 ?⑥쐞濡??꾩넚?섍퀬, ?ㅽ뙣 ??`pipe_write_failed`瑜?濡쒓퉭?????곌껐??醫낅즺?⑸땲??
-- ?먮윭 ?묐떟???숈씪???⑥닔 寃쎈줈瑜??ъ슜?섎ŉ, write ?ㅽ뙣瑜??ㅼ떆 JSON ?먮윭濡?媛먯떥吏 ?딆뒿?덈떎.
-
-#### ???硫붿떆吏 泥섎━ (`ERROR_MORE_DATA`)
-
-?꾨옒 ?덉떆??**?숈씪??OVERLAPPED ?몃뱾 洹쒖빟???좎??섎뒗 媛쒕뀗 ?ㅼ?移?*?낅땲?? `FILE_FLAG_OVERLAPPED`濡????몃뱾?먯꽌??`ReadFile(..., lpOverlapped = nullptr)`瑜??ъ슜?섏? ?딄퀬, ?쎄린留덈떎 怨좎쑀??`OVERLAPPED`瑜??섍꺼???⑸땲??
-
-```cpp
-void PipeConnection::ReadMessage() {
-    std::vector<uint8_t> chunk(8192);
-    std::vector<uint8_t> fullMessage;
-    OVERLAPPED readOverlapped{};
-    winrt::handle readEvent{ CreateEventW(nullptr, TRUE, FALSE, nullptr) };
-    readOverlapped.hEvent = readEvent.get();
-
-    while (true) {
-        DWORD bytesRead = 0;
-        ResetEvent(readOverlapped.hEvent);
-        BOOL ok = ReadFile(
-            m_pipe,
-            chunk.data(),
-            static_cast<DWORD>(chunk.size()),
-            &bytesRead,
-            &readOverlapped);
-
-        if (!ok && GetLastError() == ERROR_IO_PENDING) {
-            ok = GetOverlappedResult(m_pipe, &readOverlapped, &bytesRead, TRUE);
-        }
-
-        fullMessage.insert(fullMessage.end(), chunk.begin(), chunk.begin() + bytesRead);
-
-        if (ok) break;
-
-        DWORD err = GetLastError();
-        if (err == ERROR_MORE_DATA) {
-            if (fullMessage.size() > 1024 * 1024) {
-                WriteAsync(R"({"type":"error","code":"payload_too_large"})");
-                return;
-            }
-            continue;
-        }
-
-        WriteAsync(R"({"type":"error","code":"pipe_read_failed"})");
-        return;
-    }
-
-    OnDataReceived(fullMessage);
-}
-```
-
-#### 硫붿떆吏 ?쒕룄 ?곸닔
-
-- 湲곕낯 read chunk??`8192` 諛붿씠?몄엯?덈떎.
-- 理쒕? ?붿껌/?묐떟 payload??**1 MiB**濡?怨좎젙?섎ŉ, 珥덇낵 ??`payload_too_large` ?먮윭瑜?諛섑솚?⑸땲??
-- 1 MiB ?쒕룄???ㅼ젙 ?뚯씪濡??몄텧?섏? ?딄퀬 ?꾨줈?좎퐳 ?곸닔濡??좎??⑸땲?? 硫붾え由??ъ슜?됯낵 UI ?묐떟?깆쓣 ?댁쑀濡??꾩쓽 ?뺣??섏? ?딆뒿?덈떎.
-
-## ?붿뒪而ㅻ쾭由?濡쒖쭅: ?섍꼍蹂??湲곕컲 ?붾뱶?ъ씤??
-
-?쒕쾭? CLI ?대씪?댁뼵??媛꾩쓽 ?숈쟻 ?뚯씠???대쫫 怨듭쑀 泥닿퀎?낅땲??
-
-| ?섍꼍蹂??| ?ㅼ젙 二쇱껜 | ?⑸룄 |
-|------|------|------|
-| `CMUX_PIPE_NAME` | cmux ?쒕쾭 | IPC Named Pipe ?꾩껜 寃쎈줈 (`\\.\pipe\cmux-<SessionID>-<PID>`) |
-| `CMUX_PANE_ID` | cmux ?쒕쾭 | ?꾩옱 ?몄씠 ?곌껐???⑥씤 ID |
-| `CMUX_SURFACE_ID` | cmux ?쒕쾭 | ?꾩옱 ?뚮뜑 ?쒗뵾??ID |
-
-1. **?쒕쾭 ?쒖옉**: 
-   - 湲곕낯 ?뚯씠???대쫫 `\\.\pipe\cmux-<SessionID>-<PID>` ?뺥깭濡?怨좎쑀?섍쾶 ?앹꽦?⑸땲??
-   - ?쒕쾭媛 ???곕????섍꼍??援щ룞????`CMUX_PIPE_NAME` ?섍꼍蹂?섏뿉 ??寃쎈줈瑜?二쇱엯?⑸땲??
-2. **CLI 援щ룞 (`cmux.exe`)**:
-   - `cmux.exe` ?ㅽ뻾 ??1?쒖쐞濡?紐낅졊以??몄옄 `--pipe`瑜??뺤씤?⑸땲??
-   - 2?쒖쐞濡?`CMUX_PIPE_NAME` ?섍꼍蹂?섎? ?쎌뼱 ?뚯씠?꾩뿉 ?곌껐?⑸땲??
-   - 紐⑤몢 ?놁쑝硫?湲곕낯 Fallback 寃쎈줈(`\\.\pipe\cmux-default-<USERNAME>`)瑜??쒕룄?⑸땲??
-
-```cpp
-// ?대씪?댁뼵??痢??붿뒪而ㅻ쾭由?濡쒖쭅
-std::wstring GetTargetPipeName() {
-    // 1. 而ㅻ㎤?쒕씪??(?뚯떛 ?꾨즺???곹깭 媛??
-    if (!args.pipeName.empty()) return args.pipeName;
-
-    // 2. ?섍꼍蹂??
-    wchar_t envBuffer[MAX_PATH];
-    if (GetEnvironmentVariableW(L"CMUX_PIPE_NAME", envBuffer, MAX_PATH)) {
-        return std::wstring(envBuffer);
-    }
-
-    // 3. Fallback
-    std::wstring username = GetCurrentUsername();
-    return L"\\\\.\\pipe\\cmux-default-" + username;
-}
-```
-
-> `\\.\pipe\cmux-default-<USERNAME>` fallback? **媛쒕컻/?⑥씪 ?몄뒪?댁뒪??蹂댁“ 寃쎈줈**?낅땲?? PowerShell/WSL ???낆? ??寃쎈줈瑜??ш뎄?깊븯吏 ?딄퀬, ??긽 `CMUX_PIPE_NAME`?쇰줈 吏곸젒 ?곌껐?⑸땲??
-
-## ?꾨줈?좎퐳 ?명솚??諛??먮윭 泥섎━ (V2 以묒떖)
-
-- **Graceful Fail**: ?대씪?댁뼵?멸? `--json` 紐⑤뱶濡??몄텧?덈뒗???쒕쾭?먯꽌 吏?먰븯吏 ?딅뒗 紐낅졊???? Windows?먯꽌 吏?먰븯吏 ?딅뒗 援ы삎 ?쒗뵾??議곗옉 紐낅졊)瑜?諛쏆쑝硫? ?뚯씠???곌껐???딅뒗 ???紐낆떆?곸씤 `not_supported` ?먮윭 肄붾뱶瑜?JSON?쇰줈 ?묐떟?⑸땲??
-- **Capabilities ?몃뱶?곗씠??*: 珥덇린 ?묒냽 ??`system.capabilities` 援먰솚???꾩닔?뷀븯?? CLI ?댁씠 ?숈쟻?쇰줈 UI/紐낅졊???대갚(Fallback)?????덈룄濡??ㅺ퀎?⑸땲??
+새 연결은 첫 응답으로 `capabilities`를 반환해야 한다.
 
 ```json
 {
   "type": "capabilities",
   "version": 2,
+  "platform": "win32",
   "features": [
-    "split-pane",
+    "split_pane",
+    "browser_panel",
     "notifications",
-    "shell-report",
-    "browser-panel"
-  ],
-  "platform": "win32"
+    "shell_report"
+  ]
 }
 ```
 
-?대씪?댁뼵?몃뒗 ???묐떟???섏떊???ㅼ뿉留?湲곕뒫 紐낅졊??蹂대궡硫? `features` 諛곗뿴???녿뒗 湲곕뒫???붿껌??寃쎌슦 `not_supported` ?먮윭瑜?湲곕??섍퀬 ?곗븘?섍쾶 ?대갚?⑸땲??
+## 6. error code 표준
 
-### AI ?먯씠?꾪듃??蹂댁씪?ы뵆?덉씠??(蹂댁븞 ?뚯씠???앹꽦)
+| code | 의미 | retry |
+|------|------|-------|
+| `unsupported_version` | protocol version 미지원 | no |
+| `not_supported` | 현재 기능/플랫폼 미지원 | no |
+| `invalid_request` | schema 또는 필수 필드 오류 | no |
+| `unknown_command` | 존재하지 않는 command | no |
+| `payload_too_large` | 1 MiB 초과 | no |
+| `acl_denied` | same-user ACL 또는 identity 검증 실패 | no |
+| `pipe_connect_failed` | pipe 연결 실패 | yes |
+| `pipe_read_failed` | read 실패 | yes |
+| `pipe_write_failed` | write 실패 | yes |
+| `state_conflict` | 현재 앱 상태와 충돌 | depends |
+| `browser_cdp_unavailable` | CDP session 없음 | no |
+| `browser_cdp_failed` | CDP 호출 실패 | depends |
+| `settings_write_failed` | settings persistence 실패 | yes |
 
-```cpp
-// ?꾩옱 ?ъ슜??SID?먮쭔 GA 沅뚰븳??遺?ы븯??ACL ?앹꽦 ?덉떆
-wil::unique_hlocal_security_descriptor BuildSameUserPipeSecurityDescriptor() {
-    // ConvertStringSecurityDescriptorToSecurityDescriptorW ?ъ슜
-    // "D:(A;;GA;;;PS)" - PS??Personal Self(?꾩옱 ?ъ슜?? ?섎?
-    PSECURITY_DESCRIPTOR psd = nullptr;
-    if (ConvertStringSecurityDescriptorToSecurityDescriptorW(L"D:(A;;GA;;;PS)", SDDL_REVISION_1, &psd, nullptr)) {
-        return wil::unique_hlocal_security_descriptor(psd);
-    }
-    return nullptr;
+모든 error payload는 최소 아래 구조를 가진다.
+
+```json
+{
+  "type": "error",
+  "code": "invalid_request",
+  "message": "missing workspace_id"
 }
 ```
 
-### AI ?먯씠?꾪듃 IPC/CLI 泥댄겕由ъ뒪??
+## 7. 인증과 보안 규칙
 
-- [ ] **蹂댁븞 ACL ?곸슜**: `CreateNamedPipe` ?몄텧 ??`lpSecurityDescriptor`???꾩옱 ?ъ슜???꾩슜 ACL???좊떦?섏뿀?붽??
-- [ ] **硫붿떆吏 紐⑤뱶**: `PIPE_TYPE_MESSAGE` 諛?`PIPE_READMODE_MESSAGE`媛 ?ㅼ젙?섏뼱 JSON 寃쎄퀎媛 蹂댁〈?섎뒗媛?
-- [ ] **鍮꾨룞湲?I/O**: `FILE_FLAG_OVERLAPPED`? `PTP_IO`瑜??ъ슜?섏뿬 UI ?ㅻ젅??釉붾줈???놁씠 ?듭떊?섎뒗媛?
-- [ ] **?섏씠濡쒕뱶 ?쒗븳**: 1MiB ?댁긽???붿껌?????`payload_too_large` ?먮윭瑜??뺥솗??諛섑솚?섎뒗媛?
-- [ ] **Capabilities ?묐떟**: ?대씪?댁뼵???묒냽 ??泥??묐떟?쇰줈 ?뚮옯??諛?湲곕뒫 由ъ뒪?멸? ?닿릿 JSON???꾩넚?섎뒗媛?
+1. pipe 생성 시 same-user ACL 적용
+2. helper가 ACL 생성에 실패하면 pipe 생성도 실패
+3. 보안 실패를 무시하고 약한 descriptor로 생성하지 않음
 
+## 8. command routing 우선순위
+
+1. protocol handshake
+2. global app commands
+3. workspace/split commands
+4. panel-specific commands
+5. browser automation commands
+
+## 9. 테스트 기준
+
+M3 이후 최소 아래 케이스를 자동화한다.
+
+- same-user ACL pass/fail
+- oversized payload
+- unsupported version
+- unknown command
+- UI state conflict
+- browser automation unavailable
