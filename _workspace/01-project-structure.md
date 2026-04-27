@@ -36,7 +36,8 @@ cmux-win\
 ├─ resources\
 ├─ tests\
 ├─ _workspace\
-└─ cmux\   (reference only)
+├─ cmux\      (reference only)
+└─ ghostty\   (legacy/reference subtree, not a Windows implementation target)
 ```
 
 ## 3. 참조 트리와 새 트리의 관계
@@ -45,6 +46,7 @@ cmux-win\
 |------|------|-----------|
 | `cmux\Sources\...` | UX / behavior reference | Windows 구현을 위해 직접 수정하지 않음 |
 | `cmux\CLI\...` | 기존 CLI 흐름 참고 | 직접 포팅 금지, 구조만 참조 |
+| `ghostty\...` | legacy/upstream reference assets | Windows 구현을 위해 직접 수정하지 않음 |
 | `src\...` | Windows app 본체 | 실제 구현 위치 |
 | `cli\...` | `cmux.exe` | 실제 구현 위치 |
 | `ports\libvterm\` | overlay port | 버전 및 patch의 유일한 관리 위치 |

@@ -93,6 +93,30 @@
 
 - background -> UI 경계 처리 유틸 확보
 
+#### logging skeleton contract
+
+M0-5는 아래 logging contract를 기준으로 구현한다.
+
+| 항목 | 규칙 |
+|------|------|
+| API shape | `Logger::Debug`, `Info`, `Warn`, `Error` |
+| 필수 입력 | event name + message |
+| optional fields | key/value metadata |
+| file sink | `%LOCALAPPDATA%\cmux\logs\cmux.log` |
+| debug sink | Debug build에서 `OutputDebugString` mirror 허용 |
+| rotation | `cmux.log` + 최대 5개 rolled file, 각 10 MiB 상한 |
+
+#### redaction rules
+
+기본 로그에 아래는 남기지 않는다.
+
+- terminal 출력 전문
+- browser DOM / page HTML
+- notification body 원문
+- access token, cookie, authorization header
+
+에러 코드는 로그해도 되지만, 민감 payload 원문은 남기지 않는다.
+
 ### M0-6. Settings and shortcut schema
 
 **산출물**
@@ -103,6 +127,7 @@
 **완료 기준**
 
 - precedence, atomic write, migration 규칙 문서화 완료
+- v1 필드 이름 / 타입 / 기본값 고정
 
 ### M0-7. Release prework
 

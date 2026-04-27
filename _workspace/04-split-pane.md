@@ -14,6 +14,29 @@
 
 UI는 controller가 내보낸 snapshot만 반영한다.
 
+### `BonsplitController` 최소 public interface
+
+```cpp
+class BonsplitController {
+public:
+    LayoutSnapshot GetSnapshot() const;
+    uint64_t GetLayoutVersion() const;
+
+    PaneId GetActivePaneId() const;
+    std::optional<SurfaceId> GetSurfaceId(PaneId pane_id) const;
+
+    SplitResult SplitPane(PaneId target, SplitOrientation orientation);
+    CloseResult ClosePane(PaneId target);
+    MoveResult MovePane(PaneId source, PaneId destination, DropPosition position);
+    bool FocusPane(PaneId target);
+
+    void AttachSurface(PaneId pane_id, SurfaceId surface_id);
+    void DetachSurface(PaneId pane_id);
+};
+```
+
+이 인터페이스는 구현 클래스 이름이나 내부 자료구조를 고정하려는 목적이 아니라, M1/M3에서 필요한 최소 public contract를 잠그기 위한 스케치다.
+
 ## 2. snapshot 계약
 
 모든 구조 변경은 `LayoutSnapshot`으로 publish 한다.
@@ -23,6 +46,41 @@ UI는 controller가 내보낸 snapshot만 반영한다.
 - workspace 전환에 따른 root pane 교체
 
 UI는 최신 `layout_version`만 적용한다.
+
+### `LayoutSnapshot` 최소 필드
+
+```cpp
+struct LayoutSnapshot {
+    uint64_t layout_version;
+    PaneId active_pane_id;
+    PaneNode root;
+    std::vector<PanePresentation> panes;
+};
+
+enum class PaneNodeKind {
+    Leaf,
+    Split
+};
+
+struct PaneNode {
+    PaneNodeKind kind;
+    std::optional<PaneId> pane_id;
+    std::optional<SplitOrientation> orientation;
+    double primary_ratio;
+    std::vector<PaneNode> children;
+};
+
+struct PanePresentation {
+    PaneId pane_id;
+    std::optional<SurfaceId> surface_id;
+    double width_ratio;
+    double height_ratio;
+    bool is_active;
+    bool is_leaf;
+};
+```
+
+`PaneNode`는 publish되는 snapshot의 일부이므로 형태를 고정한다. v1에서 `Leaf` 노드는 `pane_id`를 가져야 하고 child가 없어야 하며, `Split` 노드는 `orientation`, `primary_ratio`, child 2개를 가져야 한다. `primary_ratio`는 **첫 번째 child의 비율** 을 의미한다. `panes` 컬렉션은 XAML projection 계층이 pane/surface binding과 active state를 빠르게 읽을 수 있도록 제공한다.
 
 ## 3. pane / surface ID 규칙
 

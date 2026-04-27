@@ -20,6 +20,26 @@ workspace는 최소 아래 속성을 가진다.
 - active workspace는 `TabManager`가 유일하게 보유
 - `ListView.SelectedItem`은 결과를 반영할 뿐 source of truth가 아님
 
+### `TabManager` 최소 public interface
+
+```cpp
+class TabManager {
+public:
+    std::vector<WorkspaceState> ListWorkspaces() const;
+    WorkspaceId GetActiveWorkspaceId() const;
+    std::optional<WorkspaceState> GetWorkspace(WorkspaceId workspace_id) const;
+
+    WorkspaceId CreateWorkspace(NewWorkspaceOptions const& options);
+    bool ActivateWorkspace(WorkspaceId workspace_id);
+    CloseWorkspaceResult CloseWorkspace(WorkspaceId workspace_id);
+
+    void ApplyWorkspaceMetadata(WorkspaceId workspace_id, WorkspaceMetadataUpdate const& update);
+    void SetUnreadCount(WorkspaceId workspace_id, uint32_t unread_count);
+};
+```
+
+이 스케치는 sidebar selection, workspace lifecycle, IPC routing이 같은 최소 contract를 공유하도록 하기 위한 것이다.
+
 ## 3. sidebar update batching
 
 메타데이터 업데이트는 batch 적용한다.
