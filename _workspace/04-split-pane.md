@@ -106,20 +106,54 @@ split 조작이나 workspace 전환 시 panel instance를 재생성하지 않는
 - move만으로 terminal/browser runtime dispose
 - focus 이동 중 panel recreate
 
-## 5. focus 복원 규칙
+### SwapChainPanel reparent 시 reattach token
+
+terminal panel을 다른 XAML container로 이동할 때, `SwapChainPanel`은 새 XAML parent에 연결되었음에도 Direct2D swapchain 연결이 끊겨 보일 수 있다. 이를 방지하기 위해 **reattach token** 패턴을 사용한다.
+
+- `TerminalPanel`은 내부적으로 `reattach_token` (uint64) 카운터를 보유한다.
+- split/reparent 직후 `reattach_token`을 증가시킨다.
+- `SwapChainPanel`의 XAML binding이 token 변화를 감지하면 `SetSwapChain()`을 재호출하여 D2D swapchain을 다시 연결한다.
+- 이 패턴은 macOS의 `viewReattachToken`에 대응하는 Windows 구현이다.
+
+## 5. 비포커스 패널 UX 규칙
+
+비포커스 terminal/browser 패널에는 dim overlay를 적용한다.
+
+- overlay opacity: Ghostty config의 `unfocused-split-opacity` 값 사용 (기본 0.15)
+- overlay fill color: `unfocused-split-fill` 값 사용 (기본 검정)
+- 포커스 이동 시 즉시 제거
+
+unread 알림이 있는 패널에는 **파란색 테두리 링**을 표시한다.
+
+## 6. isDirty 억제 정책
+
+`TerminalPanel.isDirty`는 **close 직전 확인 창이 필요한지**를 나타낸다.
+
+- `isDirty`는 항상 `false`를 반환하도록 고정한다.
+- VT 시퀀스 파싱이나 process exit 감지 기반의 dirty 오탐을 억제하기 위함이다.
+- close 확인은 `needsConfirmClose()` 메서드로 별도 처리한다.
+
+### needsConfirmClose 규칙
+
+`needsConfirmClose()`는 실제로 close 직전에만 호출한다.
+
+- child process가 실행 중이고, 쉘이 아닌 사용자 프로세스가 foreground에 있을 때만 `true` 반환
+- 주기적 polling이나 idle 상태에서 호출하지 않음
+
+## 7. focus 복원 규칙
 
 1. split 직후 새 pane가 focus를 가짐
 2. pane close 시 가장 가까운 sibling 우선
 3. sibling이 없으면 parent tree의 인접 pane
 4. workspace 전환 시 마지막 active pane 복원
 
-## 6. Grid / GridSplitter 규칙
+## 8. Grid / GridSplitter 규칙
 
 - 화면 구성은 XAML `Grid`
 - resize handle은 toolkit `GridSplitter`
 - splitter drag는 UI에서 처리하되 최종 ratio source of truth는 controller
 
-## 7. 공통 panel lifecycle 연결
+## 9. 공통 panel lifecycle 연결
 
 layout 계층은 panel lifecycle을 아래처럼만 호출한다.
 
@@ -132,9 +166,20 @@ layout 계층은 panel lifecycle을 아래처럼만 호출한다.
 
 layout code는 terminal/browser-specific cleanup을 직접 실행하지 않는다.
 
-## 8. M3 검증 기준
+## 10. 검색 오버레이
+
+terminal 패널에는 찾기 오버레이를 제공한다.
+
+- 오버레이는 패널 위에 float으로 표시 (XAML `Popup` 또는 `Canvas` 오버레이)
+- 드래그로 패널 내 위치 변경 가능
+- 4개 코너(좌상/우상/좌하/우하)에 snap 지원
+- 현재 N번째 / 전체 M개 매치 카운터 표시
+
+## 11. M3 검증 기준
 
 - split/close/move 후 `layout_version` 일관성 유지
 - pane focus 복원 규칙 준수
 - panel reparent 시 runtime 유지
 - overlay UI가 terminal/browser panel 위에 정상 표시
+- reparent 후 SwapChainPanel swapchain 정상 재연결 확인
+- 비포커스 패널 dim overlay 표시/제거 확인

@@ -20,11 +20,31 @@
 3. `settings.json` explicit overrides
 4. runtime-detected `support_matrix` recompute
 
-### 해석 규칙
+### Ghostty config에서 읽는 보조 필드
 
-- Ghostty config는 terminal theme/font 계열 기본값만 제공한다.
-- `settings.json`에 명시된 값이 있으면 항상 우선한다.
-- `support_matrix`는 사용자가 수동 편집하는 필드가 아니다.
+Ghostty config 파싱은 아래 필드를 terminal defaults로 제공한다.
+
+| Ghostty 키 | 설명 |
+|-----------|------|
+| `font-family` | 폰트 이름 |
+| `font-size` | 폰트 크기 |
+| `theme` | 테마 이름 |
+| `scrollback-limit` | 스크롤백 라인 수 |
+| `background`, `foreground` | 배경/전경 색상 |
+| `cursor-color`, `cursor-text` | 커서 색상 |
+| `selection-background`, `selection-foreground` | 선택 영역 색상 |
+| `palette` | 0~15 색상 팔레트 |
+| `unfocused-split-opacity` | 비포커스 split 투명도 |
+| `unfocused-split-fill` | 비포커스 split 채움 색 |
+| `split-divider-color` | split 구분선 색상 |
+
+Ghostty config 탐색 순서:
+1. `%APPDATA%\ghostty\config`
+2. `%APPDATA%\ghostty\config.ghostty`
+
+`settings.json`에 명시된 값이 있으면 위 Ghostty config 값을 덮어쓴다.
+
+> **⚠️ analytics.enabled 주의**: macOS cmux는 RELEASE 빌드에서 항상 analytics를 전송한다. Windows 포트는 반드시 `analytics.enabled = false`(기본값)를 지키고, 사용자가 명시적으로 opt-in해야만 전송해야 한다. 이를 어기면 개인정보처리방침 위반이 된다.
 
 ## 3. v1 `settings.json` 필드 스키마
 
@@ -47,7 +67,7 @@ v1에서 아래 필드는 이름, 타입, 기본값을 고정한다.
 | `browser.restore_session` | boolean | `true` | |
 | `notifications.toast_enabled` | boolean | `true` | |
 | `notifications.suppress_when_focused` | boolean | `true` | |
-| `analytics.enabled` | boolean | `false` | opt-in 전송만 허용 |
+| `analytics.enabled` | boolean | `false` | **opt-in 전송만 허용** — 반드시 사용자가 명시적으로 활성화해야 한다
 
 ### shortcut 필드 규칙
 
@@ -79,8 +99,21 @@ v1에서 아래 필드는 이름, 타입, 기본값을 고정한다.
     "font_family": "Cascadia Code"
   },
   "shortcuts": {
-    "toggle_sidebar": { "key": "B", "ctrl": true, "scope": "global" },
-    "new_workspace": { "key": "N", "ctrl": true, "scope": "global" }
+    "toggle_sidebar":    { "key": "B", "ctrl": true, "scope": "global" },
+    "new_workspace":     { "key": "N", "ctrl": true, "scope": "global" },
+    "close_workspace":   { "key": "W", "ctrl": true, "scope": "global" },
+    "split_right":       { "key": "D", "ctrl": true, "scope": "terminal" },
+    "split_down":        { "key": "D", "ctrl": true, "shift": true, "scope": "terminal" },
+    "next_surface":      { "key": "OEM_6", "ctrl": true, "shift": true, "scope": "terminal" },
+    "prev_surface":      { "key": "OEM_4", "ctrl": true, "shift": true, "scope": "terminal" },
+    "focus_left":        { "key": "Left", "ctrl": true, "alt": true, "scope": "terminal" },
+    "focus_right":       { "key": "Right", "ctrl": true, "alt": true, "scope": "terminal" },
+    "focus_up":          { "key": "Up", "ctrl": true, "alt": true, "scope": "terminal" },
+    "focus_down":        { "key": "Down", "ctrl": true, "alt": true, "scope": "terminal" },
+    "open_browser":      { "key": "L", "ctrl": true, "shift": true, "scope": "global" },
+    "show_notifications":{ "key": "I", "ctrl": true, "scope": "global" },
+    "jump_to_unread":    { "key": "U", "ctrl": true, "shift": true, "scope": "global" },
+    "trigger_flash":     { "key": "H", "ctrl": true, "shift": true, "scope": "global" }
   }
 }
 ```
