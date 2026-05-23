@@ -30,7 +30,7 @@
 - Settings file I/O
 - VT parse, dirty region 계산
 
-background 코드는 XAML object를 직접 만지지 않는다. UI 반영은 항상 `DispatcherQueue.TryEnqueue`를 거친다. enqueue 실패는 조용히 무시하지 않고 로그를 남긴다.
+background 코드는 XAML object를 직접 만지지 않는다. UI 반영은 항상 `DispatcherQueue.TryEnqueue`를 거친다. enqueue 실패는 조용히 무시하지 않고 Warning 레벨 앱 로그에 작업명과 함께 기록한다. 재시도는 하지 않는다.
 
 ---
 
@@ -42,7 +42,7 @@ background 코드는 XAML object를 직접 만지지 않는다. UI 반영은 항
 2. shell / notification background callbacks 차단
 3. panels detach
 4. terminal / browser runtime dispose
-5. settings flush 대기
+5. settings flush 대기 (debounce 대기 중인 write는 즉시 flush로 승격; 최대 5초 대기 후 초과 시 Warning 로그 기록 후 계속 진행)
 6. windows close
 7. bootstrap shutdown
 
@@ -56,7 +56,7 @@ background 코드는 XAML object를 직접 만지지 않는다. UI 반영은 항
 |----|-----------------|
 | active window | WindowManager |
 | active workspace | TabManager |
-| active pane / surface | BonsplitController + panel container |
+| active pane / surface | BonsplitController + panel container (BonsplitController: split tree 상태 및 레이아웃 버전 관리; panel container: active panel을 실제 host하는 XAML element) |
 | split tree / layout version | BonsplitController |
 | unread count | NotificationStore |
 | settings | `%APPDATA%\cmux\settings.json` |

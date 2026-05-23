@@ -10,6 +10,8 @@ v1의 공식 개발/CI 빌드 경로는 아래 하나로 고정한다.
 - **NuGet central package management**
 - **Windows App SDK bootstrap**
 
+공식 지원 아키텍처: **x64, arm64**. 다른 아키텍처(x86 등)는 공식 지원하지 않으며, 기여자가 자체 유지한다.
+
 ### 표준 명령
 
 ```powershell
@@ -47,6 +49,7 @@ ctest --preset dev-arm64 --output-on-failure
 | gtest | vcpkg | `vcpkg.json` |
 | Microsoft.Windows.CppWinRT | NuGet | `Directory.Packages.props` |
 | Windows App SDK | NuGet | `Directory.Packages.props` |
+| Windows App SDK bootstrap (WinAppSDK init) | NuGet + cmake init | `Directory.Packages.props` |
 | WebView2 SDK | NuGet | `Directory.Packages.props` |
 | CommunityToolkit controls | NuGet | `Directory.Packages.props` |
 
@@ -56,4 +59,4 @@ ctest --preset dev-arm64 --output-on-failure
 - `vendor\libvterm` 같은 별도 복사 금지 — libvterm은 반드시 `ports\libvterm\`만 사용
 - 로컬 전역 설치 버전에 의존하는 빌드 금지
 - pin 파일에 없는 패키지 버전 참조 금지
-- 예외가 필요하면 ADR과 빌드 재현 문서를 먼저 작성
+- 예외가 필요하면 ADR 문서를 먼저 작성한다. ADR에는 최소한 상황, 결정, 결과, 빌드 재현 절차를 포함해야 한다.

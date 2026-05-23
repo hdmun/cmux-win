@@ -4,6 +4,8 @@
 
 코드를 변경할 때 아래 문서를 함께 수정한다.
 
+> `12-tasks.md`는 milestone 작업 목록과 gate 정의를 담는다. 모든 기능 변경은 해당 milestone task의 완료 여부에 영향을 미치므로, 아래 표에서 포함된 항목은 항상 함께 수정한다.
+
 | 변경 유형 | 함께 수정할 문서 |
 |-----------|-----------------|
 | bootstrap / 빌드 구조 변경 | _workspace/01-project-structure.md, _workspace/11-build-release.md, _workspace/12-tasks.md |
@@ -13,8 +15,18 @@
 | sidebar / workspace lifecycle 변경 | _workspace/05-sidebar-tabs.md, _workspace/12-tasks.md |
 | notification 변경 | _workspace/07-notification.md, _workspace/12-tasks.md |
 | shell integration 변경 | _workspace/10-shell-integration.md, _workspace/08-ipc-cli.md, _workspace/12-tasks.md |
+| `.rules` 파일 추가/변경/삭제 | AGENTS.md (인덱스 테이블) |
 
 구현보다 문서가 뒤처진 상태를 허용하지 않는다.
+
+---
+
+## PR 머지 전 체크리스트
+
+- [ ] 변경 유형을 위 표에서 확인했는가?
+- [ ] 해당하는 `_workspace/` 문서를 모두 수정했는가?
+- [ ] `12-tasks.md`의 관련 task 상태를 업데이트했는가?
+- [ ] `.rules` 파일을 변경했다면 `AGENTS.md` 인덱스를 갱신했는가?
 
 ---
 
