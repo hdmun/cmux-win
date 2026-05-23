@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "milestone_id": "m0",
+  "display_name": "M0",
+  "depends_on": [],
+  "doc_refs": [
+    "_workspace/11-build-release.md",
+    "_workspace/12-tasks.md",
+    "_workspace/13-autonomous-execution.md"
+  ],
+  "tasks": [
+    {
+      "task_id": "m0-1",
+      "title": "Build bootstrap skeleton",
+      "status": "ready",
+      "summary": "Create the canonical Windows bootstrap files and build entrypoints.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/11-build-release.md",
+        "_workspace/15-scaffolding.md"
+      ],
+      "touches": [
+        "CMakeLists.txt",
+        "CMakePresets.json",
+        "src/CMakeLists.txt",
+        "cli/CMakeLists.txt",
+        "Directory.Packages.props",
+        "NuGet.config"
+      ],
+      "acceptance": [
+        "cmake --preset dev-x64",
+        "cmake --build --preset dev-x64",
+        "ctest --preset dev-x64 --output-on-failure"
+      ],
+      "commands": [
+        "cmake --preset dev-x64",
+        "cmake --build --preset dev-x64",
+        "ctest --preset dev-x64 --output-on-failure"
+      ],
+      "outputs": [
+        "CMakeLists.txt",
+        "CMakePresets.json",
+        "src/CMakeLists.txt",
+        "cli/CMakeLists.txt",
+        "Directory.Packages.props",
+        "NuGet.config"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m0-2",
+      "title": "Dependency pinning and overlay ports",
+      "status": "ready",
+      "summary": "Create vcpkg and NuGet pinning files, including the libvterm overlay location.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/11-build-release.md",
+        "_workspace/03-terminal-engine.md"
+      ],
+      "touches": [
+        "vcpkg.json",
+        "vcpkg-configuration.json",
+        "ports/libvterm"
+      ],
+      "acceptance": [
+        "manual: verify libvterm overlay path is fixed at ports/libvterm",
+        "manual: verify NuGet and vcpkg ownership is not duplicated"
+      ],
+      "commands": [],
+      "outputs": [
+        "vcpkg.json",
+        "vcpkg-configuration.json",
+        "ports/libvterm"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m0-3",
+      "title": "Runtime manifest and resources",
+      "status": "ready",
+      "summary": "Create the manifest and resource skeleton used by the unpackaged desktop app.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/11-build-release.md",
+        "_workspace/15-scaffolding.md"
+      ],
+      "touches": [
+        "resources/app.manifest",
+        "resources/*.rc"
+      ],
+      "acceptance": [
+        "manual: verify manifest locks DPI awareness and compatibility decisions"
+      ],
+      "commands": [],
+      "outputs": [
+        "resources/app.manifest",
+        "resources/*.rc"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m0-4",
+      "title": "ADR freeze",
+      "status": "ready",
+      "summary": "Write the required ADRs for threading, passthrough fallback, parser choice, and panel lifecycle.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/14-adr-guide.md",
+        "_workspace/03-terminal-engine.md",
+        "_workspace/04-split-pane.md",
+        "_workspace/06-browser-panel.md"
+      ],
+      "touches": [
+        "_workspace/adr"
+      ],
+      "acceptance": [
+        "manual: verify adr-0001 through adr-0004 exist and are cross-referenced from the domain docs"
+      ],
+      "commands": [],
+      "outputs": [
+        "_workspace/adr/adr-0001-terminal-threading.md",
+        "_workspace/adr/adr-0002-conpty-passthrough-fallback.md",
+        "_workspace/adr/adr-0003-parser-selection.md",
+        "_workspace/adr/adr-0004-panel-lifecycle.md"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m0-5",
+      "title": "Shared utilities",
+      "status": "ready",
+      "summary": "Add logging, string/encoding, and dispatcher helper scaffolding.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/02-core-app.md",
+        "_workspace/12-tasks.md"
+      ],
+      "touches": [
+        "src/utils"
+      ],
+      "acceptance": [
+        "manual: verify background-to-UI boundary helpers exist"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/utils"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m0-6",
+      "title": "Settings and shortcut schema",
+      "status": "ready",
+      "summary": "Lock settings schema, shortcut scopes, precedence, migration, and atomic write rules.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/09-config-settings.md"
+      ],
+      "touches": [
+        "_workspace/09-config-settings.md"
+      ],
+      "acceptance": [
+        "manual: verify field names, types, and defaults are fixed in the doc"
+      ],
+      "commands": [],
+      "outputs": [
+        "_workspace/09-config-settings.md"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m0-7",
+      "title": "Release prework",
+      "status": "ready",
+      "summary": "Separate release-only backlog items from implementation-start scope.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/11-build-release.md",
+        "_workspace/12-tasks.md"
+      ],
+      "touches": [
+        "_workspace/11-build-release.md",
+        "_workspace/12-tasks.md"
+      ],
+      "acceptance": [
+        "manual: verify release-only tasks are separated from implementation tasks"
+      ],
+      "commands": [],
+      "outputs": [
+        "_workspace/11-build-release.md",
+        "_workspace/12-tasks.md"
+      ],
+      "blocked_by": [],
+      "notes": []
+    }
+  ]
+}

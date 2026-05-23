@@ -33,6 +33,7 @@ cmux-win\
 │  ├─ config\
 │  └─ utils\
 ├─ cli\
+├─ plans\
 ├─ resources\
 ├─ tests\
 ├─ _workspace\
@@ -47,6 +48,7 @@ cmux-win\
 | `cmux\Sources\...` | UX / behavior reference | Windows 구현을 위해 직접 수정하지 않음 |
 | `cmux\CLI\...` | 기존 CLI 흐름 참고 | 직접 포팅 금지, 구조만 참조 |
 | `ghostty\...` | legacy/upstream reference assets | Windows 구현을 위해 직접 수정하지 않음 |
+| `plans\...` | machine-readable task registry / session execution metadata | 코드 추가 금지, JSON/README/schema만 허용 |
 | `src\...` | Windows app 본체 | 실제 구현 위치 |
 | `cli\...` | `cmux.exe` | 실제 구현 위치 |
 | `ports\libvterm\` | overlay port | 버전 및 patch의 유일한 관리 위치 |
@@ -100,13 +102,15 @@ M0 종료 시 아래 파일이 저장소에 존재해야 한다.
 - `cmux\`
 - `ghostty\`
 - `_workspace\`
+- `plans\`
 
-`_workspace\`는 계획 문서 전용이다.
+`_workspace\`는 계획 문서 전용이고, `plans\`는 committed task/state JSON 전용이다.
 
 ## 8. 문서 갱신 규칙
 
-저장소 구조가 바뀌면 최소 아래 세 문서를 동시에 갱신한다.
+저장소 구조가 바뀌면 최소 아래 네 문서를 동시에 갱신한다.
 
 - `01-project-structure.md`
 - `11-build-release.md`
 - `12-tasks.md`
+- `13-autonomous-execution.md`

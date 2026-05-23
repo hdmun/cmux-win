@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "milestone_id": "m5",
+  "display_name": "M5",
+  "depends_on": [
+    "m3",
+    "m4"
+  ],
+  "doc_refs": [
+    "_workspace/08-ipc-cli.md",
+    "_workspace/12-tasks.md"
+  ],
+  "tasks": [
+    {
+      "task_id": "m5-1",
+      "title": "cmux.exe CLI + capabilities handshake",
+      "status": "pending",
+      "summary": "Implement the CLI entrypoint and the capabilities handshake path.",
+      "depends_on": [
+        "m3-1"
+      ],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md"
+      ],
+      "touches": [
+        "cli",
+        "src/ipc"
+      ],
+      "acceptance": [
+        "manual: verify capabilities response matches protocol version 2"
+      ],
+      "commands": [],
+      "outputs": [
+        "cli",
+        "src/ipc"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m5-2",
+      "title": "Workspace/panel control commands",
+      "status": "pending",
+      "summary": "Implement CLI and IPC routing for workspace and panel control commands.",
+      "depends_on": [
+        "m5-1"
+      ],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md"
+      ],
+      "touches": [
+        "cli",
+        "src/ipc",
+        "src/core"
+      ],
+      "acceptance": [
+        "manual: verify command routing matches the published command catalog"
+      ],
+      "commands": [],
+      "outputs": [
+        "cli",
+        "src/ipc",
+        "src/core"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m5-3",
+      "title": "Crash/log/privacy policy freeze",
+      "status": "pending",
+      "summary": "Lock crash, logging, and privacy behavior before crash capture integration.",
+      "depends_on": [
+        "m0-6"
+      ],
+      "doc_refs": [
+        "_workspace/07-notification.md",
+        "_workspace/09-config-settings.md",
+        "_workspace/12-tasks.md"
+      ],
+      "touches": [
+        "_workspace/07-notification.md",
+        "_workspace/09-config-settings.md"
+      ],
+      "acceptance": [
+        "manual: verify redaction policy and analytics opt-in are fixed"
+      ],
+      "commands": [],
+      "outputs": [
+        "_workspace/07-notification.md",
+        "_workspace/09-config-settings.md"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m5-4",
+      "title": "Crash capture integration",
+      "status": "pending",
+      "summary": "Implement crash capture only after crash and privacy policy is frozen.",
+      "depends_on": [
+        "m5-3"
+      ],
+      "doc_refs": [
+        "_workspace/12-tasks.md"
+      ],
+      "touches": [
+        "src/app",
+        "resources"
+      ],
+      "acceptance": [
+        "manual: verify crash capture honors the frozen log/privacy policy"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/app",
+        "resources"
+      ],
+      "blocked_by": [],
+      "notes": []
+    }
+  ]
+}

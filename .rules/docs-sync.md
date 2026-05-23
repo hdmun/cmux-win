@@ -9,6 +9,9 @@
 | 변경 유형 | 함께 수정할 문서 |
 |-----------|-----------------|
 | bootstrap / 빌드 구조 변경 | _workspace/01-project-structure.md, _workspace/11-build-release.md, _workspace/12-tasks.md |
+| autonomous execution / task registry 변경 | _workspace/13-autonomous-execution.md, _workspace/session-state.md, plans/index.json, plans/milestones/*.json, _workspace/12-tasks.md |
+| ADR / gate contract 변경 | _workspace/14-adr-guide.md, _workspace/12-tasks.md, 관련 도메인 _workspace 문서 |
+| scaffolding / test strategy 변경 | _workspace/15-scaffolding.md, _workspace/16-test-strategy.md, _workspace/11-build-release.md, _workspace/12-tasks.md |
 | IPC protocol / schema 변경 | _workspace/08-ipc-cli.md, _workspace/12-tasks.md |
 | settings 필드/schema 변경 | _workspace/09-config-settings.md, _workspace/12-tasks.md |
 | panel lifecycle 변경 | _workspace/03-terminal-engine.md, _workspace/04-split-pane.md, _workspace/06-browser-panel.md |
@@ -24,8 +27,9 @@
 ## PR 머지 전 체크리스트
 
 - [ ] 변경 유형을 위 표에서 확인했는가?
-- [ ] 해당하는 `_workspace/` 문서를 모두 수정했는가?
-- [ ] `12-tasks.md`의 관련 task 상태를 업데이트했는가?
+- [ ] 해당하는 `_workspace/` 및 `plans/` 문서를 모두 수정했는가?
+- [ ] 관련 `plans/milestones/*.json`와 `_workspace/session-state.md` 상태를 업데이트했는가?
+- [ ] `12-tasks.md`의 관련 milestone/gate 설명을 업데이트했는가?
 - [ ] `.rules` 파일을 변경했다면 `AGENTS.md` 인덱스를 갱신했는가?
 
 ---
@@ -47,3 +51,10 @@
 | _workspace/10-shell-integration.md | PowerShell/CMD/WSL integration, env var 주입 |
 | _workspace/11-build-release.md | 빌드 부트스트랩, dependency pinning, CI 원칙 |
 | _workspace/12-tasks.md | milestone 작업 목록, gate 정의, 검증 기준 |
+| _workspace/13-autonomous-execution.md | `_workspace` / `plans` / `.rules` authority split, read order |
+| _workspace/14-adr-guide.md | ADR 위치, 템플릿, M0-4 필수 ADR |
+| _workspace/15-scaffolding.md | bootstrap starter file, target naming, scaffold 규칙 |
+| _workspace/16-test-strategy.md | test layout, task acceptance, mocking seam |
+| _workspace/session-state.md | 세션 handoff snapshot |
+| plans/index.json | milestone registry, status enum, startup read order |
+| plans/milestones/*.json | machine-readable task 상태, 의존성, acceptance |

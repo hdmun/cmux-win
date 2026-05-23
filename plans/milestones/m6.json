@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "milestone_id": "m6",
+  "display_name": "M6",
+  "depends_on": [
+    "m3",
+    "m5"
+  ],
+  "doc_refs": [
+    "_workspace/07-notification.md",
+    "_workspace/09-config-settings.md",
+    "_workspace/10-shell-integration.md",
+    "_workspace/12-tasks.md"
+  ],
+  "tasks": [
+    {
+      "task_id": "m6-1",
+      "title": "NotificationStore + toast",
+      "status": "pending",
+      "summary": "Implement NotificationStore, in-app ring projection, and toast integration.",
+      "depends_on": [
+        "m3-3"
+      ],
+      "doc_refs": [
+        "_workspace/07-notification.md"
+      ],
+      "touches": [
+        "src/notification",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify toast failures degrade without breaking in-app notifications"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/notification",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-2",
+      "title": "Settings persistence and migration",
+      "status": "pending",
+      "summary": "Implement settings source of truth, atomic write, and migration behavior.",
+      "depends_on": [
+        "m0-6"
+      ],
+      "doc_refs": [
+        "_workspace/09-config-settings.md"
+      ],
+      "touches": [
+        "src/config"
+      ],
+      "acceptance": [
+        "manual: verify backup-on-migration and explicit failure surfacing"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/config"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-3",
+      "title": "Shortcut routing engine",
+      "status": "pending",
+      "summary": "Implement shortcut scopes, validation, and routing behavior.",
+      "depends_on": [
+        "m6-2"
+      ],
+      "doc_refs": [
+        "_workspace/09-config-settings.md"
+      ],
+      "touches": [
+        "src/config",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify conflicts are rejected and scope rules are enforced"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/config",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-4",
+      "title": "Shell integration scripts",
+      "status": "pending",
+      "summary": "Implement PowerShell/CMD/WSL shell integration scripts and direct-pipe metadata reporting.",
+      "depends_on": [
+        "m5-1"
+      ],
+      "doc_refs": [
+        "_workspace/10-shell-integration.md",
+        "_workspace/08-ipc-cli.md"
+      ],
+      "touches": [
+        "resources/shell-integration",
+        "src/ipc"
+      ],
+      "acceptance": [
+        "manual: verify no prompt blocking and schema-aligned direct-pipe payloads"
+      ],
+      "commands": [],
+      "outputs": [
+        "resources/shell-integration",
+        "src/ipc"
+      ],
+      "blocked_by": [],
+      "notes": []
+    }
+  ]
+}

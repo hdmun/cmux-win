@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "milestone_id": "m3",
+  "display_name": "M3",
+  "depends_on": [
+    "m1",
+    "m2"
+  ],
+  "doc_refs": [
+    "_workspace/04-split-pane.md",
+    "_workspace/05-sidebar-tabs.md",
+    "_workspace/08-ipc-cli.md",
+    "_workspace/12-tasks.md"
+  ],
+  "tasks": [
+    {
+      "task_id": "m3-1",
+      "title": "ControlServer foundation",
+      "status": "pending",
+      "summary": "Implement the Named Pipe control server foundation.",
+      "depends_on": [
+        "m1-2"
+      ],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md"
+      ],
+      "touches": [
+        "src/ipc"
+      ],
+      "acceptance": [
+        "manual: verify same-user ACL and message-mode transport"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/ipc"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m3-2",
+      "title": "Split layout controller + XAML projection",
+      "status": "pending",
+      "summary": "Implement the BonsplitController and project snapshots into XAML.",
+      "depends_on": [
+        "m2-4"
+      ],
+      "doc_refs": [
+        "_workspace/04-split-pane.md"
+      ],
+      "touches": [
+        "src/core",
+        "src/ui",
+        "src/panels"
+      ],
+      "acceptance": [
+        "manual: verify split/close/move keep layout_version consistent"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/core",
+        "src/ui",
+        "src/panels"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m3-3",
+      "title": "Sidebar/workspace state projection",
+      "status": "pending",
+      "summary": "Implement TabManager-backed sidebar projection and metadata batching.",
+      "depends_on": [
+        "m1-2"
+      ],
+      "doc_refs": [
+        "_workspace/05-sidebar-tabs.md"
+      ],
+      "touches": [
+        "src/core",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify active workspace source of truth remains in TabManager"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/core",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m3-4",
+      "title": "Tab/workspace lifecycle rules",
+      "status": "pending",
+      "summary": "Implement lifecycle and selection rules for workspaces and tabs.",
+      "depends_on": [
+        "m3-2",
+        "m3-3"
+      ],
+      "doc_refs": [
+        "_workspace/05-sidebar-tabs.md",
+        "_workspace/04-split-pane.md"
+      ],
+      "touches": [
+        "src/core",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify close selection follows the documented left-priority rule"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/core",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m3-5",
+      "title": "IPC TDD for split/focus/state conflict",
+      "status": "pending",
+      "summary": "Add tests for IPC error handling and state conflicts around split/focus operations.",
+      "depends_on": [
+        "m3-1",
+        "m3-4"
+      ],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md",
+        "_workspace/16-test-strategy.md"
+      ],
+      "touches": [
+        "tests/unit/ipc",
+        "tests/integration"
+      ],
+      "acceptance": [
+        "manual: verify error codes and payload limits match the contract"
+      ],
+      "commands": [],
+      "outputs": [
+        "tests/unit/ipc",
+        "tests/integration"
+      ],
+      "blocked_by": [],
+      "notes": []
+    }
+  ]
+}

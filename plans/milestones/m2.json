@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "milestone_id": "m2",
+  "display_name": "M2",
+  "depends_on": [
+    "m0",
+    "m1"
+  ],
+  "doc_refs": [
+    "_workspace/03-terminal-engine.md",
+    "_workspace/12-tasks.md"
+  ],
+  "tasks": [
+    {
+      "task_id": "m2-1",
+      "title": "ConPTY process and I/O pipeline",
+      "status": "pending",
+      "summary": "Implement the ConPTY spawn path and terminal I/O pipeline.",
+      "depends_on": [
+        "m0-4",
+        "m1-1"
+      ],
+      "doc_refs": [
+        "_workspace/03-terminal-engine.md",
+        "_workspace/16-test-strategy.md"
+      ],
+      "touches": [
+        "src/terminal"
+      ],
+      "acceptance": [
+        "manual: verify standard ConPTY mode works on Win10"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/terminal"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m2-2",
+      "title": "libvterm wrapper + terminal buffer",
+      "status": "pending",
+      "summary": "Wrap libvterm and define the terminal buffer integration.",
+      "depends_on": [
+        "m2-1"
+      ],
+      "doc_refs": [
+        "_workspace/03-terminal-engine.md"
+      ],
+      "touches": [
+        "src/terminal"
+      ],
+      "acceptance": [
+        "manual: verify parser path uses libvterm without a custom VT parser"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/terminal"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m2-3",
+      "title": "Direct2D renderer",
+      "status": "pending",
+      "summary": "Implement the Direct2D/DirectWrite renderer for published frames.",
+      "depends_on": [
+        "m1-1"
+      ],
+      "doc_refs": [
+        "_workspace/03-terminal-engine.md"
+      ],
+      "touches": [
+        "src/terminal",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify dirty-region-based redraw path"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/terminal",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m2-4",
+      "title": "SwapChainPanel host integration",
+      "status": "pending",
+      "summary": "Attach the terminal renderer to the WinUI 3 SwapChainPanel host.",
+      "depends_on": [
+        "m2-3"
+      ],
+      "doc_refs": [
+        "_workspace/03-terminal-engine.md",
+        "_workspace/04-split-pane.md"
+      ],
+      "touches": [
+        "src/panels",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify host integration survives reattach_token changes"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/panels",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m2-5",
+      "title": "IME + UIA",
+      "status": "pending",
+      "summary": "Implement IME rect updates and baseline UIA support.",
+      "depends_on": [
+        "m2-4"
+      ],
+      "doc_refs": [
+        "_workspace/03-terminal-engine.md"
+      ],
+      "touches": [
+        "src/terminal",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify IME candidate window placement and text exposure through UIA"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/terminal",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    }
+  ]
+}

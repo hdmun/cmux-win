@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "milestone_id": "m1",
+  "display_name": "M1",
+  "depends_on": [
+    "m0"
+  ],
+  "doc_refs": [
+    "_workspace/02-core-app.md",
+    "_workspace/12-tasks.md"
+  ],
+  "tasks": [
+    {
+      "task_id": "m1-1",
+      "title": "WinUI 3 app + main window bootstrap",
+      "status": "pending",
+      "summary": "Create the WinUI 3 application entrypoint and first MainWindow bootstrap.",
+      "depends_on": [
+        "m0-1"
+      ],
+      "doc_refs": [
+        "_workspace/02-core-app.md",
+        "_workspace/15-scaffolding.md"
+      ],
+      "touches": [
+        "src/app",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify first MainWindow creation on STA thread"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/app",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m1-2",
+      "title": "WindowManager and window lifecycle",
+      "status": "pending",
+      "summary": "Implement WindowManager and the canonical lifecycle states.",
+      "depends_on": [
+        "m1-1"
+      ],
+      "doc_refs": [
+        "_workspace/02-core-app.md"
+      ],
+      "touches": [
+        "src/app",
+        "src/core"
+      ],
+      "acceptance": [
+        "manual: verify active window tracking and close order"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/app",
+        "src/core"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m1-3",
+      "title": "Titlebar / backdrop / fallback",
+      "status": "pending",
+      "summary": "Implement titlebar customization and Win10/Win11 backdrop fallback behavior.",
+      "depends_on": [
+        "m1-1"
+      ],
+      "doc_refs": [
+        "_workspace/02-core-app.md",
+        "_workspace/09-config-settings.md"
+      ],
+      "touches": [
+        "src/ui",
+        "src/app"
+      ],
+      "acceptance": [
+        "manual: verify backdrop fallback matches support matrix"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/ui",
+        "src/app"
+      ],
+      "blocked_by": [],
+      "notes": []
+    }
+  ]
+}

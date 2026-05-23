@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "authority_model": {
+    "_workspace": "architecture_and_contracts",
+    "plans": "machine_readable_task_state",
+    "rules": "agent_operating_constraints",
+    "session_state": "_workspace/session-state.md"
+  },
+  "startup_read_order": [
+    {
+      "step": 1,
+      "kind": "workspace_doc",
+      "path": "_workspace/00-overview.md"
+    },
+    {
+      "step": 2,
+      "kind": "workspace_doc",
+      "path": "_workspace/12-tasks.md"
+    },
+    {
+      "step": 3,
+      "kind": "plan_index",
+      "path": "plans/index.json"
+    },
+    {
+      "step": 4,
+      "kind": "milestone_plan",
+      "path_template": "plans/milestones/<active_milestone>.json",
+      "selection_from": "active_milestone"
+    },
+    {
+      "step": 5,
+      "kind": "session_handoff",
+      "path": "_workspace/session-state.md"
+    },
+    {
+      "step": 6,
+      "kind": "queue_rules",
+      "path_pattern": ".rules/*.md",
+      "selection_from": "current_task_queue",
+      "selection_mapping_doc": ".rules/agent-workflow.md"
+    },
+    {
+      "step": 7,
+      "kind": "task_doc_refs",
+      "selection_from": "selected_task.doc_refs",
+      "selection_file": "plans/milestones/<active_milestone>.json"
+    }
+  ],
+  "status_enum": [
+    "pending",
+    "ready",
+    "in_progress",
+    "blocked",
+    "done"
+  ],
+  "milestones": [
+    {
+      "milestone_id": "m0",
+      "display_name": "M0",
+      "file": "plans/milestones/m0.json",
+      "depends_on": []
+    },
+    {
+      "milestone_id": "m1",
+      "display_name": "M1",
+      "file": "plans/milestones/m1.json",
+      "depends_on": [
+        "m0"
+      ]
+    },
+    {
+      "milestone_id": "m2",
+      "display_name": "M2",
+      "file": "plans/milestones/m2.json",
+      "depends_on": [
+        "m0",
+        "m1"
+      ]
+    },
+    {
+      "milestone_id": "m3",
+      "display_name": "M3",
+      "file": "plans/milestones/m3.json",
+      "depends_on": [
+        "m1",
+        "m2"
+      ]
+    },
+    {
+      "milestone_id": "m4",
+      "display_name": "M4",
+      "file": "plans/milestones/m4.json",
+      "depends_on": [
+        "m1",
+        "m3"
+      ]
+    },
+    {
+      "milestone_id": "m5",
+      "display_name": "M5",
+      "file": "plans/milestones/m5.json",
+      "depends_on": [
+        "m3",
+        "m4"
+      ]
+    },
+    {
+      "milestone_id": "m6",
+      "display_name": "M6",
+      "file": "plans/milestones/m6.json",
+      "depends_on": [
+        "m3",
+        "m5"
+      ]
+    }
+  ],
+  "release_backlog_doc": "_workspace/12-tasks.md#7-release-only-backlog"
+}

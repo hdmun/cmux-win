@@ -26,6 +26,16 @@
 - M6 착수 전: M3, M5 완료
 - M7 착수 전: 기능 범위 잠금 및 release-only backlog 분리 완료
 
+### machine-readable execution state
+
+이 문서는 milestone/gate의 사람용 설명을 유지한다. durable task 상태와 의존성 해석은 아래 파일을 함께 사용한다.
+
+- `plans\index.json`
+- `plans\milestones\m0.json` ~ `m6.json`
+- `_workspace\session-state.md`
+
+Markdown 설명과 JSON 상태가 충돌하면, 계약 내용은 `_workspace\*.md`가 우선이고 task 상태는 `plans\`가 우선이다.
+
 ## 3. M0 상세 작업
 
 ### M0-1. Build bootstrap skeleton
@@ -72,14 +82,15 @@
 
 **산출물**
 
-- terminal threading contract
-- passthrough fallback contract
-- parser selection rationale
-- panel lifecycle contract
+- `_workspace\adr\adr-0001-terminal-threading.md`
+- `_workspace\adr\adr-0002-conpty-passthrough-fallback.md`
+- `_workspace\adr\adr-0003-parser-selection.md`
+- `_workspace\adr\adr-0004-panel-lifecycle.md`
 
 **완료 기준**
 
 - `_workspace\03`, `04`, `06`, `08`, `09`에 교차 참조 가능한 규약이 고정됨
+- `_workspace\14-adr-guide.md`의 규칙과 파일명이 일치함
 
 ### M0-5. Shared utilities
 
@@ -214,6 +225,9 @@ M0-5는 아래 logging contract를 기준으로 구현한다.
 기능 구현 시 아래 문서는 함께 수정한다.
 
 - bootstrap 변경: `01`, `11`, `12`
+- autonomous execution / task registry 변경: `13`, `session-state`, `plans/index.json`, `plans/milestones/*.json`
+- ADR / gate contract 변경: `14`, 관련 도메인 문서, `12`
 - protocol 변경: `08`, `12`
 - settings 변경: `09`, `12`
 - panel lifecycle 변경: `03`, `04`, `06`
+- scaffolding / test strategy 변경: `15`, `16`, `12`

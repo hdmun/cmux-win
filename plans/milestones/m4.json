@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "milestone_id": "m4",
+  "display_name": "M4",
+  "depends_on": [
+    "m1",
+    "m3"
+  ],
+  "doc_refs": [
+    "_workspace/06-browser-panel.md",
+    "_workspace/12-tasks.md"
+  ],
+  "tasks": [
+    {
+      "task_id": "m4-1",
+      "title": "Browser panel host",
+      "status": "pending",
+      "summary": "Implement the WebView2 browser panel host and environment pooling.",
+      "depends_on": [
+        "m1-1"
+      ],
+      "doc_refs": [
+        "_workspace/06-browser-panel.md"
+      ],
+      "touches": [
+        "src/panels",
+        "src/ui"
+      ],
+      "acceptance": [
+        "manual: verify WebView2 host survives workspace and split transitions"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/panels",
+        "src/ui"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m4-2",
+      "title": "Omnibar and navigation UX",
+      "status": "pending",
+      "summary": "Implement omnibar input rules, focus behavior, and navigation suggestions.",
+      "depends_on": [
+        "m4-1"
+      ],
+      "doc_refs": [
+        "_workspace/06-browser-panel.md"
+      ],
+      "touches": [
+        "src/ui",
+        "src/panels"
+      ],
+      "acceptance": [
+        "manual: verify URL normalization and Ctrl+L behavior"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/ui",
+        "src/panels"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m4-3",
+      "title": "CDP automation contract",
+      "status": "pending",
+      "summary": "Implement browser automation through the documented CDP contract.",
+      "depends_on": [
+        "m4-1",
+        "m3-1"
+      ],
+      "doc_refs": [
+        "_workspace/06-browser-panel.md",
+        "_workspace/08-ipc-cli.md"
+      ],
+      "touches": [
+        "src/panels",
+        "src/ipc"
+      ],
+      "acceptance": [
+        "manual: verify CDP unavailable and failed paths return explicit errors"
+      ],
+      "commands": [],
+      "outputs": [
+        "src/panels",
+        "src/ipc"
+      ],
+      "blocked_by": [],
+      "notes": []
+    }
+  ]
+}

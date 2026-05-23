@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cmux-win.local/plans/task-registry.schema.json",
+  "title": "cmux-win task registry",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "milestone_id",
+    "display_name",
+    "depends_on",
+    "tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "milestone_id": {
+      "type": "string",
+      "pattern": "^m[0-9]+$"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "depends_on": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^m[0-9]+$"
+      }
+    },
+    "doc_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    }
+  },
+  "$defs": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "ready",
+        "in_progress",
+        "blocked",
+        "done"
+      ]
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "task_id",
+        "title",
+        "status",
+        "summary",
+        "depends_on",
+        "doc_refs",
+        "touches",
+        "acceptance",
+        "commands",
+        "outputs",
+        "blocked_by",
+        "notes"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^m[0-9]+-[0-9]+$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^m[0-9]+-[0-9]+$"
+          }
+        },
+        "doc_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "touches": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptance": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blocked_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
