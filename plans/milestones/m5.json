@@ -29,16 +29,15 @@
       "acceptance": [
         "manual: verify capabilities response matches protocol version 2"
       ],
-      "commands": [],
-      "outputs": [
-        "cli",
-        "src/ipc"
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux",
+        "ctest --preset dev-x64 -R cli --output-on-failure"
       ],
-      "blocked_by": [],
-      "notes": []
-    },
-    {
-      "task_id": "m5-2",
+      "outputs": [
+        "cli/main.cpp",
+        "cli/cmux_client.h",
+        "cli/cmux_client.cpp"
+      ],
       "title": "Workspace/panel control commands",
       "status": "pending",
       "summary": "Implement CLI and IPC routing for workspace and panel control commands.",
@@ -56,11 +55,15 @@
       "acceptance": [
         "manual: verify command routing matches the published command catalog"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux",
+        "ctest --preset dev-x64 -R ipc_commands --output-on-failure"
+      ],
       "outputs": [
-        "cli",
-        "src/ipc",
-        "src/core"
+        "cli/workspace_commands.h",
+        "cli/workspace_commands.cpp",
+        "src/ipc/command_dispatcher.h",
+        "src/ipc/command_dispatcher.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -102,22 +105,33 @@
         "m5-3"
       ],
       "doc_refs": [
-        "_workspace/12-tasks.md"
+        "_workspace/12-tasks.md",
+        "_workspace/adr/adr-0002-conpty-passthrough-fallback.md"
       ],
       "touches": [
-        "src/app",
-        "resources"
+        "src/core/crash_reporter.h",
+        "src/core/crash_reporter.cpp"
       ],
       "acceptance": [
-        "manual: verify crash capture honors the frozen log/privacy policy"
+        "manual: verify crash capture honors the frozen log/privacy policy from m5-3",
+        "manual: verify Crashpad is initialized via InitializeCrashpad() before any other app logic",
+        "manual: verify minidump is generated in %LOCALAPPDATA%\\cmux\\crashes\\ on simulated crash",
+        "manual: verify crash reporter respects analytics opt-in setting (no upload if opted-out)"
       ],
-      "commands": [],
+      "commands": [
+        "vcpkg install crashpad",
+        "cmake --build --preset dev-x64 --target cmux-win"
+      ],
       "outputs": [
-        "src/app",
-        "resources"
+        "src/core/crash_reporter.h",
+        "src/core/crash_reporter.cpp"
       ],
       "blocked_by": [],
-      "notes": []
+      "notes": [
+        "Crashpad vcpkg 패키지명: crashpad (microsoft/vcpkg 공식 port 확인 필요)",
+        "InitializeCrashpad() 최소 시그니처: bool InitializeCrashpad(const std::filesystem::path& handler_path, const std::filesystem::path& db_path)",
+        "crash handler 바이너리(crashpad_handler.exe)는 app 배포 시 함께 패키징 필요"
+      ]
     }
   ]
 }

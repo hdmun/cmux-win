@@ -137,12 +137,25 @@
         "tests/integration"
       ],
       "acceptance": [
-        "manual: verify error codes and payload limits match the contract"
+        "manual: verify error codes and payload limits match _workspace/08-ipc-cli.md contract",
+        "tc-pipe-connect: client connects to Named Pipe → server returns session_id (UUID format)",
+        "tc-cmd-new-tab: new_tab command sent via IPC → TabManager adds exactly 1 workspace",
+        "tc-cmd-send-input: send_input command → ConPTY stdin receives the exact byte payload",
+        "tc-cmd-close-pane: close_pane with valid pane_id → pane removed, focus moved to nearest sibling",
+        "tc-error-unknown-cmd: unknown command name → error response with code UNKNOWN_COMMAND",
+        "tc-error-invalid-id: valid command with non-existent pane_id → error response with code NOT_FOUND",
+        "tc-split-conflict: simultaneous split and close on same pane → one succeeds, other returns CONFLICT or NOT_FOUND",
+        "tc-focus-while-closing: focus command on pane that is being disposed → error response, no crash"
       ],
-      "commands": [],
+      "commands": [
+        "ctest --preset dev-x64 -R ipc --output-on-failure",
+        "ctest --preset dev-x64 -R integration --output-on-failure"
+      ],
       "outputs": [
-        "tests/unit/ipc",
-        "tests/integration"
+        "tests/unit/ipc/test_pipe_connect.cpp",
+        "tests/unit/ipc/test_command_routing.cpp",
+        "tests/unit/ipc/test_error_codes.cpp",
+        "tests/integration/test_ipc_split_focus.cpp"
       ],
       "blocked_by": [],
       "notes": []

@@ -128,3 +128,198 @@ v1 terminal은 최소 아래를 만족한다.
 - IME candidate window 위치 정상
 - Narrator/NVDA로 텍스트 이동 확인
 - 새 shell spawn 시 `CMUX_PIPE_NAME`, `CMUX_PANE_ID`, `CMUX_SURFACE_ID`가 예상 값으로 주입됨
+
+---
+
+## 10. ConPTY Spawn Contract
+
+> M2 구현 계약. `_workspace/adr/adr-0002-conpty-passthrough-fallback.md` 결정에 따름.
+
+### 10.1 API 호출 순서
+
+```cpp
+// (1) pipe 쌍 생성
+HANDLE h_pipe_in_read,  h_pipe_in_write;
+HANDLE h_pipe_out_read, h_pipe_out_write;
+CreatePipe(&h_pipe_in_read,  &h_pipe_in_write,  nullptr, 0);
+CreatePipe(&h_pipe_out_read, &h_pipe_out_write, nullptr, 0);
+
+// (2) ConPTY 생성
+HPCON hpc{};
+HRESULT hr = CreatePseudoConsole(size, h_pipe_in_read, h_pipe_out_write, flags, &hpc);
+// flags: 0 (standard) 또는 PSEUDOCONSOLE_PASSTHROUGH_MODE (passthrough, adr-0002 탐지 결과 사용)
+
+// (3) STARTUPINFOEX 조립
+SIZE_T attr_list_size{};
+InitializeProcThreadAttributeList(nullptr, 2, 0, &attr_list_size);
+LPPROC_THREAD_ATTRIBUTE_LIST attr_list = /* heap alloc attr_list_size */;
+InitializeProcThreadAttributeList(attr_list, 2, 0, &attr_list_size);
+UpdateProcThreadAttribute(attr_list, 0, PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, hpc, sizeof(HPCON), nullptr, nullptr);
+// 환경 변수 주입은 §6 참조
+
+// (4) CreateProcess
+STARTUPINFOEXW si{};
+si.StartupInfo.cb = sizeof(STARTUPINFOEXW);
+si.lpAttributeList = attr_list;
+CreateProcessW(shell_exe, nullptr, nullptr, nullptr, FALSE,
+               EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT,
+               env_block, nullptr, &si.StartupInfo, &pi);
+
+// (5) 사용한 read/write 핸들 닫기
+CloseHandle(h_pipe_in_read);
+CloseHandle(h_pipe_out_write);
+// h_pipe_in_write (stdin feed), h_pipe_out_read (stdout drain) 은 I/O loop에서 사용
+```
+
+### 10.2 핸들 수명
+
+| 핸들 | 소유자 | 해제 시점 |
+|------|--------|-----------|
+| `hpc` | `ConPtySession` | `disposed` 전이 시 `ClosePseudoConsole(hpc)` |
+| `h_pipe_in_write` | `ConPtySession` | `disposed` 전이 시 `CloseHandle` |
+| `h_pipe_out_read` | `ConPtySession` | `disposed` 전이 시 `CloseHandle` |
+| Process/Thread handles | `ConPtySession` | process exit 감지 후 `CloseHandle` |
+
+### 10.3 리사이즈 프로토콜
+
+- 리사이즈는 UI 스레드에서 감지하되, `ResizePseudoConsole` 호출은 background 스레드에 enqueue한다.
+- `ResizePseudoConsole` 호출 빈도를 throttle한다: 50ms 이내 연속 호출은 마지막 값 하나만 전달.
+
+---
+
+## 11. libvterm Wrapper API
+
+> M2 구현 계약. `_workspace/adr/adr-0003-parser-selection.md` 결정에 따름.
+
+### 11.1 `VtermWrapper` 최소 인터페이스
+
+```cpp
+// src/terminal/engine/vterm_wrapper.h
+class VtermWrapper {
+public:
+    explicit VtermWrapper(int rows, int cols);
+    ~VtermWrapper();  // vterm_free()
+
+    // I/O
+    void PushBytes(const char* data, size_t len);  // vterm_input_write()
+
+    // 리사이즈 (ConPTY resize와 쌍으로 호출)
+    void Resize(int rows, int cols);               // vterm_set_size()
+
+    // 버퍼 접근 (background thread에서 호출)
+    const TerminalBuffer& Buffer() const;
+
+    // 스크린 콜백 (내부 등록, 외부 노출 금지)
+private:
+    VTerm*         vterm_{nullptr};
+    VTermScreen*   screen_{nullptr};
+    TerminalBuffer buffer_;
+    // callbacks_ registered via vterm_screen_set_callbacks
+};
+```
+
+### 11.2 스레드 소유권
+
+- `VtermWrapper`의 모든 메서드는 **background worker 스레드**에서만 호출한다.
+- `Buffer()` const 접근도 background에서만 한다. UI는 published frame snapshot을 읽는다.
+
+### 11.3 `TerminalBuffer` 최소 구조
+
+```cpp
+// src/terminal/engine/terminal_buffer.h
+struct TermCell {
+    char32_t codepoint;
+    VTermColor fg, bg;
+    uint8_t    attrs;  // bold/italic/underline/blink/reverse
+};
+
+struct CursorState {
+    int row, col;
+    bool visible;
+};
+
+class TerminalBuffer {
+public:
+    int Rows() const;
+    int Cols() const;
+    const TermCell& CellAt(int row, int col) const;
+    CursorState     Cursor() const;
+    // dirty region tracking
+    std::vector<TerminalRect> TakeDirtyRegions();
+};
+```
+
+---
+
+## 12. Direct2D SwapChainPanel Renderer
+
+> M2 구현 계약. D2D/DWrite 렌더링 계층.
+
+### 12.1 렌더 루프
+
+```
+[background]                         [UI thread]
+PushBytes() → VtermWrapper           DispatcherQueue.TryEnqueue()
+           → TerminalBuffer dirty    → SwapChainPanel.Invalidate()
+           → atomic publish frame    → D2DRenderer.DrawFrame()
+```
+
+1. `PushBytes()` 후 dirty region이 있으면 immutable `TerminalFrame` snapshot을 atomic publish한다.
+2. background가 `DispatcherQueue.TryEnqueue`로 swapchain invalidate를 enqueue한다.
+3. UI 스레드에서 `D2DRenderer::DrawFrame()`이 최신 published frame snapshot을 읽어 D2D draw를 실행한다.
+4. 한 프레임 내에 여러 dirty region은 coalescing한다.
+
+### 12.2 글자 타일 캐시
+
+- `IDWriteTextLayout` 재생성은 비싸므로 `(codepoint, font_size, attrs)` 키로 `IDWriteGlyphRun` 결과를 캐시한다.
+- 캐시 크기 상한: **4096 슬롯**. LRU 교체.
+- DPI 변경 시 캐시를 전체 무효화한다.
+
+### 12.3 DPI 변경 처리
+
+1. `SwapChainPanel.DpiChanged` 이벤트를 UI 스레드에서 수신한다.
+2. `IDXGISwapChain::ResizeBuffers()`를 호출한다.
+3. 글자 타일 캐시를 무효화한다.
+4. IME rect를 즉시 재계산한다.
+
+---
+
+## 13. reattach_token Binding
+
+> M2/M3 구현 계약. `_workspace/adr/adr-0004-panel-lifecycle.md` §SwapChainPanel reattach_token 참조.
+
+### 13.1 token 흐름
+
+```
+BonsplitController.MovePane()
+    └→ TerminalPanel.Detach()           // ++reattach_token_
+        └→ RaisePropertyChanged("ReattachToken")
+            └→ XAML Binding 감지
+                └→ OnReattachTokenChanged()
+                    └→ SetSwapChain(swapchain_)  // D2D swapchain 재연결
+```
+
+### 13.2 구현 스케치
+
+```cpp
+// TerminalPanel (XAML codebehind / WinRT component)
+// XAML: <SwapChainPanel x:Name="swapPanel" />
+// Binding: {x:Bind ViewModel.ReattachToken, Mode=OneWay}
+
+void TerminalPanel::OnReattachTokenChanged(uint64_t /*token*/) {
+    // UI thread에서 호출됨
+    if (swapchain_) {
+        // ISwapChainPanelNative 경유
+        winrt::com_ptr<ISwapChainPanelNative> native;
+        swapPanel().as(native);
+        native->SetSwapChain(swapchain_.get());
+    }
+}
+```
+
+### 13.3 규칙
+
+1. `reattach_token`은 **UI thread**에서만 읽는다. XAML binding이 UI thread에서 실행되므로 자연스럽게 보장된다.
+2. `++reattach_token_`은 `Detach()` 메서드 내에서만 호출한다.
+3. `Detach()` 후 XAML tree 재연결(reparent) 전에 token이 증가해야 한다. 순서를 바꾸면 재연결이 누락될 수 있다.
+4. browser 패널(`WebView2`)은 이 패턴을 사용하지 않는다.

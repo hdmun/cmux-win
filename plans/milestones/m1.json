@@ -29,16 +29,15 @@
       "acceptance": [
         "manual: verify first MainWindow creation on STA thread"
       ],
-      "commands": [],
-      "outputs": [
-        "src/app",
-        "src/ui"
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win"
       ],
-      "blocked_by": [],
-      "notes": []
-    },
-    {
-      "task_id": "m1-2",
+      "outputs": [
+        "src/app/App.xaml",
+        "src/app/App.xaml.cpp",
+        "src/ui/MainWindow.xaml",
+        "src/ui/MainWindow.xaml.cpp"
+      ],
       "title": "WindowManager and window lifecycle",
       "status": "pending",
       "summary": "Implement WindowManager and the canonical lifecycle states.",
@@ -55,10 +54,14 @@
       "acceptance": [
         "manual: verify active window tracking and close order"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win",
+        "ctest --preset dev-x64 -R window_manager --output-on-failure"
+      ],
       "outputs": [
-        "src/app",
-        "src/core"
+        "src/app/WindowManager.h",
+        "src/app/WindowManager.cpp",
+        "src/core/window_lifecycle.h"
       ],
       "blocked_by": [],
       "notes": []
@@ -82,10 +85,14 @@
       "acceptance": [
         "manual: verify backdrop fallback matches support matrix"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win"
+      ],
       "outputs": [
-        "src/ui",
-        "src/app"
+        "src/ui/titlebar.h",
+        "src/ui/titlebar.cpp",
+        "src/ui/backdrop_helper.h",
+        "src/ui/backdrop_helper.cpp"
       ],
       "blocked_by": [],
       "notes": []

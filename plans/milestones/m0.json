@@ -64,17 +64,24 @@
         "ports/libvterm"
       ],
       "acceptance": [
-        "manual: verify libvterm overlay path is fixed at ports/libvterm",
-        "manual: verify NuGet and vcpkg ownership is not duplicated"
+        "manual: verify libvterm overlay path is fixed at ports/libvterm and vcpkg-configuration.json overlay-ports references ./ports",
+        "manual: verify NuGet and vcpkg dependency ownership is not duplicated per _workspace/11-build-release.md §3 table",
+        "manual: verify vcpkg.json lists at minimum: libvterm (overlay), nlohmann-json, gtest"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --preset dev-x64"
+      ],
       "outputs": [
         "vcpkg.json",
         "vcpkg-configuration.json",
-        "ports/libvterm"
+        "ports/libvterm/portfile.cmake",
+        "ports/libvterm/vcpkg.json"
       ],
       "blocked_by": [],
-      "notes": []
+      "notes": [
+        "vcpkg.json 최소 예시: { \"dependencies\": [\"libvterm\", \"nlohmann-json\", \"gtest\"] }",
+        "vcpkg-configuration.json 최소 예시: { \"default-registry\": { \"kind\": \"git\", \"repository\": \"https://github.com/microsoft/vcpkg\", \"baseline\": \"<commit>\" }, \"overlay-ports\": [\"./ports\"] }"
+      ]
     },
     {
       "task_id": "m0-3",
@@ -91,15 +98,23 @@
         "resources/*.rc"
       ],
       "acceptance": [
-        "manual: verify manifest locks DPI awareness and compatibility decisions"
+        "manual: verify app.manifest sets dpiAwareness to PerMonitorV2",
+        "manual: verify app.manifest sets supportedOS entries for Win10 and Win11 compatibility GUIDs",
+        "manual: verify .rc file compiles without error in dev-x64 preset build"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win"
+      ],
       "outputs": [
         "resources/app.manifest",
-        "resources/*.rc"
+        "resources/cmux-win.rc",
+        "resources/resource.h"
       ],
       "blocked_by": [],
-      "notes": []
+      "notes": [
+        "app.manifest DPI awareness element: <dpiAwareness xmlns='...'>PerMonitorV2</dpiAwareness>",
+        "unpackaged app이므로 appxmanifest 아님. Win32 side-by-side manifest(.manifest)를 링커에 /MANIFEST:EMBED 로 임베딩"
+      ]
     },
     {
       "task_id": "m0-4",
@@ -143,14 +158,24 @@
         "src/utils"
       ],
       "acceptance": [
-        "manual: verify background-to-UI boundary helpers exist"
+        "manual: verify dispatcher_queue_helper.h wraps DispatcherQueue.TryEnqueue and logs on enqueue failure (see _workspace/adr/adr-0001-terminal-threading.md §DispatcherQueue 규칙)",
+        "manual: verify logger does not block the UI thread — async sink or background queue 필수",
+        "manual: verify string_encoding.h provides UTF-8 <-> UTF-16 conversion helpers"
       ],
-      "commands": [],
+      "commands": [
+        "ctest --preset dev-x64 -R \"logger|dispatcher|encoding\" --output-on-failure"
+      ],
       "outputs": [
-        "src/utils"
+        "src/utils/logger.h",
+        "src/utils/logger.cpp",
+        "src/utils/dispatcher_queue_helper.h",
+        "src/utils/string_encoding.h"
       ],
       "blocked_by": [],
-      "notes": []
+      "notes": [
+        "logger: spdlog (vcpkg) 또는 WinRT ETW sink 중 선택. v1은 spdlog 권장 (vcpkg 패키지 존재)",
+        "dispatcher_queue_helper: TryEnqueue 실패 시 spdlog::error() 호출 필수"
+      ]
     },
     {
       "task_id": "m0-6",
@@ -189,7 +214,8 @@
         "_workspace/12-tasks.md"
       ],
       "acceptance": [
-        "manual: verify release-only tasks are separated from implementation tasks"
+        "manual: verify _workspace/11-build-release.md §9 lists Azure Trusted Signing, winget, scoop, updater, symbol upload as M7-only items outside v1 gate",
+        "manual: verify _workspace/12-tasks.md has a release-only section clearly separated from milestone implementation tasks"
       ],
       "commands": [],
       "outputs": [
@@ -197,7 +223,10 @@
         "_workspace/12-tasks.md"
       ],
       "blocked_by": [],
-      "notes": []
+      "notes": [
+        "이 태스크는 코드 산출물 없음. 문서 분리 상태 확인이 목적",
+        "release infra 항목이 milestone task로 잘못 배치되지 않았는지 검토"
+      ]
     }
   ]
 }

@@ -31,10 +31,15 @@
       "acceptance": [
         "manual: verify toast failures degrade without breaking in-app notifications"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win",
+        "ctest --preset dev-x64 -R notification --output-on-failure"
+      ],
       "outputs": [
-        "src/notification",
-        "src/ui"
+        "src/notification/notification_store.h",
+        "src/notification/notification_store.cpp",
+        "src/notification/toast_bridge.h",
+        "src/notification/toast_bridge.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -56,15 +61,15 @@
       "acceptance": [
         "manual: verify backup-on-migration and explicit failure surfacing"
       ],
-      "commands": [],
-      "outputs": [
-        "src/config"
+      "commands": [
+        "ctest --preset dev-x64 -R settings --output-on-failure"
       ],
-      "blocked_by": [],
-      "notes": []
-    },
-    {
-      "task_id": "m6-3",
+      "outputs": [
+        "src/config/settings_store.h",
+        "src/config/settings_store.cpp",
+        "src/config/settings_migration.h",
+        "src/config/settings_migration.cpp"
+      ],
       "title": "Shortcut routing engine",
       "status": "pending",
       "summary": "Implement shortcut scopes, validation, and routing behavior.",
@@ -81,10 +86,14 @@
       "acceptance": [
         "manual: verify conflicts are rejected and scope rules are enforced"
       ],
-      "commands": [],
+      "commands": [
+        "ctest --preset dev-x64 -R shortcut --output-on-failure"
+      ],
       "outputs": [
-        "src/config",
-        "src/ui"
+        "src/config/shortcut_registry.h",
+        "src/config/shortcut_registry.cpp",
+        "src/ui/shortcut_router.h",
+        "src/ui/shortcut_router.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -108,10 +117,16 @@
       "acceptance": [
         "manual: verify no prompt blocking and schema-aligned direct-pipe payloads"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win",
+        "ctest --preset dev-x64 -R shell_integration --output-on-failure"
+      ],
       "outputs": [
-        "resources/shell-integration",
-        "src/ipc"
+        "resources/shell-integration/cmux.ps1",
+        "resources/shell-integration/cmux.cmd",
+        "resources/shell-integration/cmux-wsl.sh",
+        "src/ipc/shell_report_handler.h",
+        "src/ipc/shell_report_handler.cpp"
       ],
       "blocked_by": [],
       "notes": []

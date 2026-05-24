@@ -29,16 +29,15 @@
       "acceptance": [
         "manual: verify WebView2 host survives workspace and split transitions"
       ],
-      "commands": [],
-      "outputs": [
-        "src/panels",
-        "src/ui"
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win"
       ],
-      "blocked_by": [],
-      "notes": []
-    },
-    {
-      "task_id": "m4-2",
+      "outputs": [
+        "src/panels/browser_panel.h",
+        "src/panels/browser_panel.cpp",
+        "src/panels/browser_panel.xaml",
+        "src/panels/webview_environment_pool.h"
+      ],
       "title": "Omnibar and navigation UX",
       "status": "pending",
       "summary": "Implement omnibar input rules, focus behavior, and navigation suggestions.",
@@ -55,10 +54,13 @@
       "acceptance": [
         "manual: verify URL normalization and Ctrl+L behavior"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win"
+      ],
       "outputs": [
-        "src/ui",
-        "src/panels"
+        "src/ui/omnibar.h",
+        "src/ui/omnibar.cpp",
+        "src/ui/omnibar.xaml"
       ],
       "blocked_by": [],
       "notes": []
@@ -83,10 +85,14 @@
       "acceptance": [
         "manual: verify CDP unavailable and failed paths return explicit errors"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win",
+        "ctest --preset dev-x64 -R cdp --output-on-failure"
+      ],
       "outputs": [
-        "src/panels",
-        "src/ipc"
+        "src/panels/cdp_automation.h",
+        "src/panels/cdp_automation.cpp",
+        "src/ipc/browser_commands.h"
       ],
       "blocked_by": [],
       "notes": []

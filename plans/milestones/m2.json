@@ -22,17 +22,32 @@
       ],
       "doc_refs": [
         "_workspace/03-terminal-engine.md",
+        "_workspace/03-terminal-engine.md#10-conpty-spawn-contract",
+        "_workspace/adr/adr-0001-terminal-threading.md",
+        "_workspace/adr/adr-0002-conpty-passthrough-fallback.md",
         "_workspace/16-test-strategy.md"
       ],
       "touches": [
-        "src/terminal"
+        "src/terminal/engine/conpty_session.h",
+        "src/terminal/engine/conpty_session.cpp",
+        "src/terminal/engine/io_loop.h",
+        "src/terminal/engine/io_loop.cpp"
       ],
       "acceptance": [
-        "manual: verify standard ConPTY mode works on Win10"
+        "manual: verify standard ConPTY mode works on Win10 — shell spawns and I/O flows",
+        "manual: verify passthrough gate detection runs on Win11 22H2+ (log entry present)",
+        "manual: verify CMUX_PIPE_NAME, CMUX_PANE_ID, CMUX_SURFACE_ID injected on shell spawn",
+        "manual: verify CMUX_CONPTY_MODE=standard env override bypasses passthrough gate"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win",
+        "ctest --preset dev-x64 -R conpty --output-on-failure"
+      ],
       "outputs": [
-        "src/terminal"
+        "src/terminal/engine/conpty_session.h",
+        "src/terminal/engine/conpty_session.cpp",
+        "src/terminal/engine/io_loop.h",
+        "src/terminal/engine/io_loop.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -46,17 +61,30 @@
         "m2-1"
       ],
       "doc_refs": [
-        "_workspace/03-terminal-engine.md"
+        "_workspace/03-terminal-engine.md",
+        "_workspace/03-terminal-engine.md#11-libvterm-wrapper-api",
+        "_workspace/adr/adr-0003-parser-selection.md"
       ],
       "touches": [
-        "src/terminal"
+        "src/terminal/engine/vterm_wrapper.h",
+        "src/terminal/engine/vterm_wrapper.cpp",
+        "src/terminal/engine/terminal_buffer.h",
+        "src/terminal/engine/terminal_buffer.cpp"
       ],
       "acceptance": [
-        "manual: verify parser path uses libvterm without a custom VT parser"
+        "manual: verify parser path uses libvterm — no custom VT parser code exists in src/",
+        "manual: verify VtermWrapper.PushBytes() correctly updates TerminalBuffer for basic VT100 sequences (color, cursor move, erase)",
+        "manual: verify libvterm source exists only in ports/libvterm/, not in vendor/ or any other path"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win",
+        "ctest --preset dev-x64 -R vterm --output-on-failure"
+      ],
       "outputs": [
-        "src/terminal"
+        "src/terminal/engine/vterm_wrapper.h",
+        "src/terminal/engine/vterm_wrapper.cpp",
+        "src/terminal/engine/terminal_buffer.h",
+        "src/terminal/engine/terminal_buffer.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -70,19 +98,30 @@
         "m1-1"
       ],
       "doc_refs": [
-        "_workspace/03-terminal-engine.md"
+        "_workspace/03-terminal-engine.md",
+        "_workspace/03-terminal-engine.md#12-direct2d-swapchainpanel-renderer",
+        "_workspace/adr/adr-0001-terminal-threading.md"
       ],
       "touches": [
-        "src/terminal",
-        "src/ui"
+        "src/terminal/renderer/d2d_renderer.h",
+        "src/terminal/renderer/d2d_renderer.cpp",
+        "src/terminal/renderer/terminal_frame.h",
+        "src/terminal/renderer/glyph_cache.h"
       ],
       "acceptance": [
-        "manual: verify dirty-region-based redraw path"
+        "manual: verify dirty-region-based redraw path — full-screen clear does not redraw unchanged cells",
+        "manual: verify D2D draw runs on UI thread (not background) per adr-0001 threading table",
+        "manual: verify glyph cache invalidated on DPI change"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win",
+        "ctest --preset dev-x64 -R renderer --output-on-failure"
+      ],
       "outputs": [
-        "src/terminal",
-        "src/ui"
+        "src/terminal/renderer/d2d_renderer.h",
+        "src/terminal/renderer/d2d_renderer.cpp",
+        "src/terminal/renderer/terminal_frame.h",
+        "src/terminal/renderer/glyph_cache.h"
       ],
       "blocked_by": [],
       "notes": []
@@ -97,19 +136,29 @@
       ],
       "doc_refs": [
         "_workspace/03-terminal-engine.md",
-        "_workspace/04-split-pane.md"
+        "_workspace/03-terminal-engine.md#13-reattach-token-binding",
+        "_workspace/04-split-pane.md",
+        "_workspace/adr/adr-0004-panel-lifecycle.md"
       ],
       "touches": [
-        "src/panels",
-        "src/ui"
+        "src/panels/terminal_panel.h",
+        "src/panels/terminal_panel.cpp",
+        "src/panels/terminal_panel.xaml",
+        "src/panels/terminal_panel.xaml.cpp"
       ],
       "acceptance": [
-        "manual: verify host integration survives reattach_token changes"
+        "manual: verify terminal panel survives reparent — ConPTY session remains alive after split move",
+        "manual: verify reattach_token increments on Detach() and triggers SetSwapChain() re-call",
+        "manual: verify terminal panel disposed state releases ConPTY → libvterm → D2D in that order"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win"
+      ],
       "outputs": [
-        "src/panels",
-        "src/ui"
+        "src/panels/terminal_panel.h",
+        "src/panels/terminal_panel.cpp",
+        "src/panels/terminal_panel.xaml",
+        "src/panels/terminal_panel.xaml.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -123,19 +172,30 @@
         "m2-4"
       ],
       "doc_refs": [
-        "_workspace/03-terminal-engine.md"
+        "_workspace/03-terminal-engine.md",
+        "_workspace/adr/adr-0001-terminal-threading.md"
       ],
       "touches": [
-        "src/terminal",
-        "src/ui"
+        "src/terminal/ime/ime_handler.h",
+        "src/terminal/ime/ime_handler.cpp",
+        "src/terminal/uia/uia_provider.h",
+        "src/terminal/uia/uia_provider.cpp"
       ],
       "acceptance": [
-        "manual: verify IME candidate window placement and text exposure through UIA"
+        "manual: verify IME candidate window placement aligns with terminal cursor pixel rect",
+        "manual: verify IME rect recalculated immediately on DPI change (DpiChanged event)",
+        "manual: verify Narrator or NVDA can read current line text via UIA TextPattern",
+        "manual: verify caret move and viewport change UIA events are raised"
       ],
-      "commands": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux-win",
+        "ctest --preset dev-x64 -R ime --output-on-failure"
+      ],
       "outputs": [
-        "src/terminal",
-        "src/ui"
+        "src/terminal/ime/ime_handler.h",
+        "src/terminal/ime/ime_handler.cpp",
+        "src/terminal/uia/uia_provider.h",
+        "src/terminal/uia/uia_provider.cpp"
       ],
       "blocked_by": [],
       "notes": []
