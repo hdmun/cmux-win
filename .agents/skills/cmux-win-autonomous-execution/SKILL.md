@@ -1,6 +1,6 @@
 ---
 name: cmux-win-autonomous-execution
-description: Continue autonomous implementation work in cmux-win using the committed `_workspace`, `plans`, and `.rules` execution model. Use when Codex needs to resume project work, pick the next ready task from `plans/milestones/*.json`, follow the canonical read order, keep docs and task state in sync, and leave a correct handoff in `_workspace/session-state.md`.
+description: Continue autonomous implementation work in cmux-win using the committed `_workspace`, `plans`, and `.rules` execution model. Use when Codex needs to resume project work, pick the next ready task from `plans/milestones/*.json`, follow the canonical read order, keep docs and task state in sync, and leave a correct handoff in `plans/session-state.md`.
 ---
 
 # Cmux Win Autonomous Execution
@@ -16,21 +16,21 @@ Use the repository's autonomous-execution setup exactly as documented. Read the 
    - `../../_workspace/12-tasks.md`
    - `../../plans/index.json`
    - the active milestone file from `../../plans/milestones/`
-   - `../../_workspace/session-state.md`
+   - `../../plans/session-state.md`
    - `../../.rules/agent-workflow.md`, then the `.rules/*.md` files mapped from the selected task
    - the selected task's `doc_refs`
 2. Select the next task with `status = "ready"` whose `depends_on` tasks are all `done`.
-3. Set that task to `in_progress` in the milestone JSON and update `../../_workspace/session-state.md`.
+3. Set that task to `in_progress` in the milestone JSON and update `../../plans/session-state.md`.
 4. Implement the task, run its `commands`, and satisfy every `acceptance` item.
 5. Update all required `_workspace` and `plans` docs before ending the session.
-6. Mark the task `done` or `blocked`, then leave a fresh handoff in `../../_workspace/session-state.md`.
+6. Mark the task `done` or `blocked`, then leave a fresh handoff in `../../plans/session-state.md`.
 
 ## Authority Rules
 
 - `../../_workspace/*.md` is authoritative for architecture, intent, gates, and domain contracts.
 - `../../plans/index.json` and `../../plans/milestones/*.json` are authoritative for task status, dependencies, commands, and acceptance.
 - `../../.rules/*.md` is authoritative for operating constraints, queue mapping, and docs-sync.
-- `../../_workspace/session-state.md` is the cross-session baton. Never end a session without updating it.
+- `../../plans/session-state.md` is the cross-session baton. Never end a session without updating it.
 
 If Markdown and JSON disagree, follow Markdown for contract meaning and JSON for current execution state.
 
@@ -58,7 +58,7 @@ If Markdown and JSON disagree, follow Markdown for contract meaning and JSON for
 ## Session-End Checklist
 
 1. Update the task status in the milestone JSON.
-2. Update `../../_workspace/session-state.md`:
+2. Update `../../plans/session-state.md`:
    - current milestone
    - last completed task
    - any active or blocked tasks
