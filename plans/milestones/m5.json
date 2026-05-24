@@ -7,8 +7,7 @@
     "m4"
   ],
   "doc_refs": [
-    "_workspace/08-ipc-cli.md",
-    "_workspace/12-tasks.md"
+    "_workspace/08-ipc-cli.md"
   ],
   "tasks": [
     {
@@ -78,8 +77,7 @@
       ],
       "doc_refs": [
         "_workspace/07-notification.md",
-        "_workspace/09-config-settings.md",
-        "_workspace/12-tasks.md"
+        "_workspace/09-config-settings.md"
       ],
       "touches": [
         "_workspace/07-notification.md",
@@ -105,7 +103,6 @@
         "m5-3"
       ],
       "doc_refs": [
-        "_workspace/12-tasks.md",
         "_workspace/adr/adr-0002-conpty-passthrough-fallback.md"
       ],
       "touches": [

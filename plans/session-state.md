@@ -26,4 +26,4 @@
 
 ## Notes for next session
 
-- Startup read order: `_workspace/00-overview.md` → `_workspace/12-tasks.md` → `plans/index.json` → `plans/milestones/m0.json` → this file → the current task queue's `.rules/*.md` from `.rules/agent-workflow.md` → the selected task's `doc_refs`.
+- Startup read order: `_workspace/00-overview.md` → `_workspace/12-tasks.md` → `plans/index.json` → `plans/milestones/m0.json` → `plans/session-state.md` → the current task queue's `.rules/*.md` from `.rules/agent-workflow.md` → the selected task's `doc_refs`.

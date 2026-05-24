@@ -5,7 +5,6 @@
   "depends_on": [],
   "doc_refs": [
     "_workspace/11-build-release.md",
-    "_workspace/12-tasks.md",
     "_workspace/13-autonomous-execution.md"
   ],
   "tasks": [
@@ -151,8 +150,7 @@
       "summary": "Add logging, string/encoding, and dispatcher helper scaffolding.",
       "depends_on": [],
       "doc_refs": [
-        "_workspace/02-core-app.md",
-        "_workspace/12-tasks.md"
+        "_workspace/02-core-app.md"
       ],
       "touches": [
         "src/utils"

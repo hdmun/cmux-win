@@ -30,7 +30,7 @@
 2. `docs-sync`, `milestone`, `dependency`, `verification`은 반드시 authoritative 문서를 가리킨다.
 3. queue 선택은 “가장 먼저 읽어야 할 규칙 묶음” 기준으로 한다.
 4. 여러 영역을 건드리더라도 대표 queue는 하나만 선택하고, 나머지 문서는 `authoritative-rules`에 열거한다.
-5. 완전 자율 구현 작업은 시작 전에 `plans\index.json`, 해당 milestone JSON, `_workspace\session-state.md`를 함께 읽는다.
+5. 완전 자율 구현 작업은 시작 전에 `plans\index.json`, 해당 milestone JSON, `plans\session-state.md`를 함께 읽는다.
 
 ## 에이전트 입력 템플릿
 
@@ -40,7 +40,7 @@
 - [ ] **task**: 태스크 상세 내용
 - [ ] **trigger**: 트리거 방법 (issue, pull request, schedule, manual)
 - [ ] **task-file**: `plans\milestones\mN.json` 안의 대상 task 경로
-- [ ] **status-source**: 상태를 갱신할 JSON 파일과 `_workspace\session-state.md`
+- [ ] **status-source**: 상태를 갱신할 JSON 파일과 `plans\session-state.md`
 - [ ] **affected-files**: 수정 범위 (파일명, 경로)
 - [ ] **authoritative-rules**: 먼저 확인할 `.rules/*.md`, `_workspace/*.md`
 - [ ] **docs-sync**: `.rules/docs-sync.md` 기준으로 함께 갱신할 문서
@@ -56,7 +56,7 @@
 |------|--------------------|
 | `authoritative-rules` | 현재 작업에 직접 연관된 `.rules/*.md`, `_workspace/*.md` |
 | `task-file` | `plans\milestones\mN.json` |
-| `status-source` | `plans\milestones\mN.json`, `_workspace\session-state.md` |
+| `status-source` | `plans\milestones\mN.json`, `plans\session-state.md` |
 | `docs-sync` | `.rules/docs-sync.md` |
 | `milestone` | `.rules/repository-scope.md`, `_workspace/12-tasks.md` |
 | `verification` | `_workspace/12-tasks.md`, 관련 도메인 `_workspace` 문서 |
@@ -70,6 +70,6 @@
 2. `_workspace/12-tasks.md`
 3. `plans/index.json`
 4. 해당 milestone의 `plans/milestones/mN.json`
-5. `_workspace/session-state.md`
+5. `plans/session-state.md`
 6. 현재 task의 queue-number에 대응하는 `.rules/*.md` (`.rules/agent-workflow.md`의 queue mapping 기준)
 7. 선택한 task의 `doc_refs`

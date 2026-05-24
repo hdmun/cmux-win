@@ -9,8 +9,7 @@
   "doc_refs": [
     "_workspace/04-split-pane.md",
     "_workspace/05-sidebar-tabs.md",
-    "_workspace/08-ipc-cli.md",
-    "_workspace/12-tasks.md"
+    "_workspace/08-ipc-cli.md"
   ],
   "tasks": [
     {

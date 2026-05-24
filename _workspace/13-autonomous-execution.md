@@ -10,7 +10,7 @@
 | `_workspace\*.md` | 사람/에이전트 공용 계약 문서 | 아키텍처, milestone, gate, 도메인 규약 |
 | `plans\index.json`, `plans\milestones\*.json` | 기계 판독 실행 상태 | task 상태, 의존성, 예상 산출물, 검증 명령 |
 | `.rules\*.md` | 에이전트 운영 규칙 | 읽기 순서, 문서 동기화, 저장소 경계, workflow |
-| `_workspace\session-state.md` | 세션 handoff snapshot | 현재 milestone, 마지막 완료 task, blocker, 다음 추천 task |
+| `plans\session-state.md` | 세션 handoff snapshot | 현재 milestone, 마지막 완료 task, blocker, 다음 추천 task |
 
 `plans\`는 `_workspace\`를 대체하지 않는다. Markdown은 의도를 설명하고, JSON은 실행 상태를 추적한다.
 
@@ -22,7 +22,7 @@
 2. `_workspace\12-tasks.md`
 3. `plans\index.json`
 4. 현재 milestone의 `plans\milestones\mN.json`
-5. `_workspace\session-state.md`
+5. `plans\session-state.md`
 6. 현재 task의 queue-number에 대응하는 `.rules\*.md` (`.rules\agent-workflow.md`의 queue mapping 기준)
 7. 선택한 task의 `doc_refs`가 가리키는 문서
 
@@ -47,7 +47,7 @@
 | `blocked` | 외부 결정 또는 선행 조건 때문에 진행 불가 |
 | `done` | 산출물과 검증 기준이 충족됨 |
 
-상태 변경 시에는 관련 `plans\milestones\*.json`, `_workspace\session-state.md`, 그리고 필요 시 `_workspace\12-tasks.md`를 함께 갱신한다.
+상태 변경 시에는 관련 `plans\milestones\*.json`과 `plans\session-state.md`를 함께 갱신한다.
 
 ## 5. required task fields
 
@@ -70,7 +70,7 @@ JSON 필드 이름은 모두 `snake_case`를 사용한다.
 
 ## 6. handoff rules
 
-세션 종료 전 에이전트는 `_workspace\session-state.md`에 아래를 반영한다.
+세션 종료 전 에이전트는 `plans\session-state.md`에 아래를 반영한다.
 
 - 현재 milestone
 - 마지막 완료 task

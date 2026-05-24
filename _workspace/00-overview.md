@@ -120,7 +120,7 @@ M0 종료 시점에 아래가 모두 충족되어야 한다.
 2. 규약이 바뀌면 관련 문서 전체를 같이 수정한다.
 3. 구현보다 문서가 뒤처진 상태를 허용하지 않는다.
 4. M7 release infra는 기능 문서와 분리해서 관리한다.
-5. durable task 상태는 `plans\` JSON과 `_workspace\session-state.md`에 남긴다.
+5. durable task 상태는 `plans\` JSON과 `plans\session-state.md`에 남긴다.
 
 ## 10. autonomous execution layer
 
@@ -131,7 +131,7 @@ M0 종료 시점에 아래가 모두 충족되어야 한다.
 | `_workspace\*.md` | 아키텍처, milestone, gate, 도메인 계약 |
 | `plans\index.json`, `plans\milestones\*.json` | 기계 판독 task 상태, 의존성, acceptance |
 | `.rules\*.md` | 에이전트 운영 규칙 |
-| `_workspace\session-state.md` | 세션 handoff snapshot |
+| `plans\session-state.md` | 세션 handoff snapshot |
 
 새 세션의 기본 읽기 순서는 아래를 따른다.
 
@@ -139,6 +139,6 @@ M0 종료 시점에 아래가 모두 충족되어야 한다.
 2. `_workspace\12-tasks.md`
 3. `plans\index.json`
 4. 해당 milestone의 `plans\milestones\mN.json`
-5. `_workspace\session-state.md`
+5. `plans\session-state.md`
 6. 현재 task의 queue-number에 대응하는 `.rules\*.md` (`.rules\agent-workflow.md`의 queue mapping 기준)
 7. 선택한 task의 `doc_refs`

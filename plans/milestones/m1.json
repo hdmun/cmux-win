@@ -6,8 +6,7 @@
     "m0"
   ],
   "doc_refs": [
-    "_workspace/02-core-app.md",
-    "_workspace/12-tasks.md"
+    "_workspace/02-core-app.md"
   ],
   "tasks": [
     {
@@ -38,6 +37,11 @@
         "src/ui/MainWindow.xaml",
         "src/ui/MainWindow.xaml.cpp"
       ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m1-2",
       "title": "WindowManager and window lifecycle",
       "status": "pending",
       "summary": "Implement WindowManager and the canonical lifecycle states.",

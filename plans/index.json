@@ -4,7 +4,7 @@
     "_workspace": "architecture_and_contracts",
     "plans": "machine_readable_task_state",
     "rules": "agent_operating_constraints",
-    "session_state": "_workspace/session-state.md"
+    "session_state": "plans/session-state.md"
   },
   "startup_read_order": [
     {
@@ -31,7 +31,7 @@
     {
       "step": 5,
       "kind": "session_handoff",
-      "path": "_workspace/session-state.md"
+      "path": "plans/session-state.md"
     },
     {
       "step": 6,

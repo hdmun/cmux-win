@@ -9,8 +9,7 @@
   "doc_refs": [
     "_workspace/07-notification.md",
     "_workspace/09-config-settings.md",
-    "_workspace/10-shell-integration.md",
-    "_workspace/12-tasks.md"
+    "_workspace/10-shell-integration.md"
   ],
   "tasks": [
     {
@@ -70,6 +69,11 @@
         "src/config/settings_migration.h",
         "src/config/settings_migration.cpp"
       ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-3",
       "title": "Shortcut routing engine",
       "status": "pending",
       "summary": "Implement shortcut scopes, validation, and routing behavior.",

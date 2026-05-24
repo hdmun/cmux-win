@@ -7,8 +7,7 @@
     "m3"
   ],
   "doc_refs": [
-    "_workspace/06-browser-panel.md",
-    "_workspace/12-tasks.md"
+    "_workspace/06-browser-panel.md"
   ],
   "tasks": [
     {
@@ -38,6 +37,11 @@
         "src/panels/browser_panel.xaml",
         "src/panels/webview_environment_pool.h"
       ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m4-2",
       "title": "Omnibar and navigation UX",
       "status": "pending",
       "summary": "Implement omnibar input rules, focus behavior, and navigation suggestions.",
