@@ -28,11 +28,21 @@
         "src/ipc"
       ],
       "acceptance": [
-        "manual: verify same-user ACL and message-mode transport"
+        "manual: verify same-user ACL and message-mode transport",
+        "tc-pipe-server-open: Named Pipe server opens with PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE",
+        "tc-pipe-acl-same-user: connection from same user succeeds; connection from different SID is rejected",
+        "tc-pipe-message-mode: send 1 complete JSON message → receiver gets exactly 1 complete message (no partial reads)"
       ],
-      "commands": [],
+      "commands": [
+        "ctest --preset dev-x64 -R ipc_server --output-on-failure"
+      ],
       "outputs": [
-        "src/ipc"
+        "src/ipc/control_server.h",
+        "src/ipc/control_server.cpp",
+        "src/ipc/pipe_transport.h",
+        "src/ipc/pipe_transport.cpp",
+        "src/ipc/message_framer.h",
+        "src/ipc/message_framer.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -55,13 +65,21 @@
         "src/panels"
       ],
       "acceptance": [
-        "manual: verify split/close/move keep layout_version consistent"
+        "manual: verify split/close/move keep layout_version consistent",
+        "tc-split-h-produces-2-panes: horizontal split on root pane → snapshot.panes.size() == 2",
+        "tc-layout-version-increments: SplitPane / ClosePane / MovePane 각각 호출 후 layout_version 증가",
+        "tc-close-removes-pane: ClosePane(id) → snapshot에 해당 pane_id 없음",
+        "tc-focus-pane-tracked: FocusPane(id) → GetActivePaneId() == id"
       ],
-      "commands": [],
+      "commands": [
+        "ctest --preset dev-x64 -R split_layout --output-on-failure"
+      ],
       "outputs": [
-        "src/core",
-        "src/ui",
-        "src/panels"
+        "src/core/bonsplit_controller.h",
+        "src/core/bonsplit_controller.cpp",
+        "src/core/layout_snapshot.h",
+        "src/ui/split_panel_host.xaml",
+        "src/ui/split_panel_host.xaml.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -83,12 +101,22 @@
         "src/ui"
       ],
       "acceptance": [
-        "manual: verify active workspace source of truth remains in TabManager"
+        "manual: verify active workspace source of truth remains in TabManager",
+        "tc-create-workspace: CreateWorkspace() → ListWorkspaces().size() 정확히 1 증가",
+        "tc-active-workspace-source-of-truth: ActivateWorkspace(id) → GetActiveWorkspaceId() == id (ListView.SelectedItem은 결과만 반영)",
+        "tc-metadata-batch-window: 100ms 내 연속 ApplyWorkspaceMetadata 호출 → sidebar update 횟수 ≤ 1"
       ],
-      "commands": [],
+      "commands": [
+        "ctest --preset dev-x64 -R tab_manager --output-on-failure"
+      ],
       "outputs": [
-        "src/core",
-        "src/ui"
+        "src/core/tab_manager.h",
+        "src/core/tab_manager.cpp",
+        "src/core/workspace_model.h",
+        "src/ui/sidebar_view.xaml",
+        "src/ui/sidebar_view.xaml.cpp",
+        "src/ui/workspace_tab_item.xaml",
+        "src/ui/workspace_tab_item.xaml.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -112,12 +140,18 @@
         "src/ui"
       ],
       "acceptance": [
-        "manual: verify close selection follows the documented left-priority rule"
+        "manual: verify close selection follows the documented left-priority rule",
+        "tc-close-select-left-priority: 왼쪽 형제가 있는 workspace 닫기 → 왼쪽 형제가 active",
+        "tc-close-last-workspace-empty: 마지막 workspace 닫기 → 빈 상태, 크래시 없음",
+        "tc-lifecycle-state-sequence: workspace 생성 → created → attached → focused → blurred → hidden → detached → disposed 7개 상태 전이 모두 도달 가능",
+        "tc-close-busy-confirm: 실행 중인 프로세스가 있는 workspace CloseWorkspace() → needsConfirmClose=true 반환"
       ],
-      "commands": [],
+      "commands": [
+        "ctest --preset dev-x64 -R tab_manager --output-on-failure"
+      ],
       "outputs": [
-        "src/core",
-        "src/ui"
+        "src/core/tab_manager.h",
+        "src/core/tab_manager.cpp"
       ],
       "blocked_by": [],
       "notes": []

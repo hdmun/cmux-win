@@ -90,7 +90,8 @@
         "src/ipc"
       ],
       "acceptance": [
-        "manual: verify CDP unavailable and failed paths return explicit errors"
+        "manual: verify CDP unavailable and failed paths return explicit errors",
+        "ctest --preset dev-x64 -R cdp --output-on-failure"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",

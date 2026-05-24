@@ -58,7 +58,8 @@
         "src/core"
       ],
       "acceptance": [
-        "manual: verify active window tracking and close order"
+        "manual: verify active window tracking and close order",
+        "ctest --preset dev-x64 -R window_manager --output-on-failure"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",

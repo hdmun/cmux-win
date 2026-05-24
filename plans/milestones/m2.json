@@ -37,7 +37,8 @@
         "manual: verify standard ConPTY mode works on Win10 — shell spawns and I/O flows",
         "manual: verify passthrough gate detection runs on Win11 22H2+ (log entry present)",
         "manual: verify CMUX_PIPE_NAME, CMUX_PANE_ID, CMUX_SURFACE_ID injected on shell spawn",
-        "manual: verify CMUX_CONPTY_MODE=standard env override bypasses passthrough gate"
+        "manual: verify CMUX_CONPTY_MODE=standard env override bypasses passthrough gate",
+        "ctest --preset dev-x64 -R conpty --output-on-failure"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -75,7 +76,8 @@
       "acceptance": [
         "manual: verify parser path uses libvterm — no custom VT parser code exists in src/",
         "manual: verify VtermWrapper.PushBytes() correctly updates TerminalBuffer for basic VT100 sequences (color, cursor move, erase)",
-        "manual: verify libvterm source exists only in ports/libvterm/, not in vendor/ or any other path"
+        "manual: verify libvterm source exists only in ports/libvterm/, not in vendor/ or any other path",
+        "ctest --preset dev-x64 -R vterm --output-on-failure"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -113,7 +115,8 @@
       "acceptance": [
         "manual: verify dirty-region-based redraw path — full-screen clear does not redraw unchanged cells",
         "manual: verify D2D draw runs on UI thread (not background) per adr-0001 threading table",
-        "manual: verify glyph cache invalidated on DPI change"
+        "manual: verify glyph cache invalidated on DPI change",
+        "ctest --preset dev-x64 -R renderer --output-on-failure"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -135,6 +138,8 @@
       "status": "pending",
       "summary": "Attach the terminal renderer to the WinUI 3 SwapChainPanel host.",
       "depends_on": [
+        "m2-1",
+        "m2-2",
         "m2-3"
       ],
       "doc_refs": [
@@ -189,7 +194,8 @@
         "manual: verify IME candidate window placement aligns with terminal cursor pixel rect",
         "manual: verify IME rect recalculated immediately on DPI change (DpiChanged event)",
         "manual: verify Narrator or NVDA can read current line text via UIA TextPattern",
-        "manual: verify caret move and viewport change UIA events are raised"
+        "manual: verify caret move and viewport change UIA events are raised",
+        "ctest --preset dev-x64 -R ime --output-on-failure"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",

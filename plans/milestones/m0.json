@@ -166,7 +166,8 @@
       "acceptance": [
         "manual: verify dispatcher_queue_helper.h wraps DispatcherQueue.TryEnqueue and logs on enqueue failure (see _workspace/adr/adr-0001-terminal-threading.md §DispatcherQueue 규칙)",
         "manual: verify logger does not block the UI thread — async sink or background queue 필수",
-        "manual: verify string_encoding.h provides UTF-8 <-> UTF-16 conversion helpers"
+        "manual: verify string_encoding.h provides UTF-8 <-> UTF-16 conversion helpers",
+        "ctest --preset dev-x64 -R \"logger|dispatcher|encoding\" --output-on-failure"
       ],
       "commands": [
         "ctest --preset dev-x64 -R \"logger|dispatcher|encoding\" --output-on-failure"

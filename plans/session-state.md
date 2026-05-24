@@ -10,8 +10,8 @@
 
 ## Last completed task
 
-- task_id: `m0-7`
-- summary: `Milestone metadata cleaned up (m0-4/m0-6/m0-7 marked done). Functional spec written and reviewed. All milestone JSONs fixed for autonomous execution readiness.`
+- task_id: `m0-7` (+ milestone quality improvements)
+- summary: `Milestone JSONs fully production-ready: queue_number, canonical build targets, m5.json rewrite, m0-4/m0-6/m0-7 done, functional spec written. Acceptance/outputs/depends_on quality improvements applied (see Notes).`
 
 ## Blocked tasks
 
@@ -36,7 +36,9 @@
   - `_workspace/17-functional-spec.md` — comprehensive Windows v1 feature spec covering all 15 domains.
   - Reviewed and corrected by sub-agents: IPC catalog expanded, error codes completed, pipe discovery flow added, env-var rename map documented, cross-window move contradiction resolved, titlebar/backdrop matrix inlined, shortcut JSON schema added, appendix 18 (intentional divergences) added.
   - `.rules/docs-sync.md` updated to reference this file.
-- **Remaining plan quality issues** (not yet fixed — future session work):
-  - Most tasks still have `manual:`-only acceptance; executable `ctest` checks should be added per `_workspace/16-test-strategy.md`.
-  - `m3-1`–`m3-4` have directory-only `outputs`; should be expanded to file-level.
-  - `m2-4` and `m2-5` `depends_on` chains are weaker than their stated acceptance scope.
+- **Milestone quality improvements completed (this session)**:
+  - **Area A — acceptance/commands sync**: 11 tasks (m0-5, m1-2, m2-1~m2-3, m2-5, m4-3, m6-1~m6-4) now have matching `ctest --preset dev-x64 -R ...` entries in both `commands` and `acceptance`.
+  - **Area B — m3 file-level outputs + tc- tests**: m3-1~m3-4 `outputs` expanded to exact file paths; `commands` populated; acceptance enriched with `tc-*` test cases (total: 14 new tc- cases across 4 tasks).
+  - **Area C — m2-4 depends_on**: Fixed `["m2-3"]` → `["m2-1", "m2-2", "m2-3"]` to enforce ConPTY/vterm/D2D ordering.
+  - All 7 milestone JSONs validated (JSON parse OK).
+- **Remaining plan quality issues** *(none — all 3 identified issues resolved)*.

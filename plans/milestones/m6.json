@@ -29,7 +29,8 @@
         "src/ui"
       ],
       "acceptance": [
-        "manual: verify toast failures degrade without breaking in-app notifications"
+        "manual: verify toast failures degrade without breaking in-app notifications",
+        "ctest --preset dev-x64 -R notification --output-on-failure"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -60,7 +61,8 @@
         "src/config"
       ],
       "acceptance": [
-        "manual: verify backup-on-migration and explicit failure surfacing"
+        "manual: verify backup-on-migration and explicit failure surfacing",
+        "ctest --preset dev-x64 -R settings --output-on-failure"
       ],
       "commands": [
         "ctest --preset dev-x64 -R settings --output-on-failure"
@@ -91,7 +93,8 @@
         "src/ui"
       ],
       "acceptance": [
-        "manual: verify conflicts are rejected and scope rules are enforced"
+        "manual: verify conflicts are rejected and scope rules are enforced",
+        "ctest --preset dev-x64 -R shortcut --output-on-failure"
       ],
       "commands": [
         "ctest --preset dev-x64 -R shortcut --output-on-failure"
@@ -123,7 +126,8 @@
         "src/ipc"
       ],
       "acceptance": [
-        "manual: verify no prompt blocking and schema-aligned direct-pipe payloads"
+        "manual: verify no prompt blocking and schema-aligned direct-pipe payloads",
+        "ctest --preset dev-x64 -R shell_integration --output-on-failure"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
