@@ -11,6 +11,7 @@
   "tasks": [
     {
       "task_id": "m1-1",
+      "queue_number": 4,
       "title": "WinUI 3 app + main window bootstrap",
       "status": "pending",
       "summary": "Create the WinUI 3 application entrypoint and first MainWindow bootstrap.",
@@ -29,7 +30,7 @@
         "manual: verify first MainWindow creation on STA thread"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win"
+        "cmake --build --preset dev-x64 --target cmux_app"
       ],
       "outputs": [
         "src/app/App.xaml",
@@ -42,6 +43,7 @@
     },
     {
       "task_id": "m1-2",
+      "queue_number": 4,
       "title": "WindowManager and window lifecycle",
       "status": "pending",
       "summary": "Implement WindowManager and the canonical lifecycle states.",
@@ -59,7 +61,7 @@
         "manual: verify active window tracking and close order"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win",
+        "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R window_manager --output-on-failure"
       ],
       "outputs": [
@@ -72,6 +74,7 @@
     },
     {
       "task_id": "m1-3",
+      "queue_number": 4,
       "title": "Titlebar / backdrop / fallback",
       "status": "pending",
       "summary": "Implement titlebar customization and Win10/Win11 backdrop fallback behavior.",
@@ -90,7 +93,7 @@
         "manual: verify backdrop fallback matches support matrix"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win"
+        "cmake --build --preset dev-x64 --target cmux_app"
       ],
       "outputs": [
         "src/ui/titlebar.h",

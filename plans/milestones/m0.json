@@ -10,6 +10,7 @@
   "tasks": [
     {
       "task_id": "m0-1",
+      "queue_number": 3,
       "title": "Build bootstrap skeleton",
       "status": "ready",
       "summary": "Create the canonical Windows bootstrap files and build entrypoints.",
@@ -49,6 +50,7 @@
     },
     {
       "task_id": "m0-2",
+      "queue_number": 3,
       "title": "Dependency pinning and overlay ports",
       "status": "ready",
       "summary": "Create vcpkg and NuGet pinning files, including the libvterm overlay location.",
@@ -84,6 +86,7 @@
     },
     {
       "task_id": "m0-3",
+      "queue_number": 3,
       "title": "Runtime manifest and resources",
       "status": "ready",
       "summary": "Create the manifest and resource skeleton used by the unpackaged desktop app.",
@@ -102,7 +105,7 @@
         "manual: verify .rc file compiles without error in dev-x64 preset build"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win"
+        "cmake --build --preset dev-x64 --target cmux_app"
       ],
       "outputs": [
         "resources/app.manifest",
@@ -117,8 +120,9 @@
     },
     {
       "task_id": "m0-4",
+      "queue_number": 11,
       "title": "ADR freeze",
-      "status": "ready",
+      "status": "done",
       "summary": "Write the required ADRs for threading, passthrough fallback, parser choice, and panel lifecycle.",
       "depends_on": [],
       "doc_refs": [
@@ -141,10 +145,14 @@
         "_workspace/adr/adr-0004-panel-lifecycle.md"
       ],
       "blocked_by": [],
-      "notes": []
+      "notes": [
+        "2025-01: All 4 ADRs exist and are Status: accepted at _workspace/adr/. Task outputs verified present.",
+        "Cross-reference cleanup (linking ADRs from domain docs) may still be needed as minor follow-up."
+      ]
     },
     {
       "task_id": "m0-5",
+      "queue_number": 4,
       "title": "Shared utilities",
       "status": "ready",
       "summary": "Add logging, string/encoding, and dispatcher helper scaffolding.",
@@ -177,8 +185,9 @@
     },
     {
       "task_id": "m0-6",
+      "queue_number": 9,
       "title": "Settings and shortcut schema",
-      "status": "ready",
+      "status": "done",
       "summary": "Lock settings schema, shortcut scopes, precedence, migration, and atomic write rules.",
       "depends_on": [],
       "doc_refs": [
@@ -195,12 +204,15 @@
         "_workspace/09-config-settings.md"
       ],
       "blocked_by": [],
-      "notes": []
+      "notes": [
+        "2025-01: _workspace/09-config-settings.md already contains complete v1 settings schema, precedence rules, atomic write, and migration. Field names, types, and defaults are documented. Acceptance verified."
+      ]
     },
     {
       "task_id": "m0-7",
+      "queue_number": 11,
       "title": "Release prework",
-      "status": "ready",
+      "status": "done",
       "summary": "Separate release-only backlog items from implementation-start scope.",
       "depends_on": [],
       "doc_refs": [
@@ -222,8 +234,7 @@
       ],
       "blocked_by": [],
       "notes": [
-        "이 태스크는 코드 산출물 없음. 문서 분리 상태 확인이 목적",
-        "release infra 항목이 milestone task로 잘못 배치되지 않았는지 검토"
+        "2025-01: _workspace/11-build-release.md §9 and _workspace/12-tasks.md already have release-only items (Azure Trusted Signing, winget, scoop, updater, symbol upload) separated from milestone implementation tasks. Acceptance verified."
       ]
     }
   ]

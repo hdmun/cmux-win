@@ -14,6 +14,7 @@
   "tasks": [
     {
       "task_id": "m3-1",
+      "queue_number": 7,
       "title": "ControlServer foundation",
       "status": "pending",
       "summary": "Implement the Named Pipe control server foundation.",
@@ -38,6 +39,7 @@
     },
     {
       "task_id": "m3-2",
+      "queue_number": 5,
       "title": "Split layout controller + XAML projection",
       "status": "pending",
       "summary": "Implement the BonsplitController and project snapshots into XAML.",
@@ -66,6 +68,7 @@
     },
     {
       "task_id": "m3-3",
+      "queue_number": 4,
       "title": "Sidebar/workspace state projection",
       "status": "pending",
       "summary": "Implement TabManager-backed sidebar projection and metadata batching.",
@@ -92,6 +95,7 @@
     },
     {
       "task_id": "m3-4",
+      "queue_number": 5,
       "title": "Tab/workspace lifecycle rules",
       "status": "pending",
       "summary": "Implement lifecycle and selection rules for workspaces and tabs.",
@@ -120,6 +124,7 @@
     },
     {
       "task_id": "m3-5",
+      "queue_number": 7,
       "title": "IPC TDD for split/focus/state conflict",
       "status": "pending",
       "summary": "Add tests for IPC error handling and state conflicts around split/focus operations.",

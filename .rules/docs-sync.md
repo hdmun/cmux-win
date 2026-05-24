@@ -58,3 +58,4 @@
 | plans/session-state.md | 세션 handoff snapshot |
 | plans/index.json | milestone registry, status enum, startup read order |
 | plans/milestones/*.json | machine-readable task 상태, 의존성, acceptance |
+| _workspace/17-functional-spec.md | macOS cmux 참조 대비 Windows v1 기능 명세 (feature-by-feature) |

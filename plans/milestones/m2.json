@@ -12,6 +12,7 @@
   "tasks": [
     {
       "task_id": "m2-1",
+      "queue_number": 5,
       "title": "ConPTY process and I/O pipeline",
       "status": "pending",
       "summary": "Implement the ConPTY spawn path and terminal I/O pipeline.",
@@ -39,7 +40,7 @@
         "manual: verify CMUX_CONPTY_MODE=standard env override bypasses passthrough gate"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win",
+        "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R conpty --output-on-failure"
       ],
       "outputs": [
@@ -53,6 +54,7 @@
     },
     {
       "task_id": "m2-2",
+      "queue_number": 5,
       "title": "libvterm wrapper + terminal buffer",
       "status": "pending",
       "summary": "Wrap libvterm and define the terminal buffer integration.",
@@ -76,7 +78,7 @@
         "manual: verify libvterm source exists only in ports/libvterm/, not in vendor/ or any other path"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win",
+        "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R vterm --output-on-failure"
       ],
       "outputs": [
@@ -90,6 +92,7 @@
     },
     {
       "task_id": "m2-3",
+      "queue_number": 5,
       "title": "Direct2D renderer",
       "status": "pending",
       "summary": "Implement the Direct2D/DirectWrite renderer for published frames.",
@@ -113,7 +116,7 @@
         "manual: verify glyph cache invalidated on DPI change"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win",
+        "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R renderer --output-on-failure"
       ],
       "outputs": [
@@ -127,6 +130,7 @@
     },
     {
       "task_id": "m2-4",
+      "queue_number": 5,
       "title": "SwapChainPanel host integration",
       "status": "pending",
       "summary": "Attach the terminal renderer to the WinUI 3 SwapChainPanel host.",
@@ -151,7 +155,7 @@
         "manual: verify terminal panel disposed state releases ConPTY → libvterm → D2D in that order"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win"
+        "cmake --build --preset dev-x64 --target cmux_app"
       ],
       "outputs": [
         "src/panels/terminal_panel.h",
@@ -164,6 +168,7 @@
     },
     {
       "task_id": "m2-5",
+      "queue_number": 5,
       "title": "IME + UIA",
       "status": "pending",
       "summary": "Implement IME rect updates and baseline UIA support.",
@@ -187,7 +192,7 @@
         "manual: verify caret move and viewport change UIA events are raised"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win",
+        "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R ime --output-on-failure"
       ],
       "outputs": [

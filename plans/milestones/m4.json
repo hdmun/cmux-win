@@ -12,6 +12,7 @@
   "tasks": [
     {
       "task_id": "m4-1",
+      "queue_number": 6,
       "title": "Browser panel host",
       "status": "pending",
       "summary": "Implement the WebView2 browser panel host and environment pooling.",
@@ -29,7 +30,7 @@
         "manual: verify WebView2 host survives workspace and split transitions"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win"
+        "cmake --build --preset dev-x64 --target cmux_app"
       ],
       "outputs": [
         "src/panels/browser_panel.h",
@@ -42,6 +43,7 @@
     },
     {
       "task_id": "m4-2",
+      "queue_number": 6,
       "title": "Omnibar and navigation UX",
       "status": "pending",
       "summary": "Implement omnibar input rules, focus behavior, and navigation suggestions.",
@@ -59,7 +61,7 @@
         "manual: verify URL normalization and Ctrl+L behavior"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win"
+        "cmake --build --preset dev-x64 --target cmux_app"
       ],
       "outputs": [
         "src/ui/omnibar.h",
@@ -71,6 +73,7 @@
     },
     {
       "task_id": "m4-3",
+      "queue_number": 7,
       "title": "CDP automation contract",
       "status": "pending",
       "summary": "Implement browser automation through the documented CDP contract.",
@@ -90,7 +93,7 @@
         "manual: verify CDP unavailable and failed paths return explicit errors"
       ],
       "commands": [
-        "cmake --build --preset dev-x64 --target cmux-win",
+        "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R cdp --output-on-failure"
       ],
       "outputs": [
