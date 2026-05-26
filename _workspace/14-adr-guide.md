@@ -23,24 +23,35 @@ _workspace\
 - slug는 소문자 kebab-case
 - ADR 번호는 재사용하지 않는다
 
-## 3. minimum template
+## 3. writing rule and minimum template
+
+새 ADR은 아래 세 조건이 모두 맞을 때만 만든다.
+
+1. 뒤집기 비용이 크다.
+2. 문맥이 없으면 미래 독자가 "왜 이렇게 했지?"라고 묻는다.
+3. 실제 대안 비교가 있었고, 특정 이유로 하나를 골랐다.
+
+셋 중 하나라도 빠지면 새 ADR보다 관련 `_workspace` 문서를 직접 갱신하는 편이 낫다.
+
+ADR은 길게 쓰지 않는다. 기본값은 짧은 결정 기록이며, 전체 배경 설명을 복제하지 않는다.
 
 ```markdown
 # ADR-0001: Title
 
 - Status: proposed | accepted | superseded
-- Date:
 - Related docs:
 - Related tasks:
 
-## Context
-
-## Decision
-
-## Consequences
-
-## Verification impact
+{1-3문장: 어떤 문맥에서 무엇을 결정했고 왜 그렇게 했는지}
 ```
+
+필요할 때만 아래 섹션을 추가한다.
+
+- `## Context`
+- `## Consequences`
+- `## Verification impact`
+
+기존 full-section ADR은 계속 유효하다. 새 ADR은 짧은 형식을 기본으로 하고, 추가 섹션은 실제로 설명 가치가 있을 때만 쓴다.
 
 ## 4. M0-4 required ADRs
 

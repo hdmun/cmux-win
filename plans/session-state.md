@@ -26,7 +26,7 @@
 
 ## Notes for next session
 
-- Startup read order: `_workspace/00-overview.md` → `_workspace/12-tasks.md` → `plans/index.json` → `plans/milestones/m0.json` → `plans/session-state.md` → queue rules from `.rules/agent-workflow.md` → task `doc_refs`.
+- Startup read order: `_workspace/00-overview.md` → `_workspace/12-tasks.md` → `plans/index.json` → `plans/milestones/m0.json` → `plans/session-state.md` → queue rules from `.rules/agent-workflow.md` → task `doc_refs`. Read `CONTEXT.md` immediately when the task touches canonical terminology or glossary-owned aliases.
 - **Plan metadata cleanup completed (this session)**:
   - Every milestone task now has a `queue_number` (see `.rules/agent-workflow.md` queue table).
   - All build targets use canonical names: `cmux_app` / `cmux_cli` (not `cmux-win`).
@@ -41,4 +41,8 @@
   - **Area B — m3 file-level outputs + tc- tests**: m3-1~m3-4 `outputs` expanded to exact file paths; `commands` populated; acceptance enriched with `tc-*` test cases (total: 14 new tc- cases across 4 tasks).
   - **Area C — m2-4 depends_on**: Fixed `["m2-3"]` → `["m2-1", "m2-2", "m2-3"]` to enforce ConPTY/vterm/D2D ordering.
   - All 7 milestone JSONs validated (JSON parse OK).
+- **Hybrid documentation overlay added (this session)**:
+  - Root `CONTEXT.md` now owns canonical terminology for window / workspace / pane / surface / panel usage.
+  - `.rules/docs-sync.md`, `_workspace/00-overview.md`, and `_workspace/12-tasks.md` now require terminology / naming / ID-rule changes to stay in sync with `CONTEXT.md`.
+  - `_workspace/adr/` remains the canonical ADR home; `_workspace/14-adr-guide.md` now favors shorter ADRs for hard-to-reverse trade-offs instead of long boilerplate.
 - **Remaining plan quality issues** *(none — all 3 identified issues resolved)*.

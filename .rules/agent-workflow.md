@@ -73,3 +73,5 @@
 5. `plans/session-state.md`
 6. 현재 task의 queue-number에 대응하는 `.rules/*.md` (`.rules/agent-workflow.md`의 queue mapping 기준)
 7. 선택한 task의 `doc_refs`
+
+`CONTEXT.md`는 기본 시작 순서에는 넣지 않는다. 다만 용어/alias 판단이 필요한 작업이거나 `doc_refs`가 glossary를 요구하면 즉시 읽는다.

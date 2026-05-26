@@ -92,7 +92,8 @@ Markdown 설명과 JSON 상태가 충돌하면, 계약 내용은 `_workspace\*.m
 
 - bootstrap 변경: `01`, `11`, `12`
 - task 상태 변경: `plans/milestones/*.json`, `plans/session-state.md`
-- autonomous execution 규칙 변경: `13`, `plans/index.json`
+- terminology / naming / ID rule 변경: `CONTEXT.md`, `00`, 관련 도메인 문서
+- autonomous execution / task registry 변경: `00`, `13`, `.rules/agent-workflow.md`, `plans/index.json`, `plans/milestones/*.json`, `plans/session-state.md`
 - ADR / gate contract 변경: `14`, 관련 도메인 문서, `12`
 - protocol 변경: `08`, `12`
 - settings 변경: `09`, `12`

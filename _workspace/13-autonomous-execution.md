@@ -7,6 +7,7 @@
 
 | 경로 | 역할 | authoritative 범위 |
 |------|------|--------------------|
+| `CONTEXT.md` | canonical terminology glossary | user-facing 용어, 금지 alias, 용어 충돌 해소 |
 | `_workspace\*.md` | 사람/에이전트 공용 계약 문서 | 아키텍처, milestone, gate, 도메인 규약 |
 | `plans\index.json`, `plans\milestones\*.json` | 기계 판독 실행 상태 | task 상태, 의존성, 예상 산출물, 검증 명령 |
 | `.rules\*.md` | 에이전트 운영 규칙 | 읽기 순서, 문서 동기화, 저장소 경계, workflow |
@@ -27,6 +28,12 @@
 7. 선택한 task의 `doc_refs`가 가리키는 문서
 
 `plans\index.json`의 `startup_read_order`는 위 7단계를 그대로 표현해야 하며, 동적 단계는 `path_template`/selection metadata로 해석 가능해야 한다.
+
+`CONTEXT.md`는 기본 7단계 startup read order에 승격하지 않는다. 대신 아래 중 하나에 해당하면 즉시 읽는다.
+
+- 현재 task의 `doc_refs`가 `CONTEXT.md`를 가리킬 때
+- 수정 범위가 window / workspace / pane / surface / terminal panel / browser panel / notification 용어를 건드릴 때
+- alias 충돌이나 용어 ambiguity를 풀어야 할 때
 
 ## 3. task selection 규칙
 

@@ -62,9 +62,11 @@ v1의 기본 패키징 모델은 아래 하나로 고정한다.
 
 ## 5. 공통 용어와 명명 규칙
 
+> canonical glossary는 루트 `CONTEXT.md`가 소유한다. 이 섹션은 요약 규칙과 ID 형식을 유지하며, 용어/alias 변경 시 `CONTEXT.md`와 함께 갱신한다.
+
 | 대상 | 규칙 |
 |------|------|
-| 사용자-facing 용어 | workspace, pane, browser panel, terminal panel |
+| 사용자-facing 용어 | `CONTEXT.md`의 canonical term을 사용 (`window`, `workspace`, `pane`, `surface`, `browser panel`, `terminal panel`, `notification`) |
 | IPC / settings JSON | `snake_case` |
 | C++ types | `PascalCase` |
 | C++ methods / fields | 기존 코드 스타일을 따르되, public API는 명확한 명사/동사 조합 유지 |
@@ -120,7 +122,8 @@ M0 종료 시점에 아래가 모두 충족되어야 한다.
 2. 규약이 바뀌면 관련 문서 전체를 같이 수정한다.
 3. 구현보다 문서가 뒤처진 상태를 허용하지 않는다.
 4. M7 release infra는 기능 문서와 분리해서 관리한다.
-5. durable task 상태는 `plans\` JSON과 `plans\session-state.md`에 남긴다.
+5. 용어/alias 변경은 `CONTEXT.md`와 이 문서를 함께 갱신한다.
+6. durable task 상태는 `plans\` JSON과 `plans\session-state.md`에 남긴다.
 
 ## 10. autonomous execution layer
 
@@ -128,6 +131,7 @@ M0 종료 시점에 아래가 모두 충족되어야 한다.
 
 | 경로 | 역할 |
 |------|------|
+| `CONTEXT.md` | canonical user-facing terminology glossary |
 | `_workspace\*.md` | 아키텍처, milestone, gate, 도메인 계약 |
 | `plans\index.json`, `plans\milestones\*.json` | 기계 판독 task 상태, 의존성, acceptance |
 | `.rules\*.md` | 에이전트 운영 규칙 |
@@ -142,3 +146,5 @@ M0 종료 시점에 아래가 모두 충족되어야 한다.
 5. `plans\session-state.md`
 6. 현재 task의 queue-number에 대응하는 `.rules\*.md` (`.rules\agent-workflow.md`의 queue mapping 기준)
 7. 선택한 task의 `doc_refs`
+
+`CONTEXT.md`는 기본 7단계에 넣지 않는다. 다만 용어/alias 변경, panel/workspace/notification naming, 또는 ambiguity 해소가 현재 작업에 포함되면 즉시 읽는다.
