@@ -9,7 +9,7 @@
 |------|------|--------------------|
 | `CONTEXT.md` | canonical terminology glossary | user-facing 용어, 금지 alias, 용어 충돌 해소 |
 | `_workspace\*.md` | 사람/에이전트 공용 계약 문서 | 아키텍처, milestone, gate, 도메인 규약 |
-| `plans\index.json`, `plans\milestones\*.json` | 기계 판독 실행 상태 | task 상태, 의존성, 예상 산출물, 검증 명령 |
+| `plans\index.json`, `plans\milestones\*.json`, `plans\schema\task-registry.schema.json` | 기계 판독 실행 상태와 schema | task 상태, 의존성, `doc_refs` 해석 규칙, 예상 산출물, 검증 명령 |
 | `.rules\*.md` | 에이전트 운영 규칙 | 읽기 순서, 문서 동기화, 저장소 경계, workflow |
 | `plans\session-state.md` | 세션 handoff snapshot | 현재 milestone, 마지막 완료 task, blocker, 다음 추천 task |
 
@@ -25,13 +25,20 @@
 4. 현재 milestone의 `plans\milestones\mN.json`
 5. `plans\session-state.md`
 6. 현재 task의 queue-number에 대응하는 `.rules\*.md` (`.rules\agent-workflow.md`의 queue mapping 기준)
-7. 선택한 task의 `doc_refs`가 가리키는 문서
+7. 현재 milestone의 `doc_refs`, 다음에 선택한 task의 `doc_refs`가 가리키는 문서
 
 `plans\index.json`의 `startup_read_order`는 위 7단계를 그대로 표현해야 하며, 동적 단계는 `path_template`/selection metadata로 해석 가능해야 한다.
 
+step 7의 `doc_refs` 해석은 아래를 따른다.
+
+- merge order: `active_milestone.doc_refs` → `selected_task.doc_refs`
+- dedupe: 앞에서부터 첫 항목만 유지
+- `#` 뒤 fragment는 파일 경로가 아니라 같은 Markdown 파일 안의 heading slug를 뜻한다
+- user-facing behavior, command catalog, settings UX를 구현하는 task는 `_workspace/17-functional-spec.md`를 milestone 또는 task `doc_refs`에 포함한다
+
 `CONTEXT.md`는 기본 7단계 startup read order에 승격하지 않는다. 대신 아래 중 하나에 해당하면 즉시 읽는다.
 
-- 현재 task의 `doc_refs`가 `CONTEXT.md`를 가리킬 때
+- 현재 milestone 또는 task의 `doc_refs`가 `CONTEXT.md`를 가리킬 때
 - 수정 범위가 window / workspace / pane / surface / terminal panel / browser panel / notification 용어를 건드릴 때
 - alias 충돌이나 용어 ambiguity를 풀어야 할 때
 
@@ -40,9 +47,13 @@
 기본 선택 알고리즘은 아래와 같다.
 
 1. `status = "ready"` 인 task만 후보로 삼는다.
-2. `depends_on`에 있는 모든 task가 `done`이면 선택 가능하다.
+2. 아래 두 조건을 **모두** 충족해야 선택 가능하다.
+   - **milestone gate**: `index.json` milestones[]에서 해당 milestone의 `depends_on`에 있는 모든 선행 milestone의 status가 `done`
+   - **task-level 의존성**: 현재 task의 `depends_on`에 있는 모든 task가 `done`
 3. 같은 조건이면 현재 milestone의 가장 낮은 번호 task를 우선한다.
 4. `blocked` task는 `blocked_by`와 `notes`를 확인한 뒤 재시도 여부를 결정한다.
+
+> milestone gate는 "어떤 milestone을 착수할 수 있는가"를 결정하고, task-level 의존성은 "해당 milestone 내에서 어떤 순서로 진행하는가"를 결정한다. 두 조건은 AND 관계이며, task-level 의존성은 milestone gate 통과를 전제로 한 세부 순서다.
 
 ## 4. status semantics
 
@@ -61,6 +72,7 @@
 각 task는 최소 아래 필드를 가진다.
 
 - `task_id`
+- `queue_number`
 - `title`
 - `status`
 - `summary`
@@ -75,6 +87,8 @@
 
 JSON 필드 이름은 모두 `snake_case`를 사용한다.
 
+`queue_number`의 허용 범위와 의미는 `.rules/agent-workflow.md`의 queue mapping이 authoritative source다.
+
 ## 6. handoff rules
 
 세션 종료 전 에이전트는 `plans\session-state.md`에 아래를 반영한다.
@@ -87,6 +101,8 @@ JSON 필드 이름은 모두 `snake_case`를 사용한다.
 
 세션 상태를 남기지 않고 종료하지 않는다.
 
+phase 1의 `plans\session-state.md`는 Markdown snapshot을 유지한다. 기계 판독 handoff 레이어를 추가하더라도 phase 2 운영 레이어로 취급하며, 기존 Markdown snapshot을 암묵적으로 대체하지 않는다.
+
 ## 7. phase-1 exclusions
 
 phase 1에서는 아래를 도입하지 않는다.
@@ -94,5 +110,6 @@ phase 1에서는 아래를 도입하지 않는다.
 - `plans\leases\` 같은 ephemeral claim/heartbeat 파일
 - task 상태를 외부 서비스에만 저장하는 경로
 - Markdown과 JSON의 dual-authority 운용
+- `plans\session-state.md`를 대체하는 별도 handoff JSON mirror
 
 필요하면 phase 2에서 운영 레이어로 추가한다.

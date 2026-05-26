@@ -9,7 +9,9 @@
   "doc_refs": [
     "_workspace/07-notification.md",
     "_workspace/09-config-settings.md",
-    "_workspace/10-shell-integration.md"
+    "_workspace/10-shell-integration.md",
+    "_workspace/17-functional-spec.md",
+    "CONTEXT.md"
   ],
   "tasks": [
     {
@@ -29,6 +31,7 @@
         "src/ui"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify toast failures degrade without breaking in-app notifications",
         "ctest --preset dev-x64 -R notification --output-on-failure"
       ],
@@ -126,6 +129,7 @@
         "src/ipc"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify no prompt blocking and schema-aligned direct-pipe payloads",
         "ctest --preset dev-x64 -R shell_integration --output-on-failure"
       ],

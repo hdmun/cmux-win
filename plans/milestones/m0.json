@@ -65,6 +65,7 @@
         "ports/libvterm"
       ],
       "acceptance": [
+        "cmake --preset dev-x64",
         "manual: verify libvterm overlay path is fixed at ports/libvterm and vcpkg-configuration.json overlay-ports references ./ports",
         "manual: verify NuGet and vcpkg dependency ownership is not duplicated per _workspace/11-build-release.md §3 table",
         "manual: verify vcpkg.json lists at minimum: libvterm (overlay), nlohmann-json, gtest"
@@ -100,6 +101,7 @@
         "resources/*.rc"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify app.manifest sets dpiAwareness to PerMonitorV2",
         "manual: verify app.manifest sets supportedOS entries for Win10 and Win11 compatibility GUIDs",
         "manual: verify .rc file compiles without error in dev-x64 preset build"

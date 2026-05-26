@@ -133,7 +133,7 @@ M0 종료 시점에 아래가 모두 충족되어야 한다.
 |------|------|
 | `CONTEXT.md` | canonical user-facing terminology glossary |
 | `_workspace\*.md` | 아키텍처, milestone, gate, 도메인 계약 |
-| `plans\index.json`, `plans\milestones\*.json` | 기계 판독 task 상태, 의존성, acceptance |
+| `plans\index.json`, `plans\milestones\*.json`, `plans\schema\task-registry.schema.json` | 기계 판독 task 상태, 의존성, acceptance, schema |
 | `.rules\*.md` | 에이전트 운영 규칙 |
 | `plans\session-state.md` | 세션 handoff snapshot |
 
@@ -145,6 +145,10 @@ M0 종료 시점에 아래가 모두 충족되어야 한다.
 4. 해당 milestone의 `plans\milestones\mN.json`
 5. `plans\session-state.md`
 6. 현재 task의 queue-number에 대응하는 `.rules\*.md` (`.rules\agent-workflow.md`의 queue mapping 기준)
-7. 선택한 task의 `doc_refs`
+7. 현재 milestone의 `doc_refs`, 다음에 선택한 task의 `doc_refs`
+
+step 7의 `doc_refs`는 `active_milestone.doc_refs` 뒤에 `selected_task.doc_refs`를 merge하고, 중복은 앞에서부터 하나만 유지한다. `#fragment`는 Markdown heading slug를 뜻하며 파일 경로의 일부가 아니다.
 
 `CONTEXT.md`는 기본 7단계에 넣지 않는다. 다만 용어/alias 변경, panel/workspace/notification naming, 또는 ambiguity 해소가 현재 작업에 포함되면 즉시 읽는다.
+
+`_workspace/17-functional-spec.md`는 user-facing behavior, command catalog, settings UX를 구현하는 milestone의 기본 `doc_refs`에 포함해 task layer에서 도달 가능해야 한다.

@@ -9,7 +9,7 @@
 
 | 파일 | 주제 |
 |------|------|
-| [`.rules/agent-workflow.md`](.rules/agent-workflow.md) | queue-number 규칙, 큐 분류, 에이전트 작업 템플릿, `plans\` / `session-state` / `CONTEXT.md` 읽기 규칙 |
+| [`.rules/agent-workflow.md`](.rules/agent-workflow.md) | queue-number 규칙, 큐 분류, milestone/task `doc_refs` 읽기 규칙, `plans\` / `session-state` / `CONTEXT.md` startup 순서 |
 | [`.rules/repository-scope.md`](.rules/repository-scope.md) | 저장소 역할 경계, `plans\` 역할, 수정 금지 경로, 밀스톤 순서와 착수 조건 |
 | [`.rules/build-dependencies.md`](.rules/build-dependencies.md) | 공식 빌드 경로(CMake Presets + vcpkg + NuGet), 의존성 pinning, vendor 금지 정책 |
 | [`.rules/app-bootstrap-threading.md`](.rules/app-bootstrap-threading.md) | App bootstrap 순서, UI/background 스레드 경계, shutdown 순서, source-of-truth 계약 |
@@ -19,4 +19,4 @@
 | [`.rules/settings-persistence.md`](.rules/settings-persistence.md) | settings.json atomic write / migration, precedence, Ghostty config 보조 입력 규칙 |
 | [`.rules/logging-privacy.md`](.rules/logging-privacy.md) | analytics opt-in 정책, 로그 redaction, log sink/rotation 규칙 |
 | [`.rules/notifications-degrade.md`](.rules/notifications-degrade.md) | graceful degrade, notification suppression, toast, badge, GC 규칙 |
-| [`.rules/docs-sync.md`](.rules/docs-sync.md) | 코드 변경 시 함께 수정해야 할 `_workspace` / `plans` / `CONTEXT` 문서 목록, 전체 참조 문서 |
+| [`.rules/docs-sync.md`](.rules/docs-sync.md) | 코드 변경 시 함께 수정해야 할 `_workspace` / `plans` / `CONTEXT` / schema 문서 목록, 전체 참조 문서 |

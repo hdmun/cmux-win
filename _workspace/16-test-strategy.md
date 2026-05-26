@@ -41,10 +41,17 @@ tests\
 
 ## 4. task acceptance rule
 
-각 `plans\milestones\mN.json` task는 `acceptance` 배열을 가져야 한다.
+각 `plans\milestones\mN.json` task는 `acceptance` 배열과 `commands` 배열을 함께 가진다.
 
-- build/test 명령이 있으면 command string을 그대로 적는다
+- `commands`는 에이전트가 실행할 검증 명령의 ordered list다
+- `acceptance`는 done criteria다
+- `acceptance`의 non-manual executable 항목은 아래 둘 중 하나여야 한다:
+  - `commands`에 들어 있는 literal command string
+  - `tc-*` 형식의 test case identifier
+- `tc-*` acceptance를 쓸 때는 해당 test case를 포함해 검증하는 command가 `commands`에 있어야 한다
 - 수동 확인이 필요하면 `manual:` prefix로 기록한다
+- doc/policy freeze task처럼 실행 명령 자체가 산출물이 아닌 경우에만 `commands`를 비워 둘 수 있다
+- release-only task는 외부 CI 파이프라인에서만 실행되는 특성상 `commands`를 비울 수 있다 (m7 tasks 등). 이 경우 task의 `notes`에 CI-only 이유를 명시한다
 - acceptance가 비어 있는 task를 `done`으로 올리지 않는다
 
 예시:
@@ -55,7 +62,30 @@ tests\
   "cmake --build --preset dev-x64",
   "manual: verify first MainWindow creation on STA thread"
 ]
+
+[
+  "manual: verify same-user ACL and message-mode transport",
+  "tc-pipe-server-open: Named Pipe server opens with PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE",
+  "ctest --preset dev-x64 -R ipc_server --output-on-failure"
+]
 ```
+
+## 5. tc-* naming convention
+
+`tc-{slug}` test case identifier는 아래 규칙으로 소스 파일과 함수명에 매핑된다.
+
+| 요소 | 규칙 | 예시 |
+|------|------|------|
+| 파일 위치 | `tests/unit/{module}/test_{module}.cpp` (unit) 또는 `tests/integration/test_{scope}.cpp` (integration) | `tests/unit/core/test_bonsplit_controller.cpp` |
+| 함수명 | `TEST({ModuleGroup}, {SlugInPascalCase})` (Google Test) | `TEST(BonsplitController, SplitHProduces2Panes)` |
+| ctest 필터 | `-R {module_pattern}` 으로 해당 파일의 모든 tc-* 를 포함 | `ctest -R split_layout` |
+
+변환 규칙:
+- `tc-split-h-produces-2-panes` → slug: `split-h-produces-2-panes` → Pascal: `SplitHProduces2Panes`
+- module group은 task의 `outputs`에서 primary source file의 모듈명을 따른다
+- 같은 source module을 다루는 tc-* 는 같은 test file에 모은다
+
+task에 `tc-*` acceptance 항목이 있으면 해당 test file 경로를 task의 `outputs`에 포함한다.
 
 ## 5. mocking seams
 
@@ -72,5 +102,6 @@ tests\
 test 전략이 바뀌면 아래도 함께 본다.
 
 - `_workspace/12-tasks.md`
+- `plans/README.md`
 - `plans\milestones\mN.json`
 - `.rules/docs-sync.md`

@@ -105,7 +105,7 @@ release signing / installer publishing은 M7 단계로 분리한다.
 - updater / appcast
 - symbol upload / crash ingestion backend
 
-이 항목들은 M7 전용 gate로 다룬다.
+이 항목들은 M7 전용 gate로 다룬다. machine-readable release state는 `plans\milestones\m7.json`이 소유한다.
 
 ## 10. 실패 정책
 
@@ -126,3 +126,4 @@ release signing / installer publishing은 M7 단계로 분리한다.
 - signing 경로가 CI에서 재현 가능
 - installer가 WinAppSDK/WebView2 prerequisite를 검증
 - release artifact와 symbol upload가 분리되어 관리됨
+- `plans\milestones\m7.json`의 task 상태와 acceptance가 release backlog와 모순되지 않음

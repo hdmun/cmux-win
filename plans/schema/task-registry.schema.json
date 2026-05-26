@@ -8,6 +8,7 @@
     "milestone_id",
     "display_name",
     "depends_on",
+    "doc_refs",
     "tasks"
   ],
   "properties": {
@@ -32,7 +33,7 @@
     "doc_refs": {
       "type": "array",
       "items": {
-        "type": "string"
+        "$ref": "#/$defs/doc_ref_string"
       }
     },
     "tasks": {
@@ -43,6 +44,15 @@
     }
   },
   "$defs": {
+    "doc_ref_string": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._\\\\/-]+(?:#[^\\s]+)?$"
+    },
+    "queue_number": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 11
+    },
     "status": {
       "type": "string",
       "enum": [
@@ -57,6 +67,7 @@
       "type": "object",
       "required": [
         "task_id",
+        "queue_number",
         "title",
         "status",
         "summary",
@@ -73,6 +84,9 @@
         "task_id": {
           "type": "string",
           "pattern": "^m[0-9]+-[0-9]+$"
+        },
+        "queue_number": {
+          "$ref": "#/$defs/queue_number"
         },
         "title": {
           "type": "string"
@@ -93,7 +107,7 @@
         "doc_refs": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/doc_ref_string"
           }
         },
         "touches": {
@@ -115,6 +129,12 @@
           }
         },
         "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "authoritative_rules": {
           "type": "array",
           "items": {
             "type": "string"

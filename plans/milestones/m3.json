@@ -9,7 +9,9 @@
   "doc_refs": [
     "_workspace/04-split-pane.md",
     "_workspace/05-sidebar-tabs.md",
-    "_workspace/08-ipc-cli.md"
+    "_workspace/08-ipc-cli.md",
+    "_workspace/17-functional-spec.md",
+    "CONTEXT.md"
   ],
   "tasks": [
     {
@@ -42,7 +44,8 @@
         "src/ipc/pipe_transport.h",
         "src/ipc/pipe_transport.cpp",
         "src/ipc/message_framer.h",
-        "src/ipc/message_framer.cpp"
+        "src/ipc/message_framer.cpp",
+        "tests/unit/ipc/test_pipe_server.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -79,7 +82,8 @@
         "src/core/bonsplit_controller.cpp",
         "src/core/layout_snapshot.h",
         "src/ui/split_panel_host.xaml",
-        "src/ui/split_panel_host.xaml.cpp"
+        "src/ui/split_panel_host.xaml.cpp",
+        "tests/unit/core/test_bonsplit_controller.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -116,7 +120,8 @@
         "src/ui/sidebar_view.xaml",
         "src/ui/sidebar_view.xaml.cpp",
         "src/ui/workspace_tab_item.xaml",
-        "src/ui/workspace_tab_item.xaml.cpp"
+        "src/ui/workspace_tab_item.xaml.cpp",
+        "tests/unit/core/test_tab_manager.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -137,7 +142,9 @@
       ],
       "touches": [
         "src/core",
-        "src/ui"
+        "src/ui",
+        "src/core/tab_manager.h",
+        "src/core/tab_manager.cpp"
       ],
       "acceptance": [
         "manual: verify close selection follows the documented left-priority rule",
@@ -150,8 +157,7 @@
         "ctest --preset dev-x64 -R tab_manager --output-on-failure"
       ],
       "outputs": [
-        "src/core/tab_manager.h",
-        "src/core/tab_manager.cpp"
+        "tests/unit/core/test_tab_manager_lifecycle.cpp"
       ],
       "blocked_by": [],
       "notes": []

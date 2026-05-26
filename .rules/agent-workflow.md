@@ -8,6 +8,8 @@
 [QUEUE-N] <태스크 요약>
 ```
 
+machine-readable source of truth는 `plans\milestones\mN.json`의 `queue_number`이며, 허용 값은 `plans\schema\task-registry.schema.json`에서 검증 가능해야 한다.
+
 ## 큐 분류
 
 | Queue | 업무 범위 | 우선 참조 문서 |
@@ -29,8 +31,11 @@
 1. 템플릿 안에서 규칙을 다시 길게 복제하지 않는다.
 2. `docs-sync`, `milestone`, `dependency`, `verification`은 반드시 authoritative 문서를 가리킨다.
 3. queue 선택은 “가장 먼저 읽어야 할 규칙 묶음” 기준으로 한다.
-4. 여러 영역을 건드리더라도 대표 queue는 하나만 선택하고, 나머지 문서는 `authoritative-rules`에 열거한다.
+4. 여러 영역을 건드리더라도 대표 queue는 하나만 선택하고, 나머지 문서는 task의 `authoritative_rules` 배열과 `authoritative-rules` 템플릿 항목에 열거한다.
 5. 완전 자율 구현 작업은 시작 전에 `plans\index.json`, 해당 milestone JSON, `plans\session-state.md`를 함께 읽는다.
+6. `doc_refs`는 `active_milestone.doc_refs` 뒤에 `selected_task.doc_refs`를 merge해서 읽는다. `#fragment`는 같은 Markdown 파일의 heading slug다.
+7. `plans\milestones\*.json` 또는 `plans\index.json`을 바꿨으면 `plans\schema\task-registry.schema.json` 기준 validation을 남긴다.
+8. task 착수 조건은 **두 단계 AND**다: (1) `index.json` milestones[]의 milestone-level `depends_on`에 있는 모든 선행 milestone status가 `done`이어야 하고, (2) task JSON의 task-level `depends_on`에 있는 모든 task가 `done`이어야 한다. milestone gate가 먼저, task 순서가 그 다음이다.
 
 ## 에이전트 입력 템플릿
 
@@ -72,6 +77,8 @@
 4. 해당 milestone의 `plans/milestones/mN.json`
 5. `plans/session-state.md`
 6. 현재 task의 queue-number에 대응하는 `.rules/*.md` (`.rules/agent-workflow.md`의 queue mapping 기준)
-7. 선택한 task의 `doc_refs`
+7. 현재 milestone의 `doc_refs`, 다음에 선택한 task의 `doc_refs`
 
-`CONTEXT.md`는 기본 시작 순서에는 넣지 않는다. 다만 용어/alias 판단이 필요한 작업이거나 `doc_refs`가 glossary를 요구하면 즉시 읽는다.
+`CONTEXT.md`는 기본 시작 순서에는 넣지 않는다. 다만 용어/alias 판단이 필요한 작업이거나 merged `doc_refs`가 glossary를 요구하면 즉시 읽는다.
+
+`_workspace/17-functional-spec.md`는 user-facing behavior, command catalog, settings UX를 구현하는 milestone의 기본 `doc_refs`에 포함해 task 선택 경로에서 빠지지 않게 한다.

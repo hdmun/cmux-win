@@ -6,7 +6,9 @@
     "m0"
   ],
   "doc_refs": [
-    "_workspace/02-core-app.md"
+    "_workspace/02-core-app.md",
+    "_workspace/17-functional-spec.md",
+    "CONTEXT.md"
   ],
   "tasks": [
     {
@@ -27,6 +29,7 @@
         "src/ui"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify first MainWindow creation on STA thread"
       ],
       "commands": [
@@ -58,6 +61,7 @@
         "src/core"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify active window tracking and close order",
         "ctest --preset dev-x64 -R window_manager --output-on-failure"
       ],
@@ -91,6 +95,7 @@
         "src/app"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify backdrop fallback matches support matrix"
       ],
       "commands": [

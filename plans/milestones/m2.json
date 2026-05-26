@@ -7,7 +7,9 @@
     "m1"
   ],
   "doc_refs": [
-    "_workspace/03-terminal-engine.md"
+    "_workspace/03-terminal-engine.md",
+    "_workspace/17-functional-spec.md",
+    "CONTEXT.md"
   ],
   "tasks": [
     {
@@ -34,6 +36,7 @@
         "src/terminal/engine/io_loop.cpp"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify standard ConPTY mode works on Win10 — shell spawns and I/O flows",
         "manual: verify passthrough gate detection runs on Win11 22H2+ (log entry present)",
         "manual: verify CMUX_PIPE_NAME, CMUX_PANE_ID, CMUX_SURFACE_ID injected on shell spawn",
@@ -74,6 +77,7 @@
         "src/terminal/engine/terminal_buffer.cpp"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify parser path uses libvterm — no custom VT parser code exists in src/",
         "manual: verify VtermWrapper.PushBytes() correctly updates TerminalBuffer for basic VT100 sequences (color, cursor move, erase)",
         "manual: verify libvterm source exists only in ports/libvterm/, not in vendor/ or any other path",
@@ -113,6 +117,7 @@
         "src/terminal/renderer/glyph_cache.h"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify dirty-region-based redraw path — full-screen clear does not redraw unchanged cells",
         "manual: verify D2D draw runs on UI thread (not background) per adr-0001 threading table",
         "manual: verify glyph cache invalidated on DPI change",
@@ -155,6 +160,7 @@
         "src/panels/terminal_panel.xaml.cpp"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify terminal panel survives reparent — ConPTY session remains alive after split move",
         "manual: verify reattach_token increments on Detach() and triggers SetSwapChain() re-call",
         "manual: verify terminal panel disposed state releases ConPTY → libvterm → D2D in that order"
@@ -191,6 +197,7 @@
         "src/terminal/uia/uia_provider.cpp"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify IME candidate window placement aligns with terminal cursor pixel rect",
         "manual: verify IME rect recalculated immediately on DPI change (DpiChanged event)",
         "manual: verify Narrator or NVDA can read current line text via UIA TextPattern",

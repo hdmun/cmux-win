@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "milestone_id": "m7",
+  "display_name": "M7",
+  "depends_on": [
+    "m1",
+    "m2",
+    "m3",
+    "m4",
+    "m5",
+    "m6"
+  ],
+  "doc_refs": [
+    "_workspace/11-build-release.md"
+  ],
+  "tasks": [
+    {
+      "task_id": "m7-1",
+      "queue_number": 3,
+      "title": "Release signing path",
+      "status": "pending",
+      "summary": "Integrate the production signing path and keep it reproducible in CI.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/11-build-release.md"
+      ],
+      "touches": [
+        ".github/workflows",
+        "resources/signing"
+      ],
+      "acceptance": [
+        "manual: verify signing path is reproducible in CI and matches the M7 gate"
+      ],
+      "commands": [],
+      "outputs": [
+        ".github/workflows",
+        "resources/signing"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "Azure Trusted Signing remains release-only and is tracked here rather than in M0~M6 feature milestones.",
+        "commands: [] — release-only task; executed via external CI/CD pipeline, not local build.",
+        "outputs list directory paths; specific filenames are determined at implementation time."
+      ]
+    },
+    {
+      "task_id": "m7-2",
+      "queue_number": 3,
+      "title": "Installer prerequisite packaging",
+      "status": "pending",
+      "summary": "Package the installer path and validate WinAppSDK and WebView2 prerequisites.",
+      "depends_on": [
+        "m7-1"
+      ],
+      "doc_refs": [
+        "_workspace/11-build-release.md"
+      ],
+      "touches": [
+        "resources/installer",
+        "resources"
+      ],
+      "acceptance": [
+        "manual: verify installer checks WinAppSDK bootstrap and WebView2 Evergreen prerequisite"
+      ],
+      "commands": [],
+      "outputs": [
+        "resources/installer"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "commands: [] — release-only task; executed via external CI/CD pipeline, not local build.",
+        "outputs list directory paths; specific filenames are determined at implementation time."
+      ]
+    },
+    {
+      "task_id": "m7-3",
+      "queue_number": 3,
+      "title": "Distribution manifests",
+      "status": "pending",
+      "summary": "Prepare the release-only winget and scoop distribution manifests.",
+      "depends_on": [
+        "m7-2"
+      ],
+      "doc_refs": [
+        "_workspace/11-build-release.md"
+      ],
+      "touches": [
+        "resources/distribution"
+      ],
+      "acceptance": [
+        "manual: verify winget and scoop manifests point at the signed release artifacts"
+      ],
+      "commands": [],
+      "outputs": [
+        "resources/distribution"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "commands: [] — release-only task; executed via external CI/CD pipeline, not local build.",
+        "outputs list directory paths; specific filenames are determined at implementation time."
+      ]
+    },
+    {
+      "task_id": "m7-4",
+      "queue_number": 10,
+      "title": "Symbol upload and crash ingestion",
+      "status": "pending",
+      "summary": "Separate symbol upload and crash ingestion backend work from the runtime crash policy tasks.",
+      "depends_on": [
+        "m7-1"
+      ],
+      "doc_refs": [
+        "_workspace/11-build-release.md",
+        "_workspace/07-notification.md"
+      ],
+      "touches": [
+        "resources/crash-ingestion",
+        ".github/workflows"
+      ],
+      "acceptance": [
+        "manual: verify symbol upload and crash ingestion are managed separately from app runtime logging policy"
+      ],
+      "commands": [],
+      "outputs": [
+        "resources/crash-ingestion"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "commands: [] — release-only task; executed via external CI/CD pipeline, not local build.",
+        "outputs list directory paths; specific filenames are determined at implementation time."
+      ]
+    },
+    {
+      "task_id": "m7-5",
+      "queue_number": 3,
+      "title": "Updater and appcast channel",
+      "status": "pending",
+      "summary": "Define the updater/appcast release channel separately from the v1 feature milestones.",
+      "depends_on": [
+        "m7-2"
+      ],
+      "doc_refs": [
+        "_workspace/11-build-release.md"
+      ],
+      "touches": [
+        "resources/updater"
+      ],
+      "acceptance": [
+        "manual: verify updater/appcast stays in the release-only lane and is not required for M0~M6"
+      ],
+      "commands": [],
+      "outputs": [
+        "resources/updater"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "commands: [] — release-only task; executed via external CI/CD pipeline, not local build.",
+        "outputs list directory paths; specific filenames are determined at implementation time."
+      ]
+    }
+  ]
+}

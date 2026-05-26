@@ -7,7 +7,9 @@
     "m4"
   ],
   "doc_refs": [
-    "_workspace/08-ipc-cli.md"
+    "_workspace/08-ipc-cli.md",
+    "_workspace/17-functional-spec.md",
+    "CONTEXT.md"
   ],
   "tasks": [
     {
@@ -27,6 +29,8 @@
         "src/ipc"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_cli",
+        "ctest --preset dev-x64 -R cli --output-on-failure",
         "manual: verify capabilities response matches protocol version 2"
       ],
       "commands": [
@@ -59,6 +63,8 @@
         "src/core"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_cli",
+        "ctest --preset dev-x64 -R ipc_commands --output-on-failure",
         "manual: verify command routing matches the published command catalog"
       ],
       "commands": [
@@ -125,6 +131,8 @@
         "vcpkg.json"
       ],
       "acceptance": [
+        "cmake --preset dev-x64",
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify crash capture honors the frozen log/privacy policy from m5-3",
         "manual: verify Crashpad is initialized via InitializeCrashpad() before any other app logic",
         "manual: verify minidump is generated in %LOCALAPPDATA%\\cmux\\crashes\\ on simulated crash",
@@ -137,6 +145,9 @@
       "outputs": [
         "src/core/crash_reporter.h",
         "src/core/crash_reporter.cpp"
+      ],
+      "authoritative_rules": [
+        ".rules/settings-persistence.md"
       ],
       "blocked_by": [],
       "notes": [

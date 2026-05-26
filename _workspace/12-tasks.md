@@ -33,7 +33,8 @@
 이 문서는 milestone/gate의 사람용 설명을 유지한다. durable task 상태와 의존성 해석은 아래 파일을 함께 사용한다.
 
 - `plans\index.json`
-- `plans\milestones\m0.json` ~ `m6.json`
+- `plans\milestones\m0.json` ~ `m7.json`
+- `plans\schema\task-registry.schema.json`
 - `plans\session-state.md`
 
 Markdown 설명과 JSON 상태가 충돌하면, 계약 내용은 `_workspace\*.md`가 우선이고 task 상태는 `plans\`가 우선이다.
@@ -42,9 +43,9 @@ Markdown 설명과 JSON 상태가 충돌하면, 계약 내용은 `_workspace\*.m
 
 > task 상세(산출물, acceptance, commands)는 `plans/milestones/m0.json`을 참조한다.
 
-## 4. M1~M6 task 목록
+## 4. M1~M7 task 목록
 
-> task 목록 및 선행 조건은 `plans/milestones/m1.json` ~ `m6.json`을 참조한다.
+> task 목록 및 선행 조건은 `plans/milestones/m1.json` ~ `m7.json`을 참조한다.
 
 ## 5. validation matrix
 
@@ -57,6 +58,7 @@ Markdown 설명과 JSON 상태가 충돌하면, 계약 내용은 `_workspace\*.m
 | M4 | WebView2 host, CDP errors, session retention |
 | M5 | CLI handshake, command routing, crash/log policy |
 | M6 | settings atomic write, migration backup, toast degrade, shell non-blocking |
+| M7 | signing, installer prerequisite, distribution manifests, updater/release channel |
 
 ## 6. gate 정의
 
@@ -86,6 +88,8 @@ Markdown 설명과 JSON 상태가 충돌하면, 계약 내용은 `_workspace\*.m
 - `scoop` manifest
 - updater / appcast
 
+release-only backlog의 machine-readable 상태는 `plans/milestones/m7.json`이 소유한다. 다만 M7은 기능 구현 milestone과 별도 gate로 유지한다.
+
 ## 8. 문서와 구현 동기화 규칙
 
 기능 구현 시 아래 문서는 함께 수정한다.
@@ -93,7 +97,8 @@ Markdown 설명과 JSON 상태가 충돌하면, 계약 내용은 `_workspace\*.m
 - bootstrap 변경: `01`, `11`, `12`
 - task 상태 변경: `plans/milestones/*.json`, `plans/session-state.md`
 - terminology / naming / ID rule 변경: `CONTEXT.md`, `00`, 관련 도메인 문서
-- autonomous execution / task registry 변경: `00`, `13`, `.rules/agent-workflow.md`, `plans/index.json`, `plans/milestones/*.json`, `plans/session-state.md`
+- autonomous execution / task registry 변경: `00`, `13`, `.rules/agent-workflow.md`, `plans/README.md`, `plans/index.json`, `plans/schema/task-registry.schema.json`, `plans/milestones/*.json`, `plans/session-state.md`
+- task `doc_refs` / spec / glossary 연결 변경: `CONTEXT.md`, `00`, `13`, `17`, `plans/README.md`, `plans/index.json`, `plans/milestones/*.json`
 - ADR / gate contract 변경: `14`, 관련 도메인 문서, `12`
 - protocol 변경: `08`, `12`
 - settings 변경: `09`, `12`

@@ -7,7 +7,9 @@
     "m3"
   ],
   "doc_refs": [
-    "_workspace/06-browser-panel.md"
+    "_workspace/06-browser-panel.md",
+    "_workspace/17-functional-spec.md",
+    "CONTEXT.md"
   ],
   "tasks": [
     {
@@ -27,6 +29,7 @@
         "src/ui"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify WebView2 host survives workspace and split transitions"
       ],
       "commands": [
@@ -58,6 +61,7 @@
         "src/panels"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify URL normalization and Ctrl+L behavior"
       ],
       "commands": [
@@ -90,6 +94,7 @@
         "src/ipc"
       ],
       "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
         "manual: verify CDP unavailable and failed paths return explicit errors",
         "ctest --preset dev-x64 -R cdp --output-on-failure"
       ],
