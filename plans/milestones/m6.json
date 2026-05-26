@@ -144,6 +144,9 @@
         "src/ipc/shell_report_handler.h",
         "src/ipc/shell_report_handler.cpp"
       ],
+      "authoritative_rules": [
+        ".rules/ipc-contract.md"
+      ],
       "blocked_by": [],
       "notes": []
     }

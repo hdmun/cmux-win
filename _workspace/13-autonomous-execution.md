@@ -101,6 +101,18 @@ JSON 필드 이름은 모두 `snake_case`를 사용한다.
 
 세션 상태를 남기지 않고 종료하지 않는다.
 
+### milestone 완료 시 필수 갱신
+
+milestone의 마지막 task가 `done`이 될 때 아래를 모두 반영한다.
+
+1. 완료된 milestone JSON의 모든 task가 `done`인지 확인
+2. `plans\index.json`의 해당 milestone 항목에 `"status": "done"` 설정
+3. 다음 착수 가능한 milestone을 결정해 `plans\index.json`의 `active_milestone` 값 갱신
+4. 다음 milestone의 `status`를 `"ready"` 또는 `"pending"` 중 맞는 값으로 설정
+5. `plans\session-state.md` 갱신
+
+`active_milestone`과 milestone `status`는 `plans\index.json`이 authoritative source다. mN.json의 task status와 index.json의 milestone status가 불일치하면 task status를 기준으로 index.json을 수정한다.
+
 phase 1의 `plans\session-state.md`는 Markdown snapshot을 유지한다. 기계 판독 handoff 레이어를 추가하더라도 phase 2 운영 레이어로 취급하며, 기존 Markdown snapshot을 암묵적으로 대체하지 않는다.
 
 ## 7. phase-1 exclusions

@@ -85,6 +85,9 @@ tests\
 - module group은 task의 `outputs`에서 primary source file의 모듈명을 따른다
 - 같은 source module을 다루는 tc-* 는 같은 test file에 모은다
 
+**예외 — TDD-only / multi-scope task:**
+task의 `outputs`가 test 파일만 있거나 여러 모듈에 걸치는 경우(예: m3-5), `tc-*` 항목은 논리적으로 가장 가까운 test 파일에 직접 매핑한다. 이 경우 task JSON의 acceptance 항목 옆에 `// → test_file.cpp` 주석 대신 `outputs` 배열의 순서로 file→tc 대응을 암묵적으로 선언한다. 명확하지 않을 경우 task `notes[]`에 explicit mapping을 기록한다.
+
 task에 `tc-*` acceptance 항목이 있으면 해당 test file 경로를 task의 `outputs`에 포함한다.
 
 ## 5. mocking seams

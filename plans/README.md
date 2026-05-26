@@ -15,10 +15,11 @@
 ## update rule
 
 1. task 상태가 바뀌면 관련 milestone JSON을 먼저 갱신한다.
-2. 계약이나 범위가 바뀌면 `_workspace\` 문서를 함께 갱신한다.
-3. `plans\index.json` 또는 `plans\milestones\*.json`을 바꿨으면 `plans\schema\task-registry.schema.json` 기준 validation을 수행한다.
-4. 세션 종료 전 `plans\session-state.md`를 최신 상태로 남긴다.
-5. JSON은 `_workspace`의 설명을 복제하지 않고 실행 메타데이터만 담는다.
+2. milestone이 완료되면 `plans\index.json`의 해당 milestone `status`를 `done`으로, `active_milestone`을 다음 milestone으로 갱신한다.
+3. 계약이나 범위가 바뀌면 `_workspace\` 문서를 함께 갱신한다.
+4. `plans\index.json` 또는 `plans\milestones\*.json`을 바꿨으면 `plans\schema\task-registry.schema.json` 기준 validation을 수행한다.
+5. 세션 종료 전 `plans\session-state.md`를 최신 상태로 남긴다.
+6. JSON은 `_workspace`의 설명을 복제하지 않고 실행 메타데이터만 담는다.
 
 ## `doc_refs` resolution rule
 

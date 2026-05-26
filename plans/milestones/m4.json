@@ -107,6 +107,9 @@
         "src/panels/cdp_automation.cpp",
         "src/ipc/browser_commands.h"
       ],
+      "authoritative_rules": [
+        ".rules/terminal-browser-panel.md"
+      ],
       "blocked_by": [],
       "notes": []
     }
