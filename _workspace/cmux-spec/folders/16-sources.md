@@ -38,8 +38,7 @@ Sources/
 │   ├── TerminalPanelView.swift    # 터미널 패인 SwiftUI 뷰
 │   ├── BrowserPanel.swift         # 브라우저 패인 모델 (WKWebView)
 │   ├── BrowserPanelView.swift     # 브라우저 패인 UI (주소창, 내비게이션)
-│   ├── CmuxWebView.swift          # WKWebView 래퍼 (포커스·단축키 보존)
-│   └── SurfaceSearchOverlay.swift # 인터미널 검색 오버레이
+│   └── CmuxWebView.swift          # WKWebView 래퍼 (포커스·단축키 보존)
 │
 ├── Find/                          # 검색 오버레이 전용 하위 모듈
 │   └── SurfaceSearchOverlay.swift # 패널 위 플로팅 검색 UI, 매치 카운터/이동/닫기 처리
@@ -48,10 +47,56 @@ Sources/
     ├── UpdateController.swift
     ├── UpdateViewModel.swift
     ├── UpdateDriver.swift
+    ├── UpdateDelegate.swift
     ├── UpdateBadge.swift
     ├── UpdatePill.swift
-    └── ...
+    ├── UpdatePopoverView.swift
+    ├── UpdateTitlebarAccessory.swift
+    ├── UpdateLogStore.swift
+    ├── UpdateTiming.swift
+    ├── UpdateTestSupport.swift     # 테스트 지원 (v1 포팅 대상 아님)
+    └── UpdateTestURLProtocol.swift # 테스트 지원 (v1 포팅 대상 아님)
 ```
+
+> **명세 정정**: `SurfaceSearchOverlay.swift`는 `Sources/Find/`에만 존재한다 (`Sources/Panels/`에는 없음). 이전 판은 양쪽에 중복 기재했다.
+
+## 소켓 API v2 메서드 카탈로그
+
+`TerminalController.swift`의 v2 디스패치 테이블에는 약 100개의 메서드가 네임스페이스별로 존재한다 (출처: `Sources/TerminalController.swift:504-806`). `CLI/cmux.swift`의 명령이 이 메서드들을 호출한다. `socket_control` 모드(`off`/`readonly`/`full`)별 허용 범위를 정의하려면 전체 카탈로그가 기준이 된다.
+
+| 네임스페이스 | 메서드 |
+|--------------|--------|
+| `system` | ping, capabilities, identify |
+| `window` | list, current, focus, create, close |
+| `workspace` | list, create, select, current, close, reorder, move_to_window |
+| `surface` | list, current, focus, split, create, close, move, reorder, refresh, health, send_key, send_text, trigger_flash, drag_to_split |
+| `pane` | list, focus, surfaces, create |
+| `notification` | create, create_for_surface, create_for_target, list, clear |
+| `app` | focus_override.set, simulate_active |
+| `browser` (기본) | navigate, back, forward, reload, snapshot, eval, wait, click, dblclick, hover, focus, type, fill, press, keydown, keyup, check, uncheck, select, scroll, scroll_into_view, screenshot, highlight, focus_webview, is_webview_focused, open_split, input_mouse, input_keyboard, input_touch, addinitscript, addscript, addstyle |
+| `browser.url` | get |
+| `browser.get` | text, html, value, attr, title, count, box, styles |
+| `browser.is` | visible, enabled, checked |
+| `browser.find` | role, text, label, placeholder, alt, title, testid, first, last, nth |
+| `browser.frame` | select, main |
+| `browser.dialog` | accept, dismiss |
+| `browser.download` | wait |
+| `browser.cookies` | get, set, clear |
+| `browser.storage` | get, set, clear |
+| `browser.tab` | new, list, switch, close |
+| `browser.console` | list, clear |
+| `browser.errors` | list |
+| `browser.state` | save, load |
+| `browser.viewport` | set |
+| `browser.geolocation` | set |
+| `browser.offline` | set |
+| `browser.trace` | start, stop |
+| `browser.network` | route, unroute, requests |
+| `browser.screencast` | start, stop |
+| `debug` | shortcut.set, shortcut.simulate, type, app.activate, layout, notification.focus, flash.count, flash.reset, window.screenshot, terminal.is_focused, terminal.read_text, terminal.render_stats, bonsplit_underflow.count, bonsplit_underflow.reset, empty_panel.count, empty_panel.reset, panel_snapshot, panel_snapshot.reset |
+
+> `debug.*` 네임스페이스는 테스트/디버그 지원 명령(단축키 시뮬레이션·레이아웃 덤프·flash 카운터·창 스크린샷)으로, 포트의 e2e 하니스 설계 시 참조한다.
+> 브라우저 고급 자동화(tab/console/errors/state/trace/network/screencast/geolocation/viewport/offline)는 `BrowserPanel.swift`가 구현한다. 사이드바(git branch·CWD·listening ports·최신 알림 텍스트)의 동작 계약은 [integrated-spec.md](../integrated-spec.md) §2를 참조한다.
 
 ## 저장소 상호작용 / 의존성
 

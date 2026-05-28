@@ -15,6 +15,17 @@ docs/
 └── assets/                        # 문서 내 이미지 에셋
 ```
 
+## 알림 API 핵심 (notifications.md / osc-sequences.mdx)
+
+Windows 포트가 동등 구현해야 할 알림 계약 세부:
+
+- **OSC 99 (Kitty)**: `ESC ] 99 ; <params> ; <payload> ST`. 파라미터 `i`(id), `e`(event, 1=new), `d`(done, 0/1), `p`(payload type: `title`/`body`/`subtitle`). 멀티파트(d=0…d=1) 누적 가능.
+- **OSC 777 (RXVT)**: `ESC ] 777 ; notify ; <title> ; <body> BEL`. 단순 title+body, subtitle/id 없음.
+- **OSC 0 (타이틀)**: `ESC ] 0 ; <title> BEL` — 탭 타이틀 설정. (이전 명세의 "OSC 9"는 osc-sequences.mdx에 상세가 없으므로 99/777/0 기준으로 구현.)
+- **전달 경로**: tmux passthrough(`set -g allow-passthrough on` + `\ePtmux;…\e\\` 래핑), SSH OSC 패스스루.
+- **`cmux notify` 옵션**: `--title` `--subtitle` `--body` `--tab <id|index>` `--panel <id|index>`.
+- **멀티 에이전트 연동 패턴**: Claude Code 훅(`~/.claude/settings.json`), OpenAI Codex(`~/.codex/config.toml`의 `notify`), OpenCode 플러그인(`.opencode/plugins/cmux-notify.js`). 모두 `command -v cmux` 가용성 체크 + macOS `osascript` fallback 패턴 사용.
+
 ## 저장소 상호작용 / 의존성
 
 - `CLI/cmux.swift`와 `Sources/TerminalController.swift`의 동작 계약을 정의한다.

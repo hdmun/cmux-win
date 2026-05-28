@@ -11,14 +11,28 @@ CLI/
 └── cmux.swift     # CLI 구현 전체 (~135 KB, 단일 파일)
 ```
 
-`cmux.swift`는 다음 CLI 서브커맨드 전체를 포함한다:
-- `cmux notify` — 알림 전송 (OSC 시퀀스 에이전트용)
-- `cmux open` / `cmux new-tab` / `cmux split` — workspace/pane 제어
-- `cmux list` / `cmux identify` — 상태 조회 (v2 API 기반)
-- `cmux browser` — 브라우저 패인 제어
-- `cmux send` — 터미널 입력 전송
-- `cmux screenshot` — 시각 캡처
-- 기타 소켓 API v2 명령 전체
+`cmux.swift`는 약 50개의 top-level 명령을 포함한다 (출처: `CLI/cmux.swift:482-928` 디스패치). 각 명령은 대응하는 소켓 v2 메서드를 호출한다 (메서드 카탈로그는 [16-sources.md](16-sources.md) 참조).
+
+**Top-level 명령 (네임스페이스별)**
+
+| 그룹 | 명령 |
+|------|------|
+| system | `ping` · `capabilities` · `identify` |
+| window | `list-windows` · `current-window` · `new-window` · `focus-window` · `close-window` · `move-workspace-to-window` |
+| workspace | `list-workspaces` · `new-workspace` · `close-workspace` · `select-workspace` · `current-workspace` · `reorder-workspace` |
+| pane | `list-panes` · `list-pane-surfaces` · `focus-pane` · `new-pane` · `list-panels` · `focus-panel` |
+| surface | `new-surface` · `close-surface` · `new-split` · `move-surface` · `reorder-surface` · `drag-surface-to-split` · `refresh-surfaces` · `surface-health` · `trigger-flash` |
+| input | `send` · `send-key` · `send-panel` · `send-key-panel` |
+| notify | `notify` · `list-notifications` · `clear-notifications` |
+| agent | `claude-hook` · `set-app-focus` · `simulate-app-active` |
+| browser | `browser` (+서브커맨드) · `open-browser` · `navigate` · `browser-back` · `browser-forward` · `browser-reload` · `get-url` · `focus-webview` · `is-webview-focused` |
+| misc | `help` |
+
+**`browser` 서브커맨드** (출처: `CLI/cmux.swift:1354-2100+`)
+
+`identify` · `open`\|`open-split`\|`new` · `goto`\|`navigate` · `back`\|`forward`\|`reload` · `url`\|`get-url` · `focus-webview` · `is-webview-focused` · `snapshot` · `eval` · `wait` · `click`\|`dblclick`\|`hover`\|`focus`\|`check`\|`uncheck`\|`scrollintoview` · `type`\|`fill` · `press`\|`key`\|`keydown`\|`keyup` · `select` · `scroll` · `screenshot` · `get {url|title|text|html|value|attr|count|box|styles}` · `is {visible|enabled|checked}` · `find {role|text|label|placeholder|alt|title|testid|first|last|nth}` · `frame {select|main}` · `dialog {accept|dismiss}` · `download` · `cookies {get|set|clear}` · `storage {get|set|clear}`
+
+> **명세 정정**: 이전 판의 예시 `new-tab` / `split` / `list` / `screenshot`는 top-level 명령으로 존재하지 않는다. 실제로는 각각 `new-workspace`·`new-surface` / `new-split` / `list-workspaces` / `browser screenshot`이다.
 
 ## 저장소 상호작용 / 의존성
 
