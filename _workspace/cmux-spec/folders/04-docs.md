@@ -26,6 +26,17 @@ Windows 포트가 동등 구현해야 할 알림 계약 세부:
 - **`cmux notify` 옵션**: `--title` `--subtitle` `--body` `--tab <id|index>` `--panel <id|index>`.
 - **멀티 에이전트 연동 패턴**: Claude Code 훅(`~/.claude/settings.json`), OpenAI Codex(`~/.codex/config.toml`의 `notify`), OpenCode 플러그인(`.opencode/plugins/cmux-notify.js`). 모두 `command -v cmux` 가용성 체크 + macOS `osascript` fallback 패턴 사용.
 
+**알림 억제 조건** (출처: `Sources/TerminalNotificationStore.swift:148–155`):
+
+알림은 아래 **4가지 조건을 모두 충족할 때만** 억제된다:
+
+1. 앱이 Active (`isActive == true`)
+2. `keyWindow.identifier`가 `"cmux.main"` 또는 `"cmux.main."` 으로 시작
+3. 해당 탭(`tabId`)이 현재 선택된 탭 (`isActiveTab`)
+4. 해당 서피스(`surfaceId`)가 포커스된 서피스 (`isFocusedSurface`)
+
+Settings/About/debug 패널이 keyWindow인 경우 앱이 active여도 알림이 표시된다. Windows 포트에서는 `IBadgeWindow` + WinUI 3 포커스 상태 + `GetForegroundWindow()` 조합으로 동등 억제 로직 구현 필요.
+
 ## 저장소 상호작용 / 의존성
 
 - `CLI/cmux.swift`와 `Sources/TerminalController.swift`의 동작 계약을 정의한다.

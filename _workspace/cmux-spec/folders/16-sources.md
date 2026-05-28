@@ -60,9 +60,41 @@ Sources/
 
 > **명세 정정**: `SurfaceSearchOverlay.swift`는 `Sources/Find/`에만 존재한다 (`Sources/Panels/`에는 없음). 이전 판은 양쪽에 중복 기재했다.
 
+## Workspace.swift 데이터 구조 (사이드바 상태 모델)
+
+**소스**: `Sources/Workspace.swift:6–37`
+
+`Workspace` 객체에 `@Published` 프로퍼티로 존재하는 사이드바 상태 구조체들. v2 API 응답 스키마 설계와 Windows 포트 데이터 모델 구현 시 기준이 된다.
+
+| 구조체 | 필드 | 용도 |
+|--------|------|------|
+| `SidebarStatusEntry` | `key: String`, `value: String`, `icon: String?`, `color: String?`, `timestamp: Date` | `set_status` v1 명령으로 설정되는 named 상태 항목. `[String: SidebarStatusEntry]` 딕셔너리로 저장 |
+| `SidebarLogEntry` | `message: String`, `level: SidebarLogLevel`, `source: String?`, `timestamp: Date` | `log` v1 명령으로 추가되는 로그 스트림 엔트리 |
+| `SidebarLogLevel` | `info` / `progress` / `success` / `warning` / `error` | 로그 레벨 enum |
+| `SidebarProgressState` | `value: Double`, `label: String?` | `set_progress` v1 명령으로 설정되는 진행률 (0.0–1.0) |
+| `SidebarGitBranchState` | `branch: String`, `isDirty: Bool` | `report_git_branch` v1 명령으로 설정되는 git 상태 |
+
+**추가 필드**:
+- `customTitle: String?` — 사용자가 직접 지정한 탭 제목 override. `hasCustomTitle: Bool`로 유효 여부 판정. 탭 타이틀 해석 체인에서 최상위 우선순위 (v1 사이드바 명령 목록은 [03-cli.md](03-cli.md) §v1 사이드바 소켓 프로토콜 참조).
+
 ## 소켓 API v2 메서드 카탈로그
 
 `TerminalController.swift`의 v2 디스패치 테이블에는 약 100개의 메서드가 네임스페이스별로 존재한다 (출처: `Sources/TerminalController.swift:504-806`). `CLI/cmux.swift`의 명령이 이 메서드들을 호출한다. `socket_control` 모드(`off`/`readonly`/`full`)별 허용 범위를 정의하려면 전체 카탈로그가 기준이 된다.
+
+**`workspace.list` 응답 스키마** (출처: `Sources/TerminalController.swift:1379`):
+
+```json
+{
+  "id": "<uuid>",
+  "ref": "workspace:1",
+  "index": 0,
+  "title": "Terminal",
+  "selected": true,
+  "pinned": false
+}
+```
+
+`pinned` 필드는 부록의 "workspace pinning v1 제외" 항목과 무관하게 API 응답 스키마에 이미 포함된다. Windows 포트의 `workspace.list` 구현 시 이 필드를 반드시 포함해야 한다.
 
 | 네임스페이스 | 메서드 |
 |--------------|--------|
