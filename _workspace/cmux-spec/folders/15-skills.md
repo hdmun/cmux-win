@@ -19,7 +19,7 @@ skills/
 ├── cmux-browser/               # 브라우저 패인 자동화 스킬
 │   ├── SKILL.md
 │   ├── agents/openai.yaml
-│   ├── references/             # authentication / commands / proxy-support / session-management / snapshot-refs / video-recording
+│   ├── references/             # authentication / commands / proxy-support / session-management / snapshot-refs / video-recording (6개)
 │   └── templates/              # authenticated-session / capture-workflow / form-automation (.sh)
 ├── cmux-debug-windows/         # Windows 환경 디버깅 스킬
 │   ├── SKILL.md

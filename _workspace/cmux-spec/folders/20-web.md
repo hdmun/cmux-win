@@ -11,7 +11,10 @@ web/
 ├── app/                    # Next.js App Router 레이아웃 및 페이지
 │   ├── layout.tsx
 │   ├── page.tsx            # 랜딩 페이지 (메인)
-│   └── ...                 # 기타 라우트 (blog, community, legal 등)
+│   ├── blog/               # 블로그 라우트
+│   ├── community/          # 커뮤니티 라우트
+│   ├── legal/              # 법적 고지 라우트
+│   └── docs/               # 인앱 문서 라우트 (docs-site/와 별개): api · changelog · concepts · configuration · getting-started · keyboard-shortcuts · notifications
 ├── public/                 # 정적 에셋 (이미지, 아이콘 등)
 ├── next.config.ts
 ├── tailwind.config.ts

@@ -16,10 +16,16 @@ tests/
 ├── test_sidebar_*.py                    # 사이드바 CWD/git/포트 표시 테스트
 ├── test_visual_*.py                     # 시각적 렌더링 스크린샷 테스트
 ├── test_ctrl_*.py                       # Ctrl 키·시그널 테스트
+├── test_claude_hook_session_mapping.py  # Claude 훅 세션 매핑 검증
+├── test_file_drop_paths.py              # 파일 드롭 경로 삽입 기능 검증
+├── test_tab_dragging.py                 # 탭 드래그 UX 검증
+├── test_terminfo_bright_colors.py       # terminfo 밝은 색상 처리 검증
+├── test_multi_workspace_focus.py        # 멀티 워크스페이스 포커스 검증
+├── test_focus_notification_dismiss.py   # 포커스 시 알림 자동 닫힘 검증
 └── test_lint_swiftui_patterns.py        # SwiftUI 패턴 린트 검사
 ```
 
-총 40여 개의 테스트 파일. `scripts/run-tests-v1.sh`로 전체 스위트를 실행한다.
+총 44개 테스트 파일 (cmux.py 포함). `scripts/run-tests-v1.sh`로 전체 스위트를 실행한다.
 
 ## 저장소 상호작용 / 의존성
 
