@@ -9,12 +9,12 @@
 ```
 Sources/
 ├── cmuxApp.swift                  # @main 진입점 (SwiftUI App lifecycle)
-├── AppDelegate.swift              # NSApplication delegate: Finder 통합, 서비스 라우팅, 키 이벤트
+├── AppDelegate.swift              # NSApplication delegate: Finder 통합, 서비스 라우팅, 키 이벤트, Sentry SDK 초기화(crash reporting)
 ├── TabManager.swift               # 윈도우 전체 워크스페이스 상태 소유 (CRUD, 선택, 순서)
 ├── Workspace.swift                # 탭 단위 모델 (BonsplitController + Panel 배열)
 ├── TerminalController.swift       # Unix 소켓 IPC 서버 (v1/v2 프로토콜 파싱·디스패치)
 ├── TerminalNotificationStore.swift# OSC 시퀀스 파싱, 알림 상태·읽음 관리
-├── GhosttyTerminalView.swift      # Ghostty C API ↔ SwiftUI 브리지
+├── GhosttyTerminalView.swift      # Ghostty C API ↔ SwiftUI 브리지 (스크롤 랙 감지 시 Sentry 메시지 캡처)
 ├── GhosttyConfig.swift            # Ghostty 설정 로딩·환경 변수 주입
 ├── ContentView.swift              # 최상위 UI 레이아웃 (사이드바 + 콘텐츠 영역)
 ├── WorkspaceContentView.swift     # 워크스페이스 콘텐츠 렌더링
@@ -138,12 +138,13 @@ Sources/
 - `Resources/shell-integration/`의 스크립트들을 실행 중에 참조한다.
 - `tests_v2/`의 Python e2e 테스트가 이 코드의 동작을 소켓 API를 통해 검증한다.
 - `docs/`의 기술 스펙 문서들이 이 코드의 계약을 정의한다.
+- **크래시 리포팅**: `sentry-cocoa` SwiftPM 패키지(`getsentry/sentry-cocoa`)를 사용한다. 의존성은 `Package.swift`가 아니라 `GhosttyTabs.xcodeproj`(XCRemoteSwiftPackageReference)에 선언된다. `AppDelegate.swift`가 `SentrySDK.start(...)`로 초기화(DSN 하드코딩)하고, `GhosttyTerminalView.swift`가 스크롤 랙 감지 시 `SentrySDK.capture(message:)`를 호출한다. PostHog(사용 분석)와 별도 운영. Windows 포트 v1 포함 여부는 미결.
 
 > **Windows 포트 주의**: `Sources/`는 가장 중요한 참조 입력이지만, 여기의 AppKit/SwiftUI 구현을 그대로 옮기지는 않는다. 특히 `Find/`, `Panels/`, 창 장식, Ghostty 연동은 Windows 전용 UI/터미널 스택으로 동등 기능을 다시 설계해야 한다.
 
 ## 편집 지침
 
-**1차 소스 — 가장 중요한 폴더**. IPC 프로토콜 변경은 `TerminalController.swift` + `CLI/cmux.swift`를 함께 수정한다. `PostHogAnalytics.swift`는 프라이버시 민감 코드이므로 의도하지 않은 수정을 피한다. `UITestRecorder.swift`는 테스트 훅이지만 앱 소스에 포함되므로 주의한다.
+**1차 소스 — 가장 중요한 폴더**. IPC 프로토콜 변경은 `TerminalController.swift` + `CLI/cmux.swift`를 함께 수정한다. `PostHogAnalytics.swift`(사용 분석)와 `AppDelegate.swift`/`GhosttyTerminalView.swift`의 Sentry(크래시 리포팅) 코드는 프라이버시·텔레메트리 민감 경계이므로 의도하지 않은 수정을 피한다. `UITestRecorder.swift`는 테스트 훅이지만 앱 소스에 포함되므로 주의한다.
 
 ## 불확실성
 

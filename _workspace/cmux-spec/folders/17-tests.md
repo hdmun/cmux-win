@@ -25,7 +25,7 @@ tests/
 └── test_lint_swiftui_patterns.py        # SwiftUI 패턴 린트 검사
 ```
 
-총 44개 테스트 파일 (cmux.py 포함). `scripts/run-tests-v1.sh`로 전체 스위트를 실행한다.
+총 43개 파일 — Python 41개(`cmux.py` 헬퍼 포함) + Shell 스크립트 2개(`test_app_keystrokes.sh`, `test_ctrl_signals.sh`). `scripts/run-tests-v1.sh`로 전체 스위트를 실행한다.
 
 ## 저장소 상호작용 / 의존성
 
