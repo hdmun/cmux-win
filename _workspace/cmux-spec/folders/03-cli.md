@@ -111,9 +111,28 @@ CLI/
 
 ### DEBUG 전용 명령
 
-| 명령 | 조건 | 역할 |
-|------|------|------|
-| `simulate_file_drop` | DEBUG 빌드만 | 파일 드롭 시뮬레이션 (`test_file_drop_paths.py`가 사용) |
+DEBUG 빌드에서만 등록되는 v1 소켓 명령(`#if DEBUG`, 출처: `Sources/TerminalController.swift:342–402`). e2e 테스트 하니스가 사용하는 테스트 지원 명령으로, 프로덕션(Release) 빌드에는 존재하지 않는다. v2 프로토콜에서는 `debug.*` 네임스페이스(18개 메서드, [16-sources.md](16-sources.md) 참조)로 대응한다. Windows 포트는 v1 계약 자체보다는 **e2e 테스트 하니스 설계 시** 참조한다.
+
+| 명령 | 역할 |
+|------|------|
+| `set_shortcut` | 단축키 바인딩 주입 (테스트용) |
+| `simulate_shortcut` | 단축키 입력 시뮬레이션 |
+| `simulate_type` | 키 입력(타이핑) 시뮬레이션 |
+| `simulate_file_drop` | 파일 드롭 시뮬레이션 (`test_file_drop_paths.py`가 사용) |
+| `activate_app` | 앱 활성화 시뮬레이션 |
+| `is_terminal_focused` | 현재 터미널 포커스 여부 조회 |
+| `read_terminal_text` | 터미널 텍스트 버퍼 읽기 |
+| `read_screen` | 화면 내용(스크린 셀) 읽기 |
+| `render_stats` | 렌더링 통계 조회 |
+| `layout_debug` | 레이아웃 트리 덤프 |
+| `bonsplit_underflow_count` / `reset_bonsplit_underflow_count` | Bonsplit arranged-subview underflow 카운터 조회/리셋 |
+| `empty_panel_count` / `reset_empty_panel_count` | 빈 패널 발생 카운터 조회/리셋 |
+| `focus_notification` | 알림으로부터 포커스 이동 시뮬레이션 |
+| `flash_count` / `reset_flash_counts` | split flash 카운터 조회/리셋 |
+| `panel_snapshot` / `panel_snapshot_reset` | 패널 스냅샷 조회/리셋 |
+| `screenshot` | 화면 캡처 (DEBUG) |
+
+> **정정 (2026-05-29)**: 이전 판은 DEBUG 전용 명령으로 `simulate_file_drop` 1개만 기재했으나, 실제로는 위 20개 명령이 `#if DEBUG` 블록에 등록되어 있다.
 
 > **Windows 포트 주의**: zsh 통합이 소켓 연결에 사용하는 도구 우선순위는 `ncat` → `socat` → `nc` 순. Windows Named Pipe에서는 `System.IO.Pipes.NamedPipeClientStream`(PowerShell) 또는 `WriteFile`+`ReadFile`(C++) 사용.
 

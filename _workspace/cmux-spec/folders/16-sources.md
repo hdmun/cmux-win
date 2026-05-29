@@ -79,7 +79,7 @@ Sources/
 
 ## 소켓 API v2 메서드 카탈로그
 
-`TerminalController.swift`의 v2 디스패치 테이블에는 약 100개의 메서드가 네임스페이스별로 존재한다 (출처: `Sources/TerminalController.swift:504-806`). `CLI/cmux.swift`의 명령이 이 메서드들을 호출한다. `socket_control` 모드(`off`/`readonly`/`full`)별 허용 범위를 정의하려면 전체 카탈로그가 기준이 된다.
+`TerminalController.swift`의 v2 디스패치 테이블에는 **142개**의 메서드가 네임스페이스별로 존재한다 (출처: `Sources/TerminalController.swift:503-806`의 `switch method`. 네임스페이스별 분포: `system` 3 · `window` 5 · `workspace` 7 · `surface` 14 · `pane` 4 · `notification` 5 · `app` 2 · `browser` 84 · `debug` 18). `CLI/cmux.swift`의 명령이 이 메서드들을 호출한다. `socket_control` 모드(`off`/`readonly`/`full`)별 허용 범위를 정의하려면 전체 카탈로그가 기준이 된다.
 
 **`workspace.list` 응답 스키마** (출처: `Sources/TerminalController.swift:1379`):
 

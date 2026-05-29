@@ -26,14 +26,14 @@ Windows 포트가 동등 구현해야 할 알림 계약 세부:
 - **`cmux notify` 옵션**: `--title` `--subtitle` `--body` `--tab <id|index>` `--panel <id|index>`.
 - **멀티 에이전트 연동 패턴**: Claude Code 훅(`~/.claude/settings.json`), OpenAI Codex(`~/.codex/config.toml`의 `notify`), OpenCode 플러그인(`.opencode/plugins/cmux-notify.js`). 모두 `command -v cmux` 가용성 체크 + macOS `osascript` fallback 패턴 사용.
 
-**알림 억제 조건** (출처: `Sources/TerminalNotificationStore.swift:148–155`):
+**알림 억제 조건** (출처: `Sources/TerminalNotificationStore.swift` — `isAppFocused()` 46–58행 + `addNotification()` 145–154행):
 
-알림은 아래 **4가지 조건을 모두 충족할 때만** 억제된다:
+알림은 아래 **4가지 조건을 모두 충족할 때만** 억제된다. 실제 판정식은 `addNotification()`의 `if isAppFocused && isFocusedPanel { return }`이며, 여기서 `isAppFocused()`가 조건 1·2를, `isFocusedPanel = isActiveTab && isFocusedSurface`가 조건 3·4를 캡슐화한다.
 
-1. 앱이 Active (`isActive == true`)
-2. `keyWindow.identifier`가 `"cmux.main"` 또는 `"cmux.main."` 으로 시작
-3. 해당 탭(`tabId`)이 현재 선택된 탭 (`isActiveTab`)
-4. 해당 서피스(`surfaceId`)가 포커스된 서피스 (`isFocusedSurface`)
+1. 앱이 Active (`NSApp.isActive == true`) — `isAppFocused()` 내부
+2. `keyWindow.identifier`가 `"cmux.main"` 또는 `"cmux.main."` 으로 시작 — `isAppFocused()` 내부
+3. 해당 탭(`tabId`)이 현재 선택된 탭 (`isActiveTab = selectedTabId == tabId`)
+4. 해당 서피스(`surfaceId`)가 포커스된 서피스 (`isFocusedSurface`; `surfaceId == nil`이면 true)
 
 Settings/About/debug 패널이 keyWindow인 경우 앱이 active여도 알림이 표시된다. Windows 포트에서는 `IBadgeWindow` + WinUI 3 포커스 상태 + `GetForegroundWindow()` 조합으로 동등 억제 로직 구현 필요.
 

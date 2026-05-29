@@ -23,8 +23,10 @@ tests_v2/
 ├── test_nested_split_*.py               # 중첩 스플릿 테스트 (다수)
 ├── test_notifications.py                # 알림 테스트
 ├── test_visual_*.py                     # 시각적 렌더링 테스트
-└── ...                                  # 기타 40여 개 파일
+└── ...                                  # 기타 다수
 ```
+
+> 총 **41개 `.py` 파일** (`cmux.py` 헬퍼 포함, `.sh` 스크립트 없음). `scripts/run-tests-v2.sh`로 전체 스위트를 실행한다. (2026-05-29 직접 카운트)
 
 **기능 시사 가치 높은 파일 요약**:
 
