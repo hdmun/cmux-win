@@ -148,4 +148,4 @@ Sources/
 
 ## 불확실성
 
-- `vendor/bonsplit/`과 `Sources/` 내 Bonsplit 사용 계층의 정확한 관계(래퍼 vs 직접 사용)는 split 로직 수정 전 별도 확인이 필요하다.
+- 없음. (이전 판의 "`vendor/bonsplit/`과 `Sources/` 내 Bonsplit 사용 계층의 관계" 불확실성은 해소됨: `Sources/Workspace.swift:3,50,131`이 `import Bonsplit`로 `BonsplitController`를 **직접 소비**하며 별도 wrapper 계층은 없다. `Sources/Panels/bonsplit/` 경로는 존재하지 않는다.)

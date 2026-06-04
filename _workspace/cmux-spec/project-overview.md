@@ -257,7 +257,7 @@ cmux/
 | `node_modules/` | JS 의존성 생성물 | 무시. `docs-site/`, `web/` 빌드 시 자동 재생성. |
 | `graphify-out/` | 그래프 생성 출력물 | 무시. 코드 탐색 시 스킵. |
 | `ghostty/` (서브모듈 내부) | 업스트림 Ghostty 포크 | 읽기만. 변경 시 별도 `manaflow-ai/ghostty` 포크 PR 필요. `docs/ghostty-fork.md` 참조. |
-| `vendor/bonsplit/` | git 서브모듈 | 직접 수정 최소화. split 로직 조사 시 `Sources/Panels/bonsplit/`와의 관계를 함께 확인. |
+| `vendor/bonsplit/` | git 서브모듈 | 직접 수정 최소화. split 로직 실체는 `vendor/bonsplit/Sources/Bonsplit/`이며, `Sources/Workspace.swift`가 `import Bonsplit`로 `BonsplitController`를 직접 소비한다 (별도 wrapper 계층 없음). |
 | `homebrew-cmux/` | 배포 지원 서브모듈 | 릴리즈 파이프라인이 자동 갱신. 수동 편집 전 submodule 업데이트 흐름부터 확인. |
 | `Assets.xcassets/` | 이미지 자산 | UI 아이콘·이미지 변경 시만 참조. |
 | `Package.swift` (루트) | 보조/레거시 | 주 빌드는 Xcode 프로젝트 사용. 현행 코드와 불일치 가능. |
@@ -276,5 +276,5 @@ cmux/
 | 2 | `ghostty/` 서브모듈 커밋 상태 | 서브모듈이 현재 체크아웃되어 있는지, 빌드된 `GhosttyKit.xcframework`가 존재하는지 Windows 환경에서 확인 불가. |
 | 3 | `cmuxd` 위치 미확인 | `CLAUDE.md`에 `cd cmuxd && zig build -Doptimize=ReleaseFast`가 릴리즈/번들링 빌드 단계로 능동 기재되어 있다 (2곳). `.gitmodules`에는 ghostty/homebrew-cmux/vendor-bonsplit 3개만 등록되며 `cmuxd/`는 현재 트리에 존재하지 않음. 미커밋·미체크아웃된 별도 Zig 컴포넌트(cmux daemon 추정)이거나 dead reference일 수 있다. **dead reference로 단정하지 않는다**. |
 | 4 | `web/` vs `docs-site/` 구분 | 두 Next.js 앱의 정확한 역할 분리가 `web/README.md`를 읽지 않아 불명확. 마케팅 사이트 vs 문서 사이트로 추정. |
-| 5 | `Sources/Panels/bonsplit/`와 `vendor/bonsplit/`의 관계 | wrapper, 복사본, 또는 별도 포팅 계층인지 현재 문서만으로는 단정하기 어렵다. split 로직 수정 전 둘 다 함께 확인 필요. |
+| 5 | ~~`Sources/Panels/bonsplit/`와 `vendor/bonsplit/`의 관계~~ (해소됨) | **해소**: `Sources/Panels/bonsplit/`는 존재하지 않는다. Bonsplit 실체는 `vendor/bonsplit/Sources/Bonsplit/`(서브모듈)이며 `Sources/Workspace.swift`가 `import Bonsplit`로 `BonsplitController`를 직접 소비한다. wrapper/복사본 계층 없음. (출처: `Sources/Workspace.swift:3,50,131`) |
 | 6 | v1 소켓 API 폐기 시점 | `docs/agent-browser-port-spec.md`에서 v1 폐기 언급이 있으나 구체적 마일스톤 미정. |
