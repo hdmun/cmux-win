@@ -15,7 +15,7 @@ web/
 │   ├── community/          # 커뮤니티 라우트
 │   ├── legal/              # 법적 고지 라우트
 │   └── docs/               # 인앱 문서 라우트 (docs-site/와 별개): api · changelog · concepts · configuration · getting-started · keyboard-shortcuts · notifications
-├── public/                 # 정적 에셋 (이미지, 아이콘 등)
+├── public/                 # 정적 에셋 (이미지, 아이콘, ghostty-vt.wasm 등)
 ├── next.config.ts
 ├── tailwind.config.ts
 ├── tsconfig.json
