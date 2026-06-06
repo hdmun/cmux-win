@@ -24,7 +24,8 @@
         "m1-2"
       ],
       "doc_refs": [
-        "_workspace/08-ipc-cli.md"
+        "_workspace/08-ipc-cli.md",
+        "_workspace/adr/adr-0002-conpty-passthrough-fallback.md"
       ],
       "touches": [
         "src/ipc"
@@ -33,7 +34,8 @@
         "manual: verify same-user ACL and message-mode transport",
         "tc-pipe-server-open: Named Pipe server opens with PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE",
         "tc-pipe-acl-same-user: connection from same user succeeds; connection from different SID is rejected",
-        "tc-pipe-message-mode: send 1 complete JSON message → receiver gets exactly 1 complete message (no partial reads)"
+        "tc-pipe-message-mode: send 1 complete JSON message → receiver gets exactly 1 complete message (no partial reads)",
+        "tc-session-info: session_info query returns session_id, pty_mode, active_window/workspace/surface and is allowed in readonly mode (08 session_info; pty_mode per ADR-0002)"
       ],
       "commands": [
         "ctest --preset dev-x64 -R ipc_server --output-on-failure"
@@ -200,6 +202,47 @@
         "tests/unit/ipc/test_command_routing.cpp",
         "tests/unit/ipc/test_error_codes.cpp",
         "tests/integration/test_ipc_split_focus.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m3-6",
+      "queue_number": 5,
+      "title": "Panel content router",
+      "status": "pending",
+      "summary": "Implement the content presenter that routes each surface to the correct host element by IPanel::Kind().",
+      "depends_on": [
+        "m2-7",
+        "m3-2"
+      ],
+      "doc_refs": [
+        "_workspace/04-split-pane.md",
+        "_workspace/04-split-pane.md#12-panel-content-router",
+        "_workspace/02-core-app.md"
+      ],
+      "touches": [
+        "src/core",
+        "src/ui",
+        "src/panels"
+      ],
+      "acceptance": [
+        "manual: verify the router owns the heterogeneous IPanel collection and never creates/destroys panels (04 §12.2)",
+        "tc-route-terminal-host: a pane with a terminal surface presents a SwapChainPanel host",
+        "tc-route-browser-host: a pane with a browser surface presents a WebView2 host",
+        "tc-route-host-reuse: moving the same surface across a split reuses the same host element and keeps runtime alive (04 §4, ADR-0004)",
+        "tc-route-mixed-tree: terminal and browser panels in one BonsplitController tree each route to the correct host",
+        "tc-route-unknown-kind: an unknown SurfaceKind shows an empty placeholder and logs without crashing"
+      ],
+      "commands": [
+        "ctest --preset dev-x64 -R panel_content_router --output-on-failure"
+      ],
+      "outputs": [
+        "src/core/panel_content_router.h",
+        "src/core/panel_content_router.cpp",
+        "src/ui/panel_content_presenter.xaml",
+        "src/ui/panel_content_presenter.xaml.cpp",
+        "tests/unit/core/test_panel_content_router.cpp"
       ],
       "blocked_by": [],
       "notes": []

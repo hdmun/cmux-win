@@ -80,7 +80,7 @@ v1에서 아래 필드는 이름, 타입, 기본값을 고정한다.
 | `shift` | boolean | optional, default `false` |
 | `alt` | boolean | optional, default `false` |
 | `win` | boolean | optional, default `false` |
-| `scope` | string | `"global"`, `"terminal"`, `"browser"` |
+| `scope` | string | `"global"`, `"workspace"`, `"surface"` |
 
 예시:
 
@@ -102,14 +102,14 @@ v1에서 아래 필드는 이름, 타입, 기본값을 고정한다.
     "toggle_sidebar":    { "key": "B", "ctrl": true, "scope": "global" },
     "new_workspace":     { "key": "N", "ctrl": true, "scope": "global" },
     "close_workspace":   { "key": "W", "ctrl": true, "scope": "global" },
-    "split_right":       { "key": "D", "ctrl": true, "scope": "terminal" },
-    "split_down":        { "key": "D", "ctrl": true, "shift": true, "scope": "terminal" },
-    "next_surface":      { "key": "OEM_6", "ctrl": true, "shift": true, "scope": "terminal" },
-    "prev_surface":      { "key": "OEM_4", "ctrl": true, "shift": true, "scope": "terminal" },
-    "focus_left":        { "key": "Left", "ctrl": true, "alt": true, "scope": "terminal" },
-    "focus_right":       { "key": "Right", "ctrl": true, "alt": true, "scope": "terminal" },
-    "focus_up":          { "key": "Up", "ctrl": true, "alt": true, "scope": "terminal" },
-    "focus_down":        { "key": "Down", "ctrl": true, "alt": true, "scope": "terminal" },
+    "split_right":       { "key": "D", "ctrl": true, "scope": "surface" },
+    "split_down":        { "key": "D", "ctrl": true, "shift": true, "scope": "surface" },
+    "next_surface":      { "key": "OEM_6", "ctrl": true, "shift": true, "scope": "surface" },
+    "prev_surface":      { "key": "OEM_4", "ctrl": true, "shift": true, "scope": "surface" },
+    "focus_left":        { "key": "Left", "ctrl": true, "alt": true, "scope": "surface" },
+    "focus_right":       { "key": "Right", "ctrl": true, "alt": true, "scope": "surface" },
+    "focus_up":          { "key": "Up", "ctrl": true, "alt": true, "scope": "surface" },
+    "focus_down":        { "key": "Down", "ctrl": true, "alt": true, "scope": "surface" },
     "open_browser":      { "key": "L", "ctrl": true, "shift": true, "scope": "global" },
     "show_notifications":{ "key": "I", "ctrl": true, "scope": "global" },
     "jump_to_unread":    { "key": "U", "ctrl": true, "shift": true, "scope": "global" },
@@ -151,14 +151,14 @@ settings 저장은 아래 순서로만 수행한다.
 | scope | 의미 |
 |-------|------|
 | `global` | app-wide command |
-| `terminal` | terminal panel focused |
-| `browser` | browser panel focused |
+| `workspace` | active workspace 범위 command |
+| `surface` | 현재 focus된 terminal/browser surface 범위 command |
 
 ### conflict 해결 규칙
 
 1. text input control이 먼저 consume
 2. app reserved command가 panel shortcut보다 우선
-3. panel scope가 현재 focus와 맞을 때만 동작
+3. shortcut scope가 현재 focus(surface/workspace)와 맞을 때만 동작
 4. 동일 조합 중복은 validation error
 
 ## 7. debounced persistence

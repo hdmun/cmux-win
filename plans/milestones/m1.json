@@ -109,6 +109,88 @@
       ],
       "blocked_by": [],
       "notes": []
+    },
+    {
+      "task_id": "m1-4",
+      "queue_number": 4,
+      "title": "App command surface + auxiliary windows",
+      "status": "pending",
+      "summary": "Implement the app-level command surface and the Settings/About auxiliary AppWindows with single-instance ownership.",
+      "depends_on": [
+        "m1-2"
+      ],
+      "doc_refs": [
+        "_workspace/02-core-app.md",
+        "_workspace/02-core-app.md#7-app-command-surface--보조-창-auxiliary-windows",
+        "_workspace/17-functional-spec.md#87-settings-window--preferences-ui"
+      ],
+      "touches": [
+        "src/app",
+        "src/ui"
+      ],
+      "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "manual: verify app commands route through the single command surface and delegate to WindowManager/TabManager",
+        "manual: verify open-settings twice keeps exactly 1 Settings window and re-activates the existing one (single-instance); About behaves identically (02 §7.4)",
+        "manual: verify closing an auxiliary window does not terminate the app while a main window is alive (02 §7.4)",
+        "manual: verify About window displays version and build identifier"
+      ],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "outputs": [
+        "src/app/app_command_surface.h",
+        "src/app/app_command_surface.cpp",
+        "src/ui/settings_window.xaml",
+        "src/ui/settings_window.xaml.cpp",
+        "src/ui/about_window.xaml",
+        "src/ui/about_window.xaml.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m1-5",
+      "queue_number": 4,
+      "title": "Titlebar chrome controls (drag region, accessor seam, toolbar, command buttons)",
+      "status": "pending",
+      "summary": "Implement the draggable titlebar handle, window accessor hook, toolbar controller, and titlebar command buttons with shortcut hints.",
+      "depends_on": [
+        "m1-3"
+      ],
+      "doc_refs": [
+        "_workspace/02-core-app.md",
+        "_workspace/02-core-app.md#8-draggable-titlebar-handle-drag-region",
+        "_workspace/02-core-app.md#9-window-accessor-hook-appwindowhwnd-seam",
+        "_workspace/02-core-app.md#10-toolbar-controller-titlebar-command-region",
+        "_workspace/02-core-app.md#11-titlebar-controls--shortcut-hints"
+      ],
+      "touches": [
+        "src/ui",
+        "src/app"
+      ],
+      "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "manual: verify empty titlebar drag moves the window and drag over interactive controls does not (02 §8.3)",
+        "manual: verify titlebar double-click toggles maximize/restore (02 §8.3)",
+        "manual: verify backdrop/titlebar config obtains AppWindow/HWND only via the accessor seam on the UI thread (02 §9.3)",
+        "manual: verify titlebar title text updates to the active workspace and command button state mirrors core model (02 §10.3)",
+        "manual: verify sidebar/new-workspace/notifications buttons trigger their actions and tooltips show shortcut hints from the 09 schema (02 §11.3)",
+        "manual: verify notifications button shows an unread badge when unread > 0 (02 §11.3)"
+      ],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "outputs": [
+        "src/ui/titlebar_toolbar.h",
+        "src/ui/titlebar_toolbar.cpp",
+        "src/ui/titlebar_drag_region.h",
+        "src/ui/titlebar_drag_region.cpp",
+        "src/app/window_accessor.h",
+        "src/app/window_accessor.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
     }
   ]
 }

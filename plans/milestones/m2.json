@@ -149,7 +149,7 @@
       ],
       "doc_refs": [
         "_workspace/03-terminal-engine.md",
-        "_workspace/03-terminal-engine.md#13-reattach-token-binding",
+        "_workspace/03-terminal-engine.md#13-reattach_token-binding",
         "_workspace/04-split-pane.md",
         "_workspace/adr/adr-0004-panel-lifecycle.md"
       ],
@@ -213,6 +213,86 @@
         "src/terminal/ime/ime_handler.cpp",
         "src/terminal/uia/uia_provider.h",
         "src/terminal/uia/uia_provider.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m2-6",
+      "queue_number": 5,
+      "title": "In-terminal find overlay + per-panel search state",
+      "status": "pending",
+      "summary": "Implement the terminal find overlay UI and per-panel search state with open/next/prev/close behavior.",
+      "depends_on": [
+        "m2-4"
+      ],
+      "doc_refs": [
+        "_workspace/04-split-pane.md",
+        "_workspace/04-split-pane.md#10-터미널-찾기-오버레이-in-terminal-find-overlay",
+        "_workspace/17-functional-spec.md#36-찾기-오버레이"
+      ],
+      "touches": [
+        "src/panels/terminal_find_overlay.h",
+        "src/panels/terminal_find_overlay.cpp",
+        "src/panels/terminal_find_overlay.xaml",
+        "src/panels/terminal_find_overlay.xaml.cpp"
+      ],
+      "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-find-open-focus: find action triggers overlay over active terminal panel and focuses the input box",
+        "tc-find-counter-sync: query input updates match_count and counter renders as N / M",
+        "tc-find-wrap-around: next/prev wraps match_index and scrolls the highlighted match into the viewport",
+        "tc-find-state-restore: closing then reopening the overlay restores the previous query and flags",
+        "tc-find-state-survives-reparent: moving the panel (hidden→attached) preserves search state",
+        "ctest --preset dev-x64 -R terminal_find --output-on-failure"
+      ],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R terminal_find --output-on-failure"
+      ],
+      "outputs": [
+        "src/panels/terminal_find_overlay.h",
+        "src/panels/terminal_find_overlay.cpp",
+        "src/panels/terminal_find_overlay.xaml",
+        "src/panels/terminal_find_overlay.xaml.cpp",
+        "tests/unit/panels/test_terminal_search_state.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m2-7",
+      "queue_number": 5,
+      "title": "Shared panel abstraction (IPanel)",
+      "status": "pending",
+      "summary": "Define the IPanel interface and make TerminalPanel implement the six lifecycle verbs so layout code stays type-agnostic.",
+      "depends_on": [
+        "m2-4"
+      ],
+      "doc_refs": [
+        "_workspace/04-split-pane.md",
+        "_workspace/04-split-pane.md#11-공유-패널-추상화-ipanel",
+        "_workspace/adr/adr-0004-panel-lifecycle.md#공통-추상화-결정-d5"
+      ],
+      "touches": [
+        "src/app/panel/i_panel.h",
+        "src/panels/terminal_panel.h",
+        "src/panels/terminal_panel.cpp"
+      ],
+      "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-ipanel-single-collection: TerminalPanel is storable through an IPanel pointer in a single heterogeneous collection",
+        "tc-ipanel-lifecycle-verbs: IPanel exposes Attach/Focus/Blur/Hide/Detach/Dispose and TerminalPanel maps them per 04 §11.2",
+        "tc-ipanel-no-concrete-branch: layout code contains no dynamic_cast to a concrete panel type (content router excepted)",
+        "ctest --preset dev-x64 -R panel_abstraction --output-on-failure"
+      ],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R panel_abstraction --output-on-failure"
+      ],
+      "outputs": [
+        "src/app/panel/i_panel.h",
+        "tests/unit/panels/test_panel_abstraction.cpp"
       ],
       "blocked_by": [],
       "notes": []

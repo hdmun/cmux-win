@@ -1,7 +1,7 @@
 # ADR-0004: Common Panel Lifecycle Contract
 
 - Status: accepted
-- Related docs: `_workspace/04-split-pane.md`, `_workspace/06-browser-panel.md`, `_workspace/03-terminal-engine.md`
+- Related docs: `_workspace/04-split-pane.md` (§11 `IPanel`, §12 Panel content router), `_workspace/06-browser-panel.md`, `_workspace/03-terminal-engine.md`
 - Related tasks: m0-4, m2-5, m3-2, m4-1
 
 ## Context
@@ -72,9 +72,30 @@ public:
 };
 ```
 
+## 공통 추상화 결정 (D5)
+
+두 패널 타입(terminal panel, browser panel)은 공통 추상 인터페이스 **`IPanel`** 을 구현한다. `IPanel`은 위 lifecycle 동사에 대응하는 6개의 가상 메서드 `attach()`, `focus()`, `blur()`, `hide()`, `detach()`, `dispose()`를 가진 런타임 다형 인터페이스다.
+
+```cpp
+// src/app/panel/i_panel.h
+class IPanel {
+public:
+    virtual ~IPanel() = default;
+    virtual void Attach() = 0;
+    virtual void Focus() = 0;
+    virtual void Blur() = 0;
+    virtual void Hide() = 0;
+    virtual void Detach() = 0;
+    virtual void Dispose() = 0;
+};
+```
+
+- CRTP(`PanelBase<T>`) 대안은 **기각** 한다. 근거: Panel content router(`_workspace/04-split-pane.md` §12)가 이질적인(heterogeneous) panel 타입을 단일 컬렉션(`std::vector<std::shared_ptr<IPanel>>` 등)에 저장하고 surface 타입에 따라 런타임에 라우팅해야 하므로, 정적 다형성인 CRTP로는 단일 컬렉션 저장이 불가능하다.
+- terminal panel과 browser panel은 각각 위 6개 가상 메서드를 구현하며, 상태 머신 전이 규칙(위 §전이 규칙)을 따른다.
+
 ## Consequences
 
-- 두 패널 타입은 공통 `IPanel` 인터페이스 또는 `PanelBase` CRTP를 구현한다 (구체 구조는 M2/M4에서 결정).
+- 두 패널 타입은 공통 `IPanel` 가상 인터페이스(위 §공통 추상화 결정 (D5))를 구현한다. CRTP는 채택하지 않는다.
 - browser 패널은 `hidden` / `detached` 상태에서 `EnsureCoreWebView2Async()`를 재실행하지 않는다.
 - ConPTY 해제는 반드시 `disposed` 전이에서만 발생한다. 다른 상태에서 ConPTY를 종료하는 코드는 버그다.
 - `reattach_token`은 terminal 패널 전용이다. browser 패널은 이 패턴을 사용하지 않는다 (WebView2 reparent는 XAML 레이어가 자동 처리).

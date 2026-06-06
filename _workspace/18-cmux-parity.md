@@ -14,7 +14,7 @@
 
 | 전체 기능 수 | ✅ covered 항목 수 | ⚠️ partial 항목 수 | ❌ missing 항목 수 |
 |---|---:|---:|---:|
-| 55 | 18 | 9 | 28 |
+| 55 | 30 | 9 | 16 |
 
 - 통계는 아래 패리티 표의 `Gap 상태` 행 수를 직접 재집계한 값이다.
 - `Milestone`은 `M0~M7` 축약 표기만 사용하고, `_workspace 참조`는 파일명만 사용한다.
@@ -26,15 +26,15 @@
 | 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
 |---|---|---|---|---|---|---|
 | App bootstrap + env setup | `cmuxApp`, `configureGhosttyEnvironment()`, `UserDefaults` | `wWinMain` + WinUI 3 `App` + `settings.json` + process env block | Med | M1+M2+M6 | 02-core-app, 03-terminal-engine, 09-config-settings, 10-shell-integration | ✅ covered |
-| App commands + auxiliary windows | `SwiftUI Commands`, `SettingsWindowController`, `AboutWindowController` | secondary `AppWindow` + command surface + settings/about windows | Med | — | — | ❌ missing |
+| App commands + auxiliary windows | `SwiftUI Commands`, `SettingsWindowController`, `AboutWindowController` | secondary `AppWindow` + command surface + settings/about windows | Med | M1 | 02-core-app, 17-functional-spec | ✅ covered |
 | App delegate orchestration + shortcut routing | `AppDelegate`, `UNUserNotificationCenterDelegate`, `NSMenuItemValidation` | activation/notification routing + app-wide shortcut router + `DispatcherQueue` | Med | M1+M6 | 02-core-app, 07-notification, 09-config-settings | ⚠️ partial |
 
 ### 패널 인프라
 
 | 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
 |---|---|---|---|---|---|---|
-| Shared panel abstraction | `Panel` protocol | 공통 panel lifecycle contract + reusable panel host interface | Med | — | 03-terminal-engine, 04-split-pane, 06-browser-panel | ❌ missing |
-| Panel content router | `PanelContentView` | XAML content presenter + panel-type routing layer | Med | — | 02-core-app, 04-split-pane | ❌ missing |
+| Shared panel abstraction | `Panel` protocol | 공통 panel lifecycle contract + reusable panel host interface | Med | M2 | 03-terminal-engine, 04-split-pane, 06-browser-panel, adr-0004 | ✅ covered |
+| Panel content router | `PanelContentView` | XAML content presenter + panel-type routing layer | Med | M3 | 02-core-app, 04-split-pane | ✅ covered |
 
 ### 워크스페이스
 
@@ -71,22 +71,22 @@
 
 | 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
 |---|---|---|---|---|---|---|
-| In-terminal find overlay | `SurfaceSearchOverlay`, `TerminalPanel.searchState` | terminal overlay (`Popup`/`Canvas`) + per-panel search state | Med | — | 04-split-pane | ❌ missing |
+| In-terminal find overlay | `SurfaceSearchOverlay`, `TerminalPanel.searchState` | terminal overlay (`Popup`/`Canvas`) + per-panel search state | Med | M2 | 04-split-pane, 17-functional-spec | ✅ covered |
 
 ### 알림
 
 | 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
 |---|---|---|---|---|---|---|
 | Terminal notification store | `TerminalNotificationStore`, `UNUserNotificationCenter` | `NotificationStore` + `AppNotification` + taskbar badge | Med | M6 | 07-notification | ✅ covered |
-| Notifications page | `NotificationsPage` | WinUI 3 notifications page/list view | Med | — | 07-notification | ❌ missing |
-| Titlebar notifications popover | `showNotificationsPopover()`, `NSPopover` | `AppWindowTitleBar` anchored flyout/popover | Med | — | — | ❌ missing |
+| Notifications page | `NotificationsPage` | WinUI 3 notifications page/list view | Med | M6 | 07-notification | ✅ covered |
+| Titlebar notifications popover | `showNotificationsPopover()`, `NSPopover` | `AppWindowTitleBar` anchored flyout/popover | Med | M6 | 07-notification, 02-core-app | ✅ covered |
 
 ### 셸 통합
 
 | 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
 |---|---|---|---|---|---|---|
 | Shell/terminal environment setup | `TERM`, `TERM_PROGRAM`, `XDG_DATA_DIRS`, `MANPATH`, Ghostty resource path | ConPTY spawn env injection + PowerShell/CMD/WSL scripts | Med | M2+M6 | 03-terminal-engine, 08-ipc-cli, 10-shell-integration | ✅ covered |
-| Ghostty clipboard/pasteboard integration | clipboard mode mapping, file URL shell-escaping | Windows Clipboard + shell-safe file URL escaping | Low | — | — | ❌ missing |
+| Ghostty clipboard/pasteboard integration | clipboard mode mapping, file URL shell-escaping | Windows Clipboard + shell-safe file URL escaping | Low | M6 | 03-terminal-engine, 10-shell-integration | ✅ covered |
 
 ### 자동화 / IPC
 
@@ -100,7 +100,7 @@
 | 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
 |---|---|---|---|---|---|---|
 | Keyboard shortcut persistence | `KeyboardShortcutSettings` | `settings.json` shortcut schema + routing engine + accelerator handling | Low | M0+M6 | 02-core-app, 09-config-settings | ✅ covered |
-| Settings window + preferences UI | `SettingsWindowController`, `SettingsView` | WinUI 3 settings window/page | Med | — | — | ❌ missing |
+| Settings window + preferences UI | `SettingsWindowController`, `SettingsView` | WinUI 3 settings window/page | Med | M6 | 17-functional-spec, 09-config-settings | ✅ covered |
 | Ghostty config parsing + theme resolution | `GhosttyConfig` | Ghostty config parser + `settings.json` precedence | Low | M6 | 09-config-settings | ✅ covered |
 
 ### 창 관리
@@ -114,11 +114,11 @@
 | 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
 |---|---|---|---|---|---|---|
 | Window chrome customization | glass/blur background, tint fallback | `SystemBackdrop` (Mica/Acrylic) + `AppWindowTitleBar` | Med | M1 | 02-core-app, 09-config-settings | ✅ covered |
-| Draggable titlebar handle | background drag without content interference | custom titlebar drag region | Med | — | — | ❌ missing |
-| Window accessor hook | underlying window exposure for config | `AppWindow` / `HWND` accessor seam | Low | — | — | ❌ missing |
+| Draggable titlebar handle | background drag without content interference | custom titlebar drag region | Med | M1 | 02-core-app | ✅ covered |
+| Window accessor hook | underlying window exposure for config | `AppWindow` / `HWND` accessor seam | Low | M1 | 02-core-app | ✅ covered |
 | Titlebar decorations controller | traffic-light hide/offset equivalent | `AppWindowTitleBar` button/title region customization | Med | M1 | 02-core-app, 09-config-settings | ⚠️ partial |
-| Toolbar controller | custom toolbar, command/tab title display | WinUI titlebar command host / toolbar region | Med | — | — | ❌ missing |
-| Titlebar controls + shortcut hints | sidebar/new-tab/notification buttons, hint placement | titlebar command buttons + keyboard hint layer | Med | — | — | ❌ missing |
+| Toolbar controller | custom toolbar, command/tab title display | WinUI titlebar command host / toolbar region | Med | M1 | 02-core-app | ✅ covered |
+| Titlebar controls + shortcut hints | sidebar/new-tab/notification buttons, hint placement | titlebar command buttons + keyboard hint layer | Med | M1 | 02-core-app | ✅ covered |
 | Backport helpers | SwiftUI key-press / pointer-style backports | 없음 (WinUI 3 기본 입력 경로) | Low | — | — | ❌ missing |
 
 ### 메뉴 바
@@ -165,19 +165,9 @@
 
 ### 5.1 ❌ missing
 
-- **App commands + auxiliary windows**: settings/about 보조 창과 command surface에 대한 문서 계약과 milestone task를 추가해야 한다.
-- **Shared panel abstraction**: terminal/browser 공통 panel host 인터페이스와 lifecycle 책임 분리를 문서화해야 한다.
-- **Panel content router**: panel type별 XAML host 선택과 content presenter 라우팅 규칙을 정의해야 한다.
+> 직전 12개 v1 task_missing 항목(App commands+aux windows, Shared panel abstraction, Panel content router, In-terminal find overlay, Notifications page, Titlebar notifications popover, Ghostty clipboard, Settings window, Draggable titlebar handle, Window accessor hook, Toolbar controller, Titlebar controls)은 계약·task 등록이 완료되어 ✅ covered로 이동했다(§6.2). 아래 남은 항목은 v1 제외(out_of_scope) 또는 `M7` release-only 범위다.
+
 - **Legacy local-process terminal view**: v1 제외 항목으로 유지하되, parity 범위를 재확장할 경우 별도 terminal backend 전략이 필요하다.
-- **In-terminal find overlay**: terminal 검색 오버레이 UI, search state 저장 위치, shortcut 연결 task를 계획에 추가해야 한다.
-- **Notifications page**: `_workspace\07-notification.md`의 projection을 실제 WinUI page/list 설계와 task로 구체화해야 한다.
-- **Titlebar notifications popover**: titlebar anchored flyout 구조, unread 상태 연결, 포커스 복귀 규칙을 새로 정의해야 한다.
-- **Ghostty clipboard/pasteboard integration**: clipboard mode 매핑과 file URL shell-escaping 규칙을 셸 통합 계약에 추가해야 한다.
-- **Settings window + preferences UI**: settings page/window 정보 구조, navigation, 저장 흐름을 문서와 milestone에 반영해야 한다.
-- **Draggable titlebar handle**: custom drag region의 hit-test 규칙과 콘텐츠 충돌 회피 동작을 정의해야 한다.
-- **Window accessor hook**: `AppWindow`/`HWND` 노출 범위와 사용 제한을 명시한 accessor seam이 필요하다.
-- **Toolbar controller**: titlebar/toolbar 영역의 명령 배치와 상태 동기화 규칙을 설계해야 한다.
-- **Titlebar controls + shortcut hints**: titlebar command 버튼, hint 표시 위치, shortcut 시각화 규칙을 추가해야 한다.
 - **Backport helpers**: WinUI 기본 입력 경로로 대체할지, 완전 제거할지를 문서에서 명확히 정리해야 한다.
 - **Menu bar extra / unread badge**: v1 제외 항목으로 유지하되, tray parity를 목표로 할 경우 별도 tray 모델과 unread 동기화가 필요하다.
 - **Update controller / Sparkle integration**: `M7`에서 사용할 Windows updater orchestration 계약을 별도 문서로 분리해야 한다.
@@ -214,28 +204,32 @@
 
 | 구분 | 건수 |
 |------|------|
-| task_exists (task 확인됨) | 18 |
+| task_exists (task 확인됨) | 30 |
 | task_partial (부분 커버) | 9 |
-| task_missing (v1 범위이나 task 없음) | 12 |
+| task_missing (v1 범위이나 task 없음) | 0 |
 | out_of_scope | 16 |
 
-### 6.2 task_missing 항목 (plans 등록 필요)
+### 6.2 직전 task_missing 항목의 등록 결과 (2026-06-05)
 
-| 기능 | 컴포넌트 그룹 | 권장 Milestone | 비고 |
-|------|--------------|---------------|------|
-| App commands + auxiliary windows | 앱 쉘/윈도우 | M1 | settings/about 보조 창과 command surface 미정의 |
-| Shared panel abstraction | 패널 인프라 | M2/M3 | terminal/browser 공통 panel host 계약 필요 |
-| Panel content router | 패널 인프라 | M1/M3 | XAML content presenter 라우팅 규칙 없음 |
-| In-terminal find overlay | 터미널 패널 | M2 | 검색 오버레이/UI 상태 task 없음 |
-| Notifications page | 알림 | M6 | WinUI notifications page/list task 없음 |
-| Titlebar notifications popover | 알림/타이틀바 | M6 | titlebar anchored popover task 없음 |
-| Ghostty clipboard/pasteboard integration | 셸 통합 | M6 | clipboard mode mapping/file URL escaping 누락 |
-| Settings window + preferences UI | 설정 UI | M6 | settings page/window task 없음 |
-| Draggable titlebar handle | 창 장식 | M1 | custom drag region hit-test 정의 없음 |
-| Window accessor hook | 창 장식 | M1 | AppWindow/HWND accessor seam 없음 |
-| Toolbar controller | 창 장식 | M1 | titlebar toolbar region task 없음 |
-| Titlebar controls + shortcut hints | 창 장식 | M1/M6 | command buttons/hint layer task 없음 |
-| Backport helpers | 창 장식 | — | WinUI 기본 경로 대체 여부만 문서상 남음 |
+> 12개 task_missing 기능에 대해 `_workspace` 계약 섹션이 추가되고 milestone task가 등록됐다. 아래는 기능→등록 task 매핑이다. Backport helpers는 v1에서 WinUI 기본 입력 경로로 대체(별도 계층 미이식)하기로 §4에서 확정되어 등록 대상이 아니다.
+
+| 기능 | 컴포넌트 그룹 | 등록 Milestone | 등록 task | 계약 doc_ref |
+|------|--------------|---------------|-----------|--------------|
+| App commands + auxiliary windows | 앱 쉘/윈도우 | M1 | m1-4 | 02 §7, 17 §8.7 |
+| Shared panel abstraction (`IPanel`) | 패널 인프라 | M2 | m2-7 | 04 §11, adr-0004 D5 |
+| Panel content router | 패널 인프라 | M3 | m3-6 | 04 §12 |
+| In-terminal find overlay | 터미널 패널 | M2 | m2-6 | 04 §10, 17 §3.6 |
+| Notifications page | 알림 | M6 | m6-5 | 07 §10 |
+| Titlebar notifications popover | 알림/타이틀바 | M6 | m6-5 | 07 §11, 02 §11 |
+| Ghostty clipboard/pasteboard integration | 셸 통합 | M6 | m6-7 | 03 §14, 10 §9 |
+| Settings window + preferences UI | 설정 UI | M6 | m6-6 | 17 §8.7, 09 |
+| Draggable titlebar handle | 창 장식 | M1 | m1-5 | 02 §8 |
+| Window accessor hook | 창 장식 | M1 | m1-5 | 02 §9 |
+| Toolbar controller | 창 장식 | M1 | m1-5 | 02 §10 |
+| Titlebar controls + shortcut hints | 창 장식 | M1 | m1-5 | 02 §11 |
+| Backport helpers | 창 장식 | — (out_of_scope) | — | 02 §11 NOTE (WinUI 기본 경로 대체) |
+
+> 부수 업데이트: `session_info` read-only IPC 명령은 별도 task 없이 m3-1(ControlServer foundation) acceptance에 `tc-session-info`로 folding됐다 (08 session_info, ADR-0002 `pty_mode` 노출).
 
 ### 6.3 task_partial 항목 (task 보강 필요)
 
@@ -252,5 +246,6 @@
 ### 6.4 검증 결론
 
 - 총 v1 범위 기능 수: 39
-- plans에 task가 없는 기능 수: 12
-- plans 보강이 필요한 최우선 항목: App commands + auxiliary windows, Shared panel abstraction, Notifications page, Settings window + preferences UI, Ghostty clipboard/pasteboard integration
+- plans에 task가 없는 v1 기능 수: 0 (직전 12개 task_missing 항목을 m1-4/m1-5/m2-6/m2-7/m3-6/m6-5/m6-6/m6-7로 등록 완료)
+- 남은 보강 영역은 §6.3 task_partial 항목(기존 task 확장)이며, 신규 task_missing은 없음
+- Backport helpers는 v1 범위 밖(out_of_scope)으로 확정되어 등록 대상에서 제외됨

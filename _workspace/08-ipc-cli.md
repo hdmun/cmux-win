@@ -186,6 +186,30 @@ CLI는 `cmux.exe [global-flags] <command> [args]` 형식이다.
 | `ping` | 연결 확인 |
 | `capabilities` | 서버 capabilities 반환 |
 | `identify [--workspace] [--surface] [--no-caller]` | 현재 context ID 반환 |
+| `session_info` | 현재 세션/창 상태 반환 (read-only) |
+
+#### `session_info` 응답 형식
+
+`session_info`는 read-only query command이며 `readonly` 모드에서도 허용된다. 현재 세션 식별자, ConPTY `pty_mode`, 활성 surface/workspace를 반환한다.
+
+```json
+{
+  "type": "session_info",
+  "session_id": "session:<uuid>",
+  "pty_mode": "standard",
+  "active_window_id": "window:<uuid>",
+  "active_workspace_id": "workspace:<uuid>",
+  "active_surface_id": "surface:<uuid>"
+}
+```
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `session_id` | string | `session:<uuid>` 현재 세션 식별자 |
+| `pty_mode` | string | ConPTY 모드 (`standard` \| `passthrough`, ADR-0002) |
+| `active_window_id` | string | 현재 활성 window |
+| `active_workspace_id` | string | 현재 활성 workspace |
+| `active_surface_id` | string \| null | 현재 focus된 surface (없으면 `null`) |
 
 ### Windows
 

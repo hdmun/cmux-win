@@ -323,3 +323,48 @@ void TerminalPanel::OnReattachTokenChanged(uint64_t /*token*/) {
 2. `++reattach_token_`은 `Detach()` 메서드 내에서만 호출한다.
 3. `Detach()` 후 XAML tree 재연결(reparent) 전에 token이 증가해야 한다. 순서를 바꾸면 재연결이 누락될 수 있다.
 4. browser 패널(`WebView2`)은 이 패턴을 사용하지 않는다.
+
+---
+
+## 14. Clipboard 통합 (terminal 측)
+
+> M6 구현 계약. macOS Ghostty의 clipboard mode mapping 대응. terminal panel의 copy/paste를 Windows Clipboard로 매핑한다. 파일 경로/URL의 shell escaping 규칙은 `_workspace/10-shell-integration.md` §9가 소유하며, 이 섹션은 clipboard ↔ terminal 경로만 다룬다.
+
+### 14.1 clipboard target 매핑
+
+Ghostty/libvterm은 OSC 52 등에서 system clipboard와 primary selection을 구분하나, Windows에는 X11 스타일 primary selection이 없다. 따라서 다음으로 고정한다.
+
+| 논리 target | Windows 매핑 |
+|-------------|--------------|
+| system clipboard (`c`) | Windows Clipboard (`CF_UNICODETEXT`) |
+| primary selection (`p`) | Windows Clipboard로 동일 매핑 (별도 primary 미구현) |
+
+- copy/paste는 항상 UI thread에서 Windows Clipboard API를 호출한다 (clipboard는 STA 의존).
+
+### 14.2 copy 경로
+
+1. 사용자 selection 또는 OSC 52 copy 요청 시 선택 텍스트를 `CF_UNICODETEXT`로 Windows Clipboard에 쓴다.
+2. 줄바꿈은 `\r\n`으로 정규화한다.
+3. trailing whitespace 처리는 terminal selection 규칙을 따른다 (rectangular selection 시 라인별 trim).
+
+### 14.3 paste 경로와 bracketed paste
+
+1. paste는 Windows Clipboard `CF_UNICODETEXT`를 읽어 ConPTY stdin feed(`h_pipe_in_write`, §10)로 보낸다.
+2. terminal이 **bracketed paste mode**(`ESC[?2004h`)를 활성화한 경우, paste 데이터를 `ESC[200~` … `ESC[201~`로 감싸 전송한다. 비활성 시 raw 전송한다.
+3. paste 데이터 내에 bracketed paste 종료 시퀀스(`ESC[201~`)가 포함되면 제거하여 escape injection을 방지한다.
+
+### 14.4 paste 확인 (paste confirmation)
+
+macOS Ghostty의 paste 경고에 대응한다.
+
+- paste 데이터에 개행(`\n`/`\r`)이 포함되고 bracketed paste mode가 **비활성** 인 경우, paste 전에 확인 dialog를 표시한다 (의도치 않은 다중 명령 실행 방지).
+- bracketed paste mode가 활성이면 셸이 paste를 단일 입력으로 처리하므로 확인을 생략한다.
+- 확인 동작은 `terminal.paste_confirm` 설정으로 끌 수 있다 (기본 `true`). 이 설정 키 정의는 `_workspace/09-config-settings.md`가 소유하며, 본 문서는 동작만 정의한다.
+- 파일을 terminal에 드롭/붙여넣어 경로로 변환하는 경우의 shell escaping은 `_workspace/10-shell-integration.md` §9의 file URL escaping 규칙을 적용한 뒤 paste 경로로 보낸다.
+
+### 14.5 수락 hook
+
+- selection copy 후 Windows Clipboard에서 `CF_UNICODETEXT`로 동일 텍스트를 읽을 수 있다.
+- bracketed paste mode 활성 시 paste가 `ESC[200~`/`ESC[201~`로 감싸여 stdin에 전달된다.
+- 개행 포함 + bracketed paste 비활성 시 확인 dialog가 뜨고, `terminal.paste_confirm=false`면 생략된다.
+- paste 데이터 내 `ESC[201~`가 제거되어 전달된다.

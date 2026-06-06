@@ -487,7 +487,7 @@ error contract: `08-ipc-cli.md` error code 표 사용 (`browser_cdp_unavailable`
 **transport 관련 환경 변수**:
 - `CMUX_PIPE_ENABLE`: `0`이면 pipe server 비활성화
 - `CMUX_PIPE_MODE`: transport mode override
-- `CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC`: client response timeout (default: 10초)
+- `CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC`: client response timeout (default: 15초)
 
 ### 6.2 프로토콜
 
@@ -527,14 +527,14 @@ error contract: `08-ipc-cli.md` error code 표 사용 (`browser_cdp_unavailable`
 | `unknown_command` | 존재하지 않는 command | no |
 | `payload_too_large` | 1 MiB 초과 | no |
 | `acl_denied` | same-user ACL 실패 | no |
-| `pipe_connect_failed` | pipe 연결 실패 | no |
+| `pipe_connect_failed` | pipe 연결 실패 | yes |
 | `pipe_read_failed` | pipe read I/O error | yes |
 | `pipe_write_failed` | pipe write I/O error | yes |
-| `state_conflict` | 앱 상태와 충돌 | no |
+| `state_conflict` | 앱 상태와 충돌 | depends |
 | `not_found` | 리소스 없음 | no |
 | `browser_cdp_unavailable` | CDP session 없음 | no |
-| `browser_cdp_failed` | CDP command execution failed | no |
-| `settings_write_failed` | settings 저장 실패 | no |
+| `browser_cdp_failed` | CDP command execution failed | depends |
+| `settings_write_failed` | settings 저장 실패 | yes |
 
 ### 6.5 socket_control.mode
 
@@ -558,7 +558,7 @@ error contract: `08-ipc-cli.md` error code 표 사용 (`browser_cdp_unavailable`
 
 | 그룹 | 주요 명령 |
 |------|-----------|
-| System | `ping`, `capabilities`, `identify` |
+| System | `ping`, `capabilities`, `identify`, `session_info` |
 | Windows | `list-windows`, `current-window`, `new-window`, `focus-window`, `close-window` |
 | Workspaces | `list-workspaces`, `new-workspace`, `select-workspace`, `current-workspace`, `close-workspace`, `move-workspace-to-window`, `reorder-workspace` |
 | Panes/Surfaces | `list-panes`, `list-pane-surfaces`, `focus-pane`, `new-pane`, `new-surface`, `close-surface`, `move-surface`, `reorder-surface`, `drag-surface-to-split`, `trigger-flash`, `refresh-surfaces` |
@@ -811,6 +811,38 @@ suppress 조건 (모두 만족 시 알림 생성 안 함):
 - atomic write가 깨진 JSON을 남기지 않음
 - migration backup 생성됨
 - shortcut conflict 검증이 UI 저장 전에 수행됨
+
+### 8.7 settings window / preferences UI
+
+**macOS 참조**: `SettingsWindowController`, `SettingsView` — 단일 설정 창 + 카테고리 navigation
+
+`settings.json`은 source of truth로 유지하되(§8.1), 사용자는 전용 settings window에서 주요 필드를 편집할 수 있다. settings window의 창 lifecycle(생성/소유/포커스/닫기)은 `02-core-app.md` §7 "App command surface + 보조 창"이 소유한다. 이 절은 그 창 안의 정보 구조(IA)와 저장 흐름만 고정한다.
+
+**navigation 카테고리** (좌측 nav, 단일 창):
+
+| 카테고리 | 편집 대상 필드 (§8.3) |
+|----------|------------------------|
+| General | `appearance.theme`, `appearance.backdrop` |
+| Terminal | `terminal.default_shell`, `terminal.scrollback_limit`, `terminal.cursor_blink`, `terminal.font_family`, `terminal.paste_confirm` |
+| Browser | `browser.search_engine`, `browser.restore_session` |
+| Shortcuts | `shortcuts.*` (§8.6 scope/conflict 규칙 적용) |
+| Advanced | `socket_control.mode`, `analytics.enabled` (read-mostly, 위험 필드는 확인 dialog) |
+
+**편집 가능 범위**:
+- UI는 §8.3 v1 필드 스키마에 존재하는 필드만 노출한다. 스키마에 없는 필드는 UI에서 편집하지 않는다.
+- UI에서 다루지 않는 고급 키는 "open settings.json" 동작으로 raw 편집을 유도한다(파일을 기본 편집기로 연다).
+
+**저장 흐름**:
+1. UI 변경은 settings ViewModel에 즉시 반영한다.
+2. 파일 쓰기는 §8.6과 동일하게 250ms debounce 후 §8.4 atomic write 규칙으로 기록한다.
+3. shortcut 편집 저장 전에는 §8.6 conflict 검증을 먼저 수행하고, 실패 시 저장하지 않고 inline validation error를 표시한다.
+4. 외부에서 `settings.json`이 바뀌면(파일 watch) UI는 현재 미저장 편집과 충돌하지 않는 범위에서 갱신한다. 충돌 시 사용자에게 reload/keep 선택을 제시한다.
+
+**인수 기준**:
+- settings window가 단일 인스턴스로 열리고 재요청 시 기존 창에 포커스한다(02 §7 계약 위임)
+- 각 카테고리에서 편집한 값이 §8.4 atomic write로 `settings.json`에 반영됨
+- shortcut conflict가 UI 저장 전에 차단됨
+- 스키마에 없는 필드는 UI에 노출되지 않음
 
 ---
 

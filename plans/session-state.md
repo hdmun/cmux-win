@@ -10,8 +10,8 @@
 
 ## Last completed task
 
-- task_id: `m0-7` (+ milestone quality improvements)
-- summary: `Milestone JSONs fully production-ready: queue_number, canonical build targets, m5.json rewrite, m0-4/m0-6/m0-7 done, functional spec written. Acceptance/outputs/depends_on quality improvements applied (see Notes).`
+- task_id: `m0-7` (+ parity task registration, this session)
+- summary: `Registered tasks for the 12 previously-missing v1 features (m1-4, m1-5, m2-6, m2-7, m3-6, m6-5, m6-6, m6-7), folded session_info into m3-1, fixed the m2-4 doc_ref fragment, and recounted 18-cmux-parity coverage. All 8 milestone JSONs validate.`
 
 ## Blocked tasks
 
@@ -26,7 +26,15 @@
 
 ## Notes for next session
 
-- **Autonomy structure hardening completed (this session)**:
+- **Parity task registration completed (this session)**:
+  - 12 previously task_missing v1 features now have contract sections + registered tasks: `m1-4` (app command surface + Settings/About windows), `m1-5` (titlebar drag region + accessor seam + toolbar + command buttons), `m2-6` (in-terminal find overlay), `m2-7` (`IPanel` shared abstraction), `m3-6` (panel content router), `m6-5` (notifications page + titlebar popover), `m6-6` (settings window/preferences UI), `m6-7` (terminal clipboard + file-URL shell escaping).
+  - `session_info` IPC command folded into `m3-1` acceptance (`tc-session-info`); ADR-0002 added to `m3-1` doc_refs for `pty_mode` exposure.
+  - Fixed `m2-4` doc_ref fragment `#13-reattach-token-binding` → `#13-reattach_token-binding` (underscore preserved).
+  - Contradiction fixes from the prior contract pass landed: scope enum, command timeout, history filename, retry policy, `session_info`, `IPanel` lifecycle decision (ADR-0004 D5).
+  - `_workspace/18-cmux-parity.md` recounted: covered 18→30, missing 28→16 (partial 9 unchanged, total 55); §6 task_missing 12→0 (Backport helpers confirmed out_of_scope).
+  - All 8 milestone JSONs pass `Test-Json` against `task-registry.schema.json`.
+  - These new tasks sit in gated milestones (M1/M2/M3/M6); current milestone stays `M0` and next recommended task is still `m0-1`.
+- **Autonomy structure hardening completed (earlier session)**:
   - `queue_number` is now required in both authority docs and `plans/schema/task-registry.schema.json`.
   - `doc_refs` resolution is normalized: read `active_milestone.doc_refs` first, then `selected_task.doc_refs`; treat `#fragment` as a Markdown heading slug, not part of the file path.
   - `plans/schema/task-registry.schema.json` now allows non-ASCII Markdown heading slugs in `doc_refs` fragments, so Korean section links validate correctly.

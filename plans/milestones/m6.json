@@ -149,6 +149,129 @@
       ],
       "blocked_by": [],
       "notes": []
+    },
+    {
+      "task_id": "m6-5",
+      "queue_number": 10,
+      "title": "Notifications page + titlebar notifications popover",
+      "status": "pending",
+      "summary": "Implement the WinUI notifications page and the titlebar-anchored notifications popover as NotificationStore projections.",
+      "depends_on": [
+        "m6-1"
+      ],
+      "doc_refs": [
+        "_workspace/07-notification.md",
+        "_workspace/07-notification.md#10-notifications-page",
+        "_workspace/07-notification.md#11-titlebar-notifications-popover",
+        "_workspace/02-core-app.md#11-titlebar-controls--shortcut-hints"
+      ],
+      "touches": [
+        "src/ui",
+        "src/notification"
+      ],
+      "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "manual: verify the page lists notifications newest-first and refreshes on store changes (07 §10.3)",
+        "manual: verify clicking an item marks it read and jumps to its workspace/surface; clear removes it and recomputes unread (07 §10.3)",
+        "manual: verify the titlebar notifications button/show_notifications shortcut opens a flyout anchored to the button (07 §11.4)",
+        "manual: verify the popover header unread count matches the store and dismiss restores focus to the previous surface (07 §11.4)",
+        "ctest --preset dev-x64 -R notification --output-on-failure"
+      ],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R notification --output-on-failure"
+      ],
+      "outputs": [
+        "src/ui/notifications_page.xaml",
+        "src/ui/notifications_page.xaml.cpp",
+        "src/ui/notifications_popover.xaml",
+        "src/ui/notifications_popover.xaml.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-6",
+      "queue_number": 9,
+      "title": "Settings window + preferences UI",
+      "status": "pending",
+      "summary": "Implement the settings window IA (category navigation) and save flow over the settings store.",
+      "depends_on": [
+        "m6-2",
+        "m6-3"
+      ],
+      "doc_refs": [
+        "_workspace/17-functional-spec.md",
+        "_workspace/17-functional-spec.md#87-settings-window--preferences-ui",
+        "_workspace/09-config-settings.md"
+      ],
+      "touches": [
+        "src/ui",
+        "src/config"
+      ],
+      "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "manual: verify the settings window opens single-instance and re-focuses on re-request (17 §8.7, delegating to 02 §7)",
+        "manual: verify edited values in each category persist via the atomic write path (17 §8.7)",
+        "manual: verify shortcut conflicts are blocked before save with an inline validation error (17 §8.7)",
+        "manual: verify fields absent from the v1 schema are not exposed in the UI (17 §8.7)",
+        "ctest --preset dev-x64 -R settings_ui --output-on-failure"
+      ],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R settings_ui --output-on-failure"
+      ],
+      "outputs": [
+        "src/ui/settings_page.xaml",
+        "src/ui/settings_page.xaml.cpp",
+        "src/config/settings_view_model.h",
+        "src/config/settings_view_model.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-7",
+      "queue_number": 8,
+      "title": "Terminal clipboard integration + file-URL shell escaping",
+      "status": "pending",
+      "summary": "Implement terminal copy/paste over Windows Clipboard (bracketed paste, paste confirm) and per-shell file-URL/path escaping.",
+      "depends_on": [
+        "m2-4",
+        "m6-4"
+      ],
+      "doc_refs": [
+        "_workspace/03-terminal-engine.md",
+        "_workspace/03-terminal-engine.md#14-clipboard-통합-terminal-측",
+        "_workspace/10-shell-integration.md#9-file-url--경로-shell-escaping"
+      ],
+      "touches": [
+        "src/terminal/clipboard",
+        "resources/shell-integration"
+      ],
+      "acceptance": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-clipboard-copy: selection copy writes CF_UNICODETEXT and the same text reads back from the Windows Clipboard (03 §14.5)",
+        "tc-clipboard-bracketed-paste: with bracketed paste mode on, paste is wrapped in ESC[200~/ESC[201~ to stdin (03 §14.5)",
+        "tc-clipboard-paste-confirm: newline + bracketed-paste-off shows a confirm dialog, skipped when terminal.paste_confirm=false (03 §14.5)",
+        "tc-clipboard-escape-strip: an embedded ESC[201~ is stripped from paste data (03 §14.5)",
+        "tc-fileurl-escape-pwsh: a space/quote path pasted to PowerShell becomes a single quoted token (10 §9.4)",
+        "tc-fileurl-escape-wsl: C:\\src\\x.txt becomes '/mnt/c/src/x.txt' for a WSL shell (10 §9.4)",
+        "ctest --preset dev-x64 -R clipboard --output-on-failure"
+      ],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R clipboard --output-on-failure"
+      ],
+      "outputs": [
+        "src/terminal/clipboard/clipboard_bridge.h",
+        "src/terminal/clipboard/clipboard_bridge.cpp",
+        "src/terminal/clipboard/file_url_escaper.h",
+        "src/terminal/clipboard/file_url_escaper.cpp",
+        "tests/unit/terminal/test_file_url_escaper.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
     }
   ]
 }
