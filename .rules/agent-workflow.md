@@ -81,4 +81,4 @@ machine-readable source of truth는 `plans\milestones\mN.json`의 `queue_number`
 
 `CONTEXT.md`는 기본 시작 순서에는 넣지 않는다. 다만 용어/alias 판단이 필요한 작업이거나 merged `doc_refs`가 glossary를 요구하면 즉시 읽는다.
 
-`_workspace/17-functional-spec.md`는 user-facing behavior, command catalog, settings UX를 구현하는 milestone의 기본 `doc_refs`에 포함해 task 선택 경로에서 빠지지 않게 한다.
+`_workspace/17-functional-spec.md`는 user-facing behavior, command catalog, settings UX를 구현하는 **task의** `doc_refs`에 해당 `#fragment` 섹션으로 포함한다(milestone-level 통째 참조 금지).

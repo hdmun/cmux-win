@@ -27,11 +27,12 @@
         "Directory.Packages.props",
         "NuGet.config"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --preset dev-x64",
         "cmake --build --preset dev-x64",
         "ctest --preset dev-x64 --output-on-failure"
       ],
+      "acceptance_manual": [],
       "commands": [
         "cmake --preset dev-x64",
         "cmake --build --preset dev-x64",
@@ -64,8 +65,10 @@
         "vcpkg-configuration.json",
         "ports/libvterm"
       ],
-      "acceptance": [
-        "cmake --preset dev-x64",
+      "acceptance_auto": [
+        "cmake --preset dev-x64"
+      ],
+      "acceptance_manual": [
         "manual: verify libvterm overlay path is fixed at ports/libvterm and vcpkg-configuration.json overlay-ports references ./ports",
         "manual: verify NuGet and vcpkg dependency ownership is not duplicated per _workspace/11-build-release.md §3 table",
         "manual: verify vcpkg.json lists at minimum: libvterm (overlay), nlohmann-json, gtest"
@@ -100,8 +103,10 @@
         "resources/app.manifest",
         "resources/*.rc"
       ],
-      "acceptance": [
-        "cmake --build --preset dev-x64 --target cmux_app",
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify app.manifest sets dpiAwareness to PerMonitorV2",
         "manual: verify app.manifest sets supportedOS entries for Win10 and Win11 compatibility GUIDs",
         "manual: verify .rc file compiles without error in dev-x64 preset build"
@@ -136,7 +141,8 @@
       "touches": [
         "_workspace/adr"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify adr-0001 through adr-0004 exist and are cross-referenced from the domain docs"
       ],
       "commands": [],
@@ -165,11 +171,13 @@
       "touches": [
         "src/utils"
       ],
-      "acceptance": [
+      "acceptance_auto": [
+        "ctest --preset dev-x64 -R \"logger|dispatcher|encoding\" --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify dispatcher_queue_helper.h wraps DispatcherQueue.TryEnqueue and logs on enqueue failure (see _workspace/adr/adr-0001-terminal-threading.md §DispatcherQueue 규칙)",
         "manual: verify logger does not block the UI thread — async sink or background queue 필수",
-        "manual: verify string_encoding.h provides UTF-8 <-> UTF-16 conversion helpers",
-        "ctest --preset dev-x64 -R \"logger|dispatcher|encoding\" --output-on-failure"
+        "manual: verify string_encoding.h provides UTF-8 <-> UTF-16 conversion helpers"
       ],
       "commands": [
         "ctest --preset dev-x64 -R \"logger|dispatcher|encoding\" --output-on-failure"
@@ -199,7 +207,8 @@
       "touches": [
         "_workspace/09-config-settings.md"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify field names, types, and defaults are fixed in the doc"
       ],
       "commands": [],
@@ -226,7 +235,8 @@
         "_workspace/11-build-release.md",
         "_workspace/12-tasks.md"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify _workspace/11-build-release.md §9 lists Azure Trusted Signing, winget, scoop, updater, symbol upload as M7-only items outside v1 gate",
         "manual: verify _workspace/12-tasks.md has a release-only section clearly separated from milestone implementation tasks"
       ],

@@ -28,7 +28,8 @@
         ".github/workflows",
         "resources/signing"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify signing path is reproducible in CI and matches the M7 gate"
       ],
       "commands": [],
@@ -59,7 +60,8 @@
         "resources/installer",
         "resources"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify installer checks WinAppSDK bootstrap and WebView2 Evergreen prerequisite"
       ],
       "commands": [],
@@ -87,7 +89,8 @@
       "touches": [
         "resources/distribution"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify winget and scoop manifests point at the signed release artifacts"
       ],
       "commands": [],
@@ -117,7 +120,8 @@
         "resources/crash-ingestion",
         ".github/workflows"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify symbol upload and crash ingestion are managed separately from app runtime logging policy"
       ],
       "commands": [],
@@ -145,7 +149,8 @@
       "touches": [
         "resources/updater"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify updater/appcast stays in the release-only lane and is not required for M0~M6"
       ],
       "commands": [],

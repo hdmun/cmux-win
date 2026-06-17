@@ -10,7 +10,6 @@
     "_workspace/04-split-pane.md",
     "_workspace/05-sidebar-tabs.md",
     "_workspace/08-ipc-cli.md",
-    "_workspace/17-functional-spec.md",
     "CONTEXT.md"
   ],
   "tasks": [
@@ -28,14 +27,17 @@
         "_workspace/adr/adr-0002-conpty-passthrough-fallback.md"
       ],
       "touches": [
-        "src/ipc"
+        "src/ipc",
+        "tests/unit/ipc"
       ],
-      "acceptance": [
-        "manual: verify same-user ACL and message-mode transport",
+      "acceptance_auto": [
         "tc-pipe-server-open: Named Pipe server opens with PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE",
         "tc-pipe-acl-same-user: connection from same user succeeds; connection from different SID is rejected",
         "tc-pipe-message-mode: send 1 complete JSON message → receiver gets exactly 1 complete message (no partial reads)",
         "tc-session-info: session_info query returns session_id, pty_mode, active_window/workspace/surface and is allowed in readonly mode (08 session_info; pty_mode per ADR-0002)"
+      ],
+      "acceptance_manual": [
+        "manual: verify same-user ACL and message-mode transport"
       ],
       "commands": [
         "ctest --preset dev-x64 -R ipc_server --output-on-failure"
@@ -67,14 +69,17 @@
       "touches": [
         "src/core",
         "src/ui",
-        "src/panels"
+        "src/panels",
+        "tests/unit/core"
       ],
-      "acceptance": [
-        "manual: verify split/close/move keep layout_version consistent",
+      "acceptance_auto": [
         "tc-split-h-produces-2-panes: horizontal split on root pane → snapshot.panes.size() == 2",
         "tc-layout-version-increments: SplitPane / ClosePane / MovePane 각각 호출 후 layout_version 증가",
         "tc-close-removes-pane: ClosePane(id) → snapshot에 해당 pane_id 없음",
         "tc-focus-pane-tracked: FocusPane(id) → GetActivePaneId() == id"
+      ],
+      "acceptance_manual": [
+        "manual: verify split/close/move keep layout_version consistent"
       ],
       "commands": [
         "ctest --preset dev-x64 -R split_layout --output-on-failure"
@@ -104,13 +109,16 @@
       ],
       "touches": [
         "src/core",
-        "src/ui"
+        "src/ui",
+        "tests/unit/core"
       ],
-      "acceptance": [
-        "manual: verify active workspace source of truth remains in TabManager",
+      "acceptance_auto": [
         "tc-create-workspace: CreateWorkspace() → ListWorkspaces().size() 정확히 1 증가",
         "tc-active-workspace-source-of-truth: ActivateWorkspace(id) → GetActiveWorkspaceId() == id (ListView.SelectedItem은 결과만 반영)",
         "tc-metadata-batch-window: 100ms 내 연속 ApplyWorkspaceMetadata 호출 → sidebar update 횟수 ≤ 1"
+      ],
+      "acceptance_manual": [
+        "manual: verify active workspace source of truth remains in TabManager"
       ],
       "commands": [
         "ctest --preset dev-x64 -R tab_manager --output-on-failure"
@@ -146,14 +154,17 @@
         "src/core",
         "src/ui",
         "src/core/tab_manager.h",
-        "src/core/tab_manager.cpp"
+        "src/core/tab_manager.cpp",
+        "tests/unit/core"
       ],
-      "acceptance": [
-        "manual: verify close selection follows the documented left-priority rule",
+      "acceptance_auto": [
         "tc-close-select-left-priority: 왼쪽 형제가 있는 workspace 닫기 → 왼쪽 형제가 active",
         "tc-close-last-workspace-empty: 마지막 workspace 닫기 → 빈 상태, 크래시 없음",
         "tc-lifecycle-state-sequence: workspace 생성 → created → attached → focused → blurred → hidden → detached → disposed 7개 상태 전이 모두 도달 가능",
         "tc-close-busy-confirm: 실행 중인 프로세스가 있는 workspace CloseWorkspace() → needsConfirmClose=true 반환"
+      ],
+      "acceptance_manual": [
+        "manual: verify close selection follows the documented left-priority rule"
       ],
       "commands": [
         "ctest --preset dev-x64 -R tab_manager --output-on-failure"
@@ -182,8 +193,7 @@
         "tests/unit/ipc",
         "tests/integration"
       ],
-      "acceptance": [
-        "manual: verify error codes and payload limits match _workspace/08-ipc-cli.md contract",
+      "acceptance_auto": [
         "tc-pipe-connect: client connects to Named Pipe → server returns session_id (UUID format)",
         "tc-cmd-new-tab: new_tab command sent via IPC → TabManager adds exactly 1 workspace",
         "tc-cmd-send-input: send_input command → ConPTY stdin receives the exact byte payload",
@@ -192,6 +202,9 @@
         "tc-error-invalid-id: valid command with non-existent pane_id → error response with code NOT_FOUND",
         "tc-split-conflict: simultaneous split and close on same pane → one succeeds, other returns CONFLICT or NOT_FOUND",
         "tc-focus-while-closing: focus command on pane that is being disposed → error response, no crash"
+      ],
+      "acceptance_manual": [
+        "manual: verify error codes and payload limits match _workspace/08-ipc-cli.md contract"
       ],
       "commands": [
         "ctest --preset dev-x64 -R ipc --output-on-failure",
@@ -224,15 +237,18 @@
       "touches": [
         "src/core",
         "src/ui",
-        "src/panels"
+        "src/panels",
+        "tests/unit/core"
       ],
-      "acceptance": [
-        "manual: verify the router owns the heterogeneous IPanel collection and never creates/destroys panels (04 §12.2)",
+      "acceptance_auto": [
         "tc-route-terminal-host: a pane with a terminal surface presents a SwapChainPanel host",
         "tc-route-browser-host: a pane with a browser surface presents a WebView2 host",
         "tc-route-host-reuse: moving the same surface across a split reuses the same host element and keeps runtime alive (04 §4, ADR-0004)",
         "tc-route-mixed-tree: terminal and browser panels in one BonsplitController tree each route to the correct host",
         "tc-route-unknown-kind: an unknown SurfaceKind shows an empty placeholder and logs without crashing"
+      ],
+      "acceptance_manual": [
+        "manual: verify the router owns the heterogeneous IPanel collection and never creates/destroys panels (04 §12.2)"
       ],
       "commands": [
         "ctest --preset dev-x64 -R panel_content_router --output-on-failure"
@@ -243,6 +259,114 @@
         "src/ui/panel_content_presenter.xaml",
         "src/ui/panel_content_presenter.xaml.cpp",
         "tests/unit/core/test_panel_content_router.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m3-7",
+      "queue_number": 7,
+      "title": "Debug/inspect IPC contract freeze",
+      "status": "pending",
+      "summary": "Author request/response for the debug/inspect IPC family in 08 §13.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md",
+        "_workspace/08-ipc-cli.md#13-debug-and-automation-ipc"
+      ],
+      "touches": [
+        "_workspace/08-ipc-cli.md"
+      ],
+      "acceptance_auto": [
+        "python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py check-docs m3-7"
+      ],
+      "acceptance_manual": [
+        "manual: verify 08 §13 documents req/res for read_terminal_text, read_screen, render_stats, layout_debug, panel_snapshot, surface_health"
+      ],
+      "commands": [
+        "python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py check-docs m3-7"
+      ],
+      "outputs": [
+        "_workspace/08-ipc-cli.md"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "doc/policy-freeze task; auto acceptance is the doc-linter anchor check, completeness is manual"
+      ]
+    },
+    {
+      "task_id": "m3-8",
+      "queue_number": 7,
+      "title": "Debug/inspect IPC implementation",
+      "status": "pending",
+      "summary": "Implement the read-only debug/inspect IPC commands.",
+      "depends_on": [
+        "m3-7",
+        "m3-1",
+        "m3-5"
+      ],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md",
+        "_workspace/08-ipc-cli.md#13-debug-and-automation-ipc"
+      ],
+      "touches": [
+        "src/ipc",
+        "tests/unit/ipc"
+      ],
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-debug-read-text: read_terminal_text returns the active surface visible text",
+        "tc-debug-layout: layout_debug returns the split tree with layout_version",
+        "ctest --preset dev-x64 -R debug_ipc --output-on-failure"
+      ],
+      "acceptance_manual": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R debug_ipc --output-on-failure"
+      ],
+      "outputs": [
+        "src/ipc/debug_commands.h",
+        "src/ipc/debug_commands.cpp",
+        "tests/unit/ipc/test_debug_ipc.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m3-9",
+      "queue_number": 5,
+      "title": "In-pane surface tab bar + new-surface menu",
+      "status": "pending",
+      "summary": "Implement the per-pane horizontal surface tab bar and the + new-surface menu.",
+      "depends_on": [
+        "m3-2",
+        "m3-3"
+      ],
+      "doc_refs": [
+        "_workspace/17-functional-spec.md#38-pane-내-surface-탭-바",
+        "_workspace/04-split-pane.md",
+        "_workspace/05-sidebar-tabs.md"
+      ],
+      "touches": [
+        "src/ui",
+        "src/panels",
+        "tests/unit/panels"
+      ],
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-surface-tab-switch: selecting a tab changes the pane active surface",
+        "tc-surface-tab-new-menu: the + menu creates a terminal or browser surface (new-surface parity)",
+        "ctest --preset dev-x64 -R surface_tab --output-on-failure"
+      ],
+      "acceptance_manual": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R surface_tab --output-on-failure"
+      ],
+      "outputs": [
+        "src/ui/surface_tab_bar.h",
+        "src/ui/surface_tab_bar.cpp",
+        "tests/unit/panels/test_surface_tab_bar.cpp"
       ],
       "blocked_by": [],
       "notes": []

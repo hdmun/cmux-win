@@ -8,7 +8,6 @@
   ],
   "doc_refs": [
     "_workspace/08-ipc-cli.md",
-    "_workspace/17-functional-spec.md",
     "CONTEXT.md"
   ],
   "tasks": [
@@ -28,9 +27,11 @@
         "cli",
         "src/ipc"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_cli",
-        "ctest --preset dev-x64 -R cli --output-on-failure",
+        "ctest --preset dev-x64 -R cli --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify capabilities response matches protocol version 2"
       ],
       "commands": [
@@ -62,9 +63,11 @@
         "src/ipc",
         "src/core"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_cli",
-        "ctest --preset dev-x64 -R ipc_commands --output-on-failure",
+        "ctest --preset dev-x64 -R ipc_commands --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify command routing matches the published command catalog"
       ],
       "commands": [
@@ -99,7 +102,8 @@
         "_workspace/07-notification.md",
         "_workspace/09-config-settings.md"
       ],
-      "acceptance": [
+      "acceptance_auto": [],
+      "acceptance_manual": [
         "manual: verify redaction policy is fixed in _workspace/07-notification.md per .rules/logging-privacy.md",
         "manual: verify analytics opt-in default is false per .rules/logging-privacy.md §analytics-policy",
         "manual: verify log rotation and sink rules are documented per .rules/logging-privacy.md §log-sink"
@@ -130,9 +134,11 @@
         "src/core/crash_reporter.cpp",
         "vcpkg.json"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --preset dev-x64",
-        "cmake --build --preset dev-x64 --target cmux_app",
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify crash capture honors the frozen log/privacy policy from m5-3",
         "manual: verify Crashpad is initialized via InitializeCrashpad() before any other app logic",
         "manual: verify minidump is generated in %LOCALAPPDATA%\\cmux\\crashes\\ on simulated crash",
@@ -156,6 +162,81 @@
         "InitializeCrashpad() minimum signature: bool InitializeCrashpad(const std::filesystem::path& handler_path, const std::filesystem::path& db_path)",
         "crash handler binary (crashpad_handler.exe) must be packaged with app deployment"
       ]
+    },
+    {
+      "task_id": "m5-5",
+      "queue_number": 7,
+      "title": "Input-simulation IPC implementation",
+      "status": "pending",
+      "summary": "Implement simulate_type/simulate_file_drop/simulate_shortcut/is_terminal_focused.",
+      "depends_on": [
+        "m3-8",
+        "m5-1"
+      ],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md#13-debug-and-automation-ipc",
+        "_workspace/17-functional-spec.md#49-파일-드롭-수신"
+      ],
+      "touches": [
+        "src/ipc",
+        "tests/unit/ipc"
+      ],
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-simulate-type: simulate_type injects text into the target surface",
+        "tc-simulate-file-drop: simulate_file_drop injects an escaped path paste",
+        "ctest --preset dev-x64 -R input_sim --output-on-failure"
+      ],
+      "acceptance_manual": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R input_sim --output-on-failure"
+      ],
+      "outputs": [
+        "src/ipc/input_sim_commands.h",
+        "src/ipc/input_sim_commands.cpp",
+        "tests/unit/ipc/test_input_sim.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m5-6",
+      "queue_number": 7,
+      "title": "Sidebar/status IPC commands",
+      "status": "pending",
+      "summary": "Implement set_status/clear_status/report_git_branch/report_ports/sidebar_state + --tab/--panel targeting.",
+      "depends_on": [
+        "m3-5",
+        "m5-1"
+      ],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md#14-sidebar-and-status-ipc-commands",
+        "_workspace/05-sidebar-tabs.md#ipc-경유-sidebar-메타데이터"
+      ],
+      "touches": [
+        "src/ipc",
+        "src/core",
+        "tests/unit/ipc"
+      ],
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-set-status: set_status updates workspace status_entries and projects to the sidebar",
+        "tc-report-ports: report_ports updates listening_ports metadata",
+        "ctest --preset dev-x64 -R sidebar_status --output-on-failure"
+      ],
+      "acceptance_manual": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R sidebar_status --output-on-failure"
+      ],
+      "outputs": [
+        "src/ipc/sidebar_status_commands.h",
+        "src/ipc/sidebar_status_commands.cpp",
+        "tests/unit/ipc/test_sidebar_status.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
     }
   ]
 }

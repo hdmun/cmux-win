@@ -1,4 +1,0 @@
-interface:
-  display_name: "cmux-win Autonomous"
-  short_description: "Run autonomous repo work from _workspace and plans."
-  default_prompt: "Use $skill-cmux-win-autonomous-execution to resume cmux-win work: read the autonomous-execution files, pick the next ready task from plans, implement it, and leave session-state updated."

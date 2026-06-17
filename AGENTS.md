@@ -20,3 +20,15 @@
 | [`.rules/logging-privacy.md`](.rules/logging-privacy.md) | analytics opt-in 정책, 로그 redaction, log sink/rotation 규칙 |
 | [`.rules/notifications-degrade.md`](.rules/notifications-degrade.md) | graceful degrade, notification suppression, toast, badge, GC 규칙 |
 | [`.rules/docs-sync.md`](.rules/docs-sync.md) | 코드 변경 시 함께 수정해야 할 `_workspace` / `plans` / `CONTEXT` / schema 문서 목록, 전체 참조 문서 |
+
+---
+
+## 자율 실행 하네스
+
+Claude 자율 구현은 **`cmux-plan`** CLI로 구동한다 (Codex용 `.agents/skills/`는 폐기됨).
+
+- 스킬: [`.claude/skills/cmux-win-autonomous-execution/SKILL.md`](.claude/skills/cmux-win-autonomous-execution/SKILL.md)
+- CLI: `python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py <next|brief|validate|check-docs|verify|status>`
+- 루프: `next` → `status … in_progress` → `brief` → 구현 → `verify` → `validate` → `status … done` (핸드오프 자동 갱신)
+- `plans/*.json` 또는 `_workspace/*.md`를 바꾸면 `cmux-plan validate`가 0 error여야 한다 (schema + 의존성 + 전이폐쇄 gate + doc-linter + tc↔ctest).
+- acceptance는 `acceptance_auto`(기계 gating) / `acceptance_manual`(사람·AT, 큐잉)로 분리된다.

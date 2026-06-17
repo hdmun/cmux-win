@@ -151,4 +151,4 @@ step 7의 `doc_refs`는 `active_milestone.doc_refs` 뒤에 `selected_task.doc_re
 
 `CONTEXT.md`는 기본 7단계에 넣지 않는다. 다만 용어/alias 변경, panel/workspace/notification naming, 또는 ambiguity 해소가 현재 작업에 포함되면 즉시 읽는다.
 
-`_workspace/17-functional-spec.md`는 user-facing behavior, command catalog, settings UX를 구현하는 milestone의 기본 `doc_refs`에 포함해 task layer에서 도달 가능해야 한다.
+`_workspace/17-functional-spec.md`는 user-facing behavior, command catalog, settings UX를 구현하는 **task의** `doc_refs`에 해당 `#fragment` 섹션으로 포함한다. milestone-level 통째 참조는 두지 않는다(brief 토큰 절약 — whole-file 참조는 build_brief가 heading index로 캡한다).

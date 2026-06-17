@@ -7,7 +7,6 @@
   ],
   "doc_refs": [
     "_workspace/02-core-app.md",
-    "_workspace/17-functional-spec.md",
     "CONTEXT.md"
   ],
   "tasks": [
@@ -28,8 +27,10 @@
         "src/app",
         "src/ui"
       ],
-      "acceptance": [
-        "cmake --build --preset dev-x64 --target cmux_app",
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify first MainWindow creation on STA thread"
       ],
       "commands": [
@@ -60,10 +61,12 @@
         "src/app",
         "src/core"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
-        "manual: verify active window tracking and close order",
         "ctest --preset dev-x64 -R window_manager --output-on-failure"
+      ],
+      "acceptance_manual": [
+        "manual: verify active window tracking and close order"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -94,8 +97,10 @@
         "src/ui",
         "src/app"
       ],
-      "acceptance": [
-        "cmake --build --preset dev-x64 --target cmux_app",
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify backdrop fallback matches support matrix"
       ],
       "commands": [
@@ -128,8 +133,10 @@
         "src/app",
         "src/ui"
       ],
-      "acceptance": [
-        "cmake --build --preset dev-x64 --target cmux_app",
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify app commands route through the single command surface and delegate to WindowManager/TabManager",
         "manual: verify open-settings twice keeps exactly 1 Settings window and re-activates the existing one (single-instance); About behaves identically (02 §7.4)",
         "manual: verify closing an auxiliary window does not terminate the app while a main window is alive (02 §7.4)",
@@ -169,8 +176,10 @@
         "src/ui",
         "src/app"
       ],
-      "acceptance": [
-        "cmake --build --preset dev-x64 --target cmux_app",
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify empty titlebar drag moves the window and drag over interactive controls does not (02 §8.3)",
         "manual: verify titlebar double-click toggles maximize/restore (02 §8.3)",
         "manual: verify backdrop/titlebar config obtains AppWindow/HWND only via the accessor seam on the UI thread (02 §9.3)",

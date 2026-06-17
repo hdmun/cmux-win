@@ -9,7 +9,7 @@
 | 변경 유형 | 함께 수정할 문서 |
 |-----------|-----------------|
 | bootstrap / 빌드 구조 변경 | _workspace/01-project-structure.md, _workspace/11-build-release.md, _workspace/12-tasks.md |
-| autonomous execution / task registry 변경 | _workspace/00-overview.md, _workspace/13-autonomous-execution.md, .rules/agent-workflow.md, plans/README.md, plans/schema/task-registry.schema.json, plans/session-state.md, plans/index.json, plans/milestones/*.json, _workspace/12-tasks.md |
+| autonomous execution / task registry 변경 | _workspace/00-overview.md, _workspace/13-autonomous-execution.md, .rules/agent-workflow.md, plans/README.md, plans/schema/task-registry.schema.json, plans/session-state.md, plans/index.json, plans/milestones/*.json, _workspace/12-tasks.md, .claude/skills/cmux-win-autonomous-execution/SKILL.md |
 | task `doc_refs` / spec / glossary 연결 변경 | CONTEXT.md, _workspace/00-overview.md, _workspace/13-autonomous-execution.md, _workspace/17-functional-spec.md, plans/README.md, plans/index.json, plans/milestones/*.json |
 | 용어 / 명명 / ID 규칙 변경 | CONTEXT.md, _workspace/00-overview.md, 관련 도메인 _workspace 문서 |
 | ADR / gate contract 변경 | _workspace/14-adr-guide.md, _workspace/12-tasks.md, 관련 도메인 _workspace 문서 |

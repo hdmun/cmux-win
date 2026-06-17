@@ -14,9 +14,10 @@
 
 | 전체 기능 수 | ✅ covered 항목 수 | ⚠️ partial 항목 수 | ❌ missing 항목 수 |
 |---|---:|---:|---:|
-| 55 | 30 | 9 | 16 |
+| 62 | 37 | 9 | 16 |
 
 - 통계는 아래 패리티 표의 `Gap 상태` 행 수를 직접 재집계한 값이다.
+- 2026-06-07: "자동화 / 관찰 / AI 통합" 그룹 7개 행(claude-hook, debug/automation IPC, port 감지, sidebar/status 명령, surface 탭 바, file-drop 수신, browser CDP superset)을 추가 등록해 covered 30→37, 전체 55→62로 갱신했다(§6.5).
 - `Milestone`은 `M0~M7` 축약 표기만 사용하고, `_workspace 참조`는 파일명만 사용한다.
 
 ## 3. 패리티 갭 분석표
@@ -94,6 +95,18 @@
 |---|---|---|---|---|---|---|
 | Socket control settings | socket access mode, path overrides | `socket_control.mode` + Named Pipe naming/override | Med | M0+M3 | 08-ipc-cli, 09-config-settings | ✅ covered |
 | Socket automation / v1+v2 control API | Unix socket server, newline-delimited JSON, text+JSON commands, terminal/browser/window/workspace automation, shell metadata reception | Named Pipe message transport + protocol v2 + CLI + CDP automation + shell auto-report | High | M3+M4+M5+M6 | 06-browser-panel, 08-ipc-cli, 10-shell-integration | ✅ covered |
+
+### 자동화 / 관찰 / AI 통합 (parity 확장, 2026-06-07)
+
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|
+| Claude Code 통합 (claude-hook) | `claude-hook`, `set_status`/`clear_status`, 세션 파일 | `claude-hook` CLI + Named Pipe + 세션 파일(`LockFileEx`) + status badge | Med | M6 | 08-ipc-cli, 17-functional-spec | ✅ covered |
+| Debug/automation IPC | `debug.*`, `read_terminal_text`, `simulate_*` | inspect + input-sim IPC 명령군 (tests_v2 검증 백본) | High | M3+M5 | 08-ipc-cli, 17-functional-spec | ✅ covered |
+| App-backend 포트 감지 | shell `report_ports` + backend scan | app backend port detector → sidebar `listening_ports` | Med | M6 | 10-shell-integration, 05-sidebar-tabs | ✅ covered |
+| Sidebar/status 명령 계층 | `set_status`, `report_git_branch`, `report_ports`, `sidebar_state`, `--tab`/`--panel` | IPC sidebar/status 명령 + 대상 지정 플래그 | Med | M5 | 08-ipc-cli, 05-sidebar-tabs | ✅ covered |
+| Pane 내 surface 탭 바 | per-pane 가로 탭 바 + `+` 메뉴 | XAML surface 탭 바 + new-surface 메뉴 | Med | M3 | 17-functional-spec, 04-split-pane | ✅ covered |
+| 터미널 파일 드롭 수신 | drag-drop → escaped paste | WinUI Drop 대상 + 경로 추출 + escaping(10 §9) | Med | M6 | 17-functional-spec, 10-shell-integration | ✅ covered |
+| Browser CDP capability superset | WKWebView `not_supported` 매트릭스 | WebView2+CDP 실제 지원 (의도적 superset) | Low | M4 | 06-browser-panel, 17-functional-spec | ✅ covered |
 
 ### 설정 / 구성
 
@@ -204,7 +217,7 @@
 
 | 구분 | 건수 |
 |------|------|
-| task_exists (task 확인됨) | 30 |
+| task_exists (task 확인됨) | 37 |
 | task_partial (부분 커버) | 9 |
 | task_missing (v1 범위이나 task 없음) | 0 |
 | out_of_scope | 16 |
@@ -245,7 +258,24 @@
 
 ### 6.4 검증 결론
 
-- 총 v1 범위 기능 수: 39
-- plans에 task가 없는 v1 기능 수: 0 (직전 12개 task_missing 항목을 m1-4/m1-5/m2-6/m2-7/m3-6/m6-5/m6-6/m6-7로 등록 완료)
+- 총 v1 범위 기능 수: 46
+- plans에 task가 없는 v1 기능 수: 0 (직전 12개 task_missing 항목 + 2026-06-07 신규 7개 갭을 모두 등록 완료)
 - 남은 보강 영역은 §6.3 task_partial 항목(기존 task 확장)이며, 신규 task_missing은 없음
 - Backport helpers는 v1 범위 밖(out_of_scope)으로 확정되어 등록 대상에서 제외됨
+
+### 6.5 신규 parity 갭 등록 결과 (2026-06-07)
+
+> 검토(에이전트 팀)에서 발견한 7개 갭에 대해 `_workspace` 계약 스텁을 추가하고 milestone task를 등록했다. 계약 상세 작성은 doc-freeze task(`m3-7`/`m4-4`/`m6-8`, anchor 검사로 auto-verify)로, 구현은 별도 task로 분리했다.
+
+| 갭 | 등록 Milestone | 계약 doc-freeze | 구현 task | 계약 doc_ref |
+|------|---------------|-----------------|-----------|--------------|
+| Claude Code 통합 (claude-hook) | M6 | m6-8 | m6-9 | 08 §10 claude-hook + event payloads, 17 §6.6 |
+| Debug/inspect IPC | M3 | m3-7 | m3-8 | 08 §13 |
+| Input-simulation IPC | M5 | (m3-7) | m5-5 | 08 §13.2, 17 §4.9 |
+| App-backend 포트 감지 | M6 | — | m6-10 | 10 §7, 05 §IPC 메타데이터 |
+| Sidebar/status 명령 계층 | M5 | — | m5-6 | 08 §14, 05 §IPC 메타데이터 |
+| Pane 내 surface 탭 바 | M3 | — | m3-9 | 17 §3.8, 04, 05 |
+| 터미널 파일 드롭 수신 | M6 | — | m6-11 | 17 §4.9, 10 §9 |
+| Browser CDP capability superset | M4 | m4-4 | — (doc note) | 06 §10, 17 §5.7 |
+
+> 모든 신규 task의 doc_ref `#fragment`는 하네스 doc-linter(`cmux-plan validate` / `check-docs`)로 해소가 검증된다.

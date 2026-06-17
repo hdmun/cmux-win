@@ -8,7 +8,6 @@
   ],
   "doc_refs": [
     "_workspace/03-terminal-engine.md",
-    "_workspace/17-functional-spec.md",
     "CONTEXT.md"
   ],
   "tasks": [
@@ -35,13 +34,15 @@
         "src/terminal/engine/io_loop.h",
         "src/terminal/engine/io_loop.cpp"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R conpty --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify standard ConPTY mode works on Win10 — shell spawns and I/O flows",
         "manual: verify passthrough gate detection runs on Win11 22H2+ (log entry present)",
         "manual: verify CMUX_PIPE_NAME, CMUX_PANE_ID, CMUX_SURFACE_ID injected on shell spawn",
-        "manual: verify CMUX_CONPTY_MODE=standard env override bypasses passthrough gate",
-        "ctest --preset dev-x64 -R conpty --output-on-failure"
+        "manual: verify CMUX_CONPTY_MODE=standard env override bypasses passthrough gate"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -76,12 +77,14 @@
         "src/terminal/engine/terminal_buffer.h",
         "src/terminal/engine/terminal_buffer.cpp"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R vterm --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify parser path uses libvterm — no custom VT parser code exists in src/",
         "manual: verify VtermWrapper.PushBytes() correctly updates TerminalBuffer for basic VT100 sequences (color, cursor move, erase)",
-        "manual: verify libvterm source exists only in ports/libvterm/, not in vendor/ or any other path",
-        "ctest --preset dev-x64 -R vterm --output-on-failure"
+        "manual: verify libvterm source exists only in ports/libvterm/, not in vendor/ or any other path"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -116,12 +119,14 @@
         "src/terminal/renderer/terminal_frame.h",
         "src/terminal/renderer/glyph_cache.h"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R renderer --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify dirty-region-based redraw path — full-screen clear does not redraw unchanged cells",
         "manual: verify D2D draw runs on UI thread (not background) per adr-0001 threading table",
-        "manual: verify glyph cache invalidated on DPI change",
-        "ctest --preset dev-x64 -R renderer --output-on-failure"
+        "manual: verify glyph cache invalidated on DPI change"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -159,8 +164,10 @@
         "src/panels/terminal_panel.xaml",
         "src/panels/terminal_panel.xaml.cpp"
       ],
-      "acceptance": [
-        "cmake --build --preset dev-x64 --target cmux_app",
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify terminal panel survives reparent — ConPTY session remains alive after split move",
         "manual: verify reattach_token increments on Detach() and triggers SetSwapChain() re-call",
         "manual: verify terminal panel disposed state releases ConPTY → libvterm → D2D in that order"
@@ -196,13 +203,15 @@
         "src/terminal/uia/uia_provider.h",
         "src/terminal/uia/uia_provider.cpp"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R ime --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify IME candidate window placement aligns with terminal cursor pixel rect",
         "manual: verify IME rect recalculated immediately on DPI change (DpiChanged event)",
         "manual: verify Narrator or NVDA can read current line text via UIA TextPattern",
-        "manual: verify caret move and viewport change UIA events are raised",
-        "ctest --preset dev-x64 -R ime --output-on-failure"
+        "manual: verify caret move and viewport change UIA events are raised"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -235,9 +244,10 @@
         "src/panels/terminal_find_overlay.h",
         "src/panels/terminal_find_overlay.cpp",
         "src/panels/terminal_find_overlay.xaml",
-        "src/panels/terminal_find_overlay.xaml.cpp"
+        "src/panels/terminal_find_overlay.xaml.cpp",
+        "tests/unit/panels"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
         "tc-find-open-focus: find action triggers overlay over active terminal panel and focuses the input box",
         "tc-find-counter-sync: query input updates match_count and counter renders as N / M",
@@ -246,6 +256,7 @@
         "tc-find-state-survives-reparent: moving the panel (hidden→attached) preserves search state",
         "ctest --preset dev-x64 -R terminal_find --output-on-failure"
       ],
+      "acceptance_manual": [],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R terminal_find --output-on-failure"
@@ -277,15 +288,17 @@
       "touches": [
         "src/app/panel/i_panel.h",
         "src/panels/terminal_panel.h",
-        "src/panels/terminal_panel.cpp"
+        "src/panels/terminal_panel.cpp",
+        "tests/unit/panels"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
         "tc-ipanel-single-collection: TerminalPanel is storable through an IPanel pointer in a single heterogeneous collection",
         "tc-ipanel-lifecycle-verbs: IPanel exposes Attach/Focus/Blur/Hide/Detach/Dispose and TerminalPanel maps them per 04 §11.2",
         "tc-ipanel-no-concrete-branch: layout code contains no dynamic_cast to a concrete panel type (content router excepted)",
         "ctest --preset dev-x64 -R panel_abstraction --output-on-failure"
       ],
+      "acceptance_manual": [],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R panel_abstraction --output-on-failure"

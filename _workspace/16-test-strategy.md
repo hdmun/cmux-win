@@ -41,32 +41,31 @@ tests\
 
 ## 4. task acceptance rule
 
-각 `plans\milestones\mN.json` task는 `acceptance` 배열과 `commands` 배열을 함께 가진다.
+각 `plans\milestones\mN.json` task는 `acceptance_auto` / `acceptance_manual` 배열과 `commands` 배열을 함께 가진다.
 
 - `commands`는 에이전트가 실행할 검증 명령의 ordered list다
-- `acceptance`는 done criteria다
-- `acceptance`의 non-manual executable 항목은 아래 둘 중 하나여야 한다:
+- `acceptance_auto`는 **기계 검증 가능한 done criteria(gating)**, `acceptance_manual`은 **사람/AT 확인 항목(비-gating, 큐잉)** 이다
+- 자율 루프는 `acceptance_auto`만으로 done을 판정하고(`cmux-plan verify`의 `auto_pass`), `acceptance_manual`은 `manual_pending`으로 큐잉한다
+- `acceptance_auto`의 항목은 아래 둘 중 하나여야 한다:
   - `commands`에 들어 있는 literal command string
   - `tc-*` 형식의 test case identifier
-- `tc-*` acceptance를 쓸 때는 해당 test case를 포함해 검증하는 command가 `commands`에 있어야 한다
-- 수동 확인이 필요하면 `manual:` prefix로 기록한다
-- doc/policy freeze task처럼 실행 명령 자체가 산출물이 아닌 경우에만 `commands`를 비워 둘 수 있다
+- `tc-*` acceptance를 쓸 때는 해당 test case를 포함해 검증하는 command가 `commands`에 있어야 한다 (하네스 `validate`가 강제)
+- 수동 확인 항목은 `acceptance_manual`에 `manual:` prefix로 기록한다 (`acceptance_auto`에 `manual:` 항목이 있으면 `validate` 오류)
+- doc/policy freeze task는 `acceptance_auto`를 doc-linter anchor 검사(`cmux-plan check-docs <task_id>`)로 채우고, 완성도는 `acceptance_manual`로 둔다
 - release-only task는 외부 CI 파이프라인에서만 실행되는 특성상 `commands`를 비울 수 있다 (m7 tasks 등). 이 경우 task의 `notes`에 CI-only 이유를 명시한다
-- acceptance가 비어 있는 task를 `done`으로 올리지 않는다
+- `acceptance_auto`와 `acceptance_manual`이 모두 비어 있는 task를 `done`으로 올리지 않는다
 
 예시:
 
 ```json
-[
-  "cmake --preset dev-x64",
-  "cmake --build --preset dev-x64",
-  "manual: verify first MainWindow creation on STA thread"
-]
-
-[
-  "manual: verify same-user ACL and message-mode transport",
+"acceptance_auto": [
+  "cmake --build --preset dev-x64 --target cmux_app",
   "tc-pipe-server-open: Named Pipe server opens with PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE",
   "ctest --preset dev-x64 -R ipc_server --output-on-failure"
+],
+"acceptance_manual": [
+  "manual: verify first MainWindow creation on STA thread",
+  "manual: verify same-user ACL and message-mode transport"
 ]
 ```
 
@@ -90,7 +89,7 @@ task의 `outputs`가 test 파일만 있거나 여러 모듈에 걸치는 경우(
 
 task에 `tc-*` acceptance 항목이 있으면 해당 test file 경로를 task의 `outputs`에 포함한다.
 
-## 5. mocking seams
+## 6. mocking seams
 
 초기 구현에서 mock 또는 fake가 필요한 경계는 아래를 우선한다.
 
@@ -100,7 +99,7 @@ task에 `tc-*` acceptance 항목이 있으면 해당 test file 경로를 task의
 - notification platform adapter
 - browser CDP transport
 
-## 6. docs-sync
+## 7. docs-sync
 
 test 전략이 바뀌면 아래도 함께 본다.
 

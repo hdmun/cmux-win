@@ -8,7 +8,6 @@
   ],
   "doc_refs": [
     "_workspace/06-browser-panel.md",
-    "_workspace/17-functional-spec.md",
     "CONTEXT.md"
   ],
   "tasks": [
@@ -28,8 +27,10 @@
         "src/panels",
         "src/ui"
       ],
-      "acceptance": [
-        "cmake --build --preset dev-x64 --target cmux_app",
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify WebView2 host survives workspace and split transitions"
       ],
       "commands": [
@@ -60,8 +61,10 @@
         "src/ui",
         "src/panels"
       ],
-      "acceptance": [
-        "cmake --build --preset dev-x64 --target cmux_app",
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app"
+      ],
+      "acceptance_manual": [
         "manual: verify URL normalization and Ctrl+L behavior"
       ],
       "commands": [
@@ -93,10 +96,12 @@
         "src/panels",
         "src/ipc"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
-        "manual: verify CDP unavailable and failed paths return explicit errors",
         "ctest --preset dev-x64 -R cdp --output-on-failure"
+      ],
+      "acceptance_manual": [
+        "manual: verify CDP unavailable and failed paths return explicit errors"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -112,6 +117,37 @@
       ],
       "blocked_by": [],
       "notes": []
+    },
+    {
+      "task_id": "m4-4",
+      "queue_number": 6,
+      "title": "Browser CDP-vs-WKWebView divergence note",
+      "status": "pending",
+      "summary": "Record the intentional CDP capability-superset divergence vs macOS WKWebView.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/06-browser-panel.md#10-macos-wkwebview와의-차이-cdp-superset",
+        "_workspace/17-functional-spec.md#57-cdp-automation"
+      ],
+      "touches": [
+        "_workspace/06-browser-panel.md"
+      ],
+      "acceptance_auto": [
+        "python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py check-docs m4-4"
+      ],
+      "acceptance_manual": [
+        "manual: verify the not_supported matrix divergence is recorded in 06 §10, 17 §5.7, and the 18 browser row"
+      ],
+      "commands": [
+        "python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py check-docs m4-4"
+      ],
+      "outputs": [
+        "_workspace/06-browser-panel.md"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "doc/policy-freeze task; auto acceptance is the doc-linter anchor check, completeness is manual"
+      ]
     }
   ]
 }

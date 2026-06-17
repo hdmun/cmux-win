@@ -34,7 +34,7 @@ step 7의 `doc_refs` 해석은 아래를 따른다.
 - merge order: `active_milestone.doc_refs` → `selected_task.doc_refs`
 - dedupe: 앞에서부터 첫 항목만 유지
 - `#` 뒤 fragment는 파일 경로가 아니라 같은 Markdown 파일 안의 heading slug를 뜻한다
-- user-facing behavior, command catalog, settings UX를 구현하는 task는 `_workspace/17-functional-spec.md`를 milestone 또는 task `doc_refs`에 포함한다
+- user-facing behavior, command catalog, settings UX를 구현하는 task는 `_workspace/17-functional-spec.md`의 해당 `#fragment` 섹션을 task `doc_refs`에 포함한다 (milestone-level 통째 참조 금지)
 
 `CONTEXT.md`는 기본 7단계 startup read order에 승격하지 않는다. 대신 아래 중 하나에 해당하면 즉시 읽는다.
 
@@ -79,7 +79,8 @@ step 7의 `doc_refs` 해석은 아래를 따른다.
 - `depends_on`
 - `doc_refs`
 - `touches`
-- `acceptance`
+- `acceptance_auto`
+- `acceptance_manual`
 - `commands`
 - `outputs`
 - `blocked_by`
@@ -125,3 +126,20 @@ phase 1에서는 아래를 도입하지 않는다.
 - `plans\session-state.md`를 대체하는 별도 handoff JSON mirror
 
 필요하면 phase 2에서 운영 레이어로 추가한다.
+
+## 8. execution harness (cmux-plan)
+
+자율 루프의 결정론적 기계 작업은 `.claude/skills/cmux-win-autonomous-execution/`의 `cmux-plan` CLI가 수행한다 (stdlib-only Python 3, 설치 불필요).
+
+| subcommand | 역할 |
+|------------|------|
+| `next` | 다음 eligible task 선택 (milestone gate 전이폐쇄 + task deps + status) |
+| `brief <id>` | merged `doc_refs`를 `#fragment` 단위로 슬라이스한 컴팩트 task brief (whole-file은 heading index로 캡) |
+| `validate` | schema(Test-Json) + 의존성·순환·전이폐쇄 gate·outputs⊆touches·tc↔ctest·doc-linter |
+| `check-docs <id>` | 단일 task의 doc_ref `#fragment` 해소 검증 (doc-freeze acceptance) |
+| `verify <id>` | `commands` 실행 → `auto_pass` + `manual_pending` (빌드 부재 시 graceful) |
+| `status <id> <state>` | atomic 상태 변경 + index rollup + pending→ready 승격 + session-state 핸드오프 |
+
+- 에이전트는 이 명령들을 도구로 호출하고 **구현 단계만 직접 수행**한다 (LLM을 호출하는 자율 daemon이 아니다).
+- `plans/*.json` 또는 `_workspace/*.md`를 수정하면 `cmux-plan validate`가 **0 error**여야 한다.
+- 골든 테스트: `python -m unittest discover .claude/skills/cmux-win-autonomous-execution/tests`.

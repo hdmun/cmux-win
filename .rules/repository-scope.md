@@ -13,8 +13,9 @@
 | `resources\` | 매니페스트, 인스톨러, shell 스크립트 | 실제 구현 위치 |
 | `tests\` | 테스트 코드 | 실제 구현 위치 |
 | `ports\` | vcpkg overlay ports (libvterm 등) | 실제 구현 위치 |
+| `.claude\skills\` | Claude 자율 실행 하네스 (SKILL.md + Python `scripts\`/`tests\`) | 하네스 도구만 허용 (앱 구현 코드 아님); stdlib-only Python 허용 |
 
-**핵심 원칙**: Windows 구현 코드는 `cmux\`, `ghostty\`, `_workspace\`, `plans\` 네 경로에 절대 추가하지 않는다.
+**핵심 원칙**: Windows 구현 코드는 `cmux\`, `ghostty\`, `_workspace\`, `plans\` 네 경로에 절대 추가하지 않는다. 자율 실행 하네스(plan 선택·검증·핸드오프 도구)의 Python 스크립트는 `.claude\skills\cmux-win-autonomous-execution\scripts\`에만 두며, 앱 본체 코드(`src\`/`cli\`)와 섞지 않는다.
 
 ---
 

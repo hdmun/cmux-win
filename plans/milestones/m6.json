@@ -10,7 +10,6 @@
     "_workspace/07-notification.md",
     "_workspace/09-config-settings.md",
     "_workspace/10-shell-integration.md",
-    "_workspace/17-functional-spec.md",
     "CONTEXT.md"
   ],
   "tasks": [
@@ -30,10 +29,12 @@
         "src/notification",
         "src/ui"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
-        "manual: verify toast failures degrade without breaking in-app notifications",
         "ctest --preset dev-x64 -R notification --output-on-failure"
+      ],
+      "acceptance_manual": [
+        "manual: verify toast failures degrade without breaking in-app notifications"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -63,9 +64,11 @@
       "touches": [
         "src/config"
       ],
-      "acceptance": [
-        "manual: verify backup-on-migration and explicit failure surfacing",
+      "acceptance_auto": [
         "ctest --preset dev-x64 -R settings --output-on-failure"
+      ],
+      "acceptance_manual": [
+        "manual: verify backup-on-migration and explicit failure surfacing"
       ],
       "commands": [
         "ctest --preset dev-x64 -R settings --output-on-failure"
@@ -95,9 +98,11 @@
         "src/config",
         "src/ui"
       ],
-      "acceptance": [
-        "manual: verify conflicts are rejected and scope rules are enforced",
+      "acceptance_auto": [
         "ctest --preset dev-x64 -R shortcut --output-on-failure"
+      ],
+      "acceptance_manual": [
+        "manual: verify conflicts are rejected and scope rules are enforced"
       ],
       "commands": [
         "ctest --preset dev-x64 -R shortcut --output-on-failure"
@@ -128,10 +133,12 @@
         "resources/shell-integration",
         "src/ipc"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
-        "manual: verify no prompt blocking and schema-aligned direct-pipe payloads",
         "ctest --preset dev-x64 -R shell_integration --output-on-failure"
+      ],
+      "acceptance_manual": [
+        "manual: verify no prompt blocking and schema-aligned direct-pipe payloads"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -169,13 +176,15 @@
         "src/ui",
         "src/notification"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R notification --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify the page lists notifications newest-first and refreshes on store changes (07 §10.3)",
         "manual: verify clicking an item marks it read and jumps to its workspace/surface; clear removes it and recomputes unread (07 §10.3)",
         "manual: verify the titlebar notifications button/show_notifications shortcut opens a flyout anchored to the button (07 §11.4)",
-        "manual: verify the popover header unread count matches the store and dismiss restores focus to the previous surface (07 §11.4)",
-        "ctest --preset dev-x64 -R notification --output-on-failure"
+        "manual: verify the popover header unread count matches the store and dismiss restores focus to the previous surface (07 §11.4)"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -209,13 +218,15 @@
         "src/ui",
         "src/config"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R settings_ui --output-on-failure"
+      ],
+      "acceptance_manual": [
         "manual: verify the settings window opens single-instance and re-focuses on re-request (17 §8.7, delegating to 02 §7)",
         "manual: verify edited values in each category persist via the atomic write path (17 §8.7)",
         "manual: verify shortcut conflicts are blocked before save with an inline validation error (17 §8.7)",
-        "manual: verify fields absent from the v1 schema are not exposed in the UI (17 §8.7)",
-        "ctest --preset dev-x64 -R settings_ui --output-on-failure"
+        "manual: verify fields absent from the v1 schema are not exposed in the UI (17 §8.7)"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -247,9 +258,10 @@
       ],
       "touches": [
         "src/terminal/clipboard",
-        "resources/shell-integration"
+        "resources/shell-integration",
+        "tests/unit/terminal"
       ],
-      "acceptance": [
+      "acceptance_auto": [
         "cmake --build --preset dev-x64 --target cmux_app",
         "tc-clipboard-copy: selection copy writes CF_UNICODETEXT and the same text reads back from the Windows Clipboard (03 §14.5)",
         "tc-clipboard-bracketed-paste: with bracketed paste mode on, paste is wrapped in ESC[200~/ESC[201~ to stdin (03 §14.5)",
@@ -259,6 +271,7 @@
         "tc-fileurl-escape-wsl: C:\\src\\x.txt becomes '/mnt/c/src/x.txt' for a WSL shell (10 §9.4)",
         "ctest --preset dev-x64 -R clipboard --output-on-failure"
       ],
+      "acceptance_manual": [],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
         "ctest --preset dev-x64 -R clipboard --output-on-failure"
@@ -269,6 +282,151 @@
         "src/terminal/clipboard/file_url_escaper.h",
         "src/terminal/clipboard/file_url_escaper.cpp",
         "tests/unit/terminal/test_file_url_escaper.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-8",
+      "queue_number": 7,
+      "title": "claude-hook event payload contract freeze",
+      "status": "pending",
+      "summary": "Author the 5 claude-hook event payload schemas in 08.",
+      "depends_on": [],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md#claude-hook-event-payloads",
+        "_workspace/08-ipc-cli.md#claude-hook",
+        "_workspace/17-functional-spec.md#66-cli-명령-카탈로그"
+      ],
+      "touches": [
+        "_workspace/08-ipc-cli.md"
+      ],
+      "acceptance_auto": [
+        "python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py check-docs m6-8"
+      ],
+      "acceptance_manual": [
+        "manual: verify 08 documents payload schema (fields, required, errors) for session-start/session-stop/notification/active/idle"
+      ],
+      "commands": [
+        "python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py check-docs m6-8"
+      ],
+      "outputs": [
+        "_workspace/08-ipc-cli.md"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "doc/policy-freeze task; auto acceptance is the doc-linter anchor check, completeness is manual"
+      ]
+    },
+    {
+      "task_id": "m6-9",
+      "queue_number": 8,
+      "title": "claude-hook implementation",
+      "status": "pending",
+      "summary": "Implement the claude-hook command, session file with LockFileEx, and set_status/clear_status badges.",
+      "depends_on": [
+        "m6-8",
+        "m5-6"
+      ],
+      "doc_refs": [
+        "_workspace/08-ipc-cli.md#claude-hook",
+        "_workspace/08-ipc-cli.md#14-sidebar-and-status-ipc-commands",
+        "_workspace/17-functional-spec.md#66-cli-명령-카탈로그"
+      ],
+      "touches": [
+        "cli",
+        "src/ipc",
+        "tests/unit/ipc"
+      ],
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-claude-hook-session: session-start/stop create and remove the session file entry under LockFileEx",
+        "tc-claude-hook-status: active/idle map to workspace status badges via set_status",
+        "ctest --preset dev-x64 -R claude_hook --output-on-failure"
+      ],
+      "acceptance_manual": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R claude_hook --output-on-failure"
+      ],
+      "outputs": [
+        "cli/commands/claude_hook.cpp",
+        "src/ipc/claude_hook_store.h",
+        "src/ipc/claude_hook_store.cpp",
+        "tests/unit/ipc/test_claude_hook.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-10",
+      "queue_number": 8,
+      "title": "App-backend listening-port detector",
+      "status": "pending",
+      "summary": "Implement backend listening-port detection feeding sidebar listening_ports.",
+      "depends_on": [
+        "m3-3"
+      ],
+      "doc_refs": [
+        "_workspace/10-shell-integration.md#7-backend-polling-위임",
+        "_workspace/05-sidebar-tabs.md#ipc-경유-sidebar-메타데이터"
+      ],
+      "touches": [
+        "src/core",
+        "tests/unit/core"
+      ],
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-port-detect: detector reports listening ports without shell-side polling",
+        "tc-port-sidebar-projection: detected ports populate workspace listening_ports",
+        "ctest --preset dev-x64 -R port_detect --output-on-failure"
+      ],
+      "acceptance_manual": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R port_detect --output-on-failure"
+      ],
+      "outputs": [
+        "src/core/port_detector.h",
+        "src/core/port_detector.cpp",
+        "tests/unit/core/test_port_detector.cpp"
+      ],
+      "blocked_by": [],
+      "notes": []
+    },
+    {
+      "task_id": "m6-11",
+      "queue_number": 5,
+      "title": "Terminal file-drop reception",
+      "status": "pending",
+      "summary": "Implement drag-drop onto the terminal: extract paths, escape (10 §9), paste only.",
+      "depends_on": [
+        "m6-7",
+        "m2-4"
+      ],
+      "doc_refs": [
+        "_workspace/17-functional-spec.md#49-파일-드롭-수신",
+        "_workspace/10-shell-integration.md#9-file-url--경로-shell-escaping"
+      ],
+      "touches": [
+        "src/panels",
+        "tests/unit/panels"
+      ],
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-file-drop-paste: dropping a file pastes its escaped path without auto-running",
+        "tc-file-drop-multi: multiple files join as space-separated escaped tokens",
+        "ctest --preset dev-x64 -R file_drop --output-on-failure"
+      ],
+      "acceptance_manual": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R file_drop --output-on-failure"
+      ],
+      "outputs": [
+        "src/panels/terminal_drop_target.h",
+        "src/panels/terminal_drop_target.cpp",
+        "tests/unit/panels/test_file_drop.cpp"
       ],
       "blocked_by": [],
       "notes": []

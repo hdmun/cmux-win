@@ -110,3 +110,12 @@ browser panel은 split 이동 시 recreate하지 않는다.
 - 히스토리 5000개 초과 시 오래된 항목 자동 삭제
 - 원격 검색 제안 timeout 0.65초 준수
 - 로딩 최소 표시 시간 0.35초 준수
+
+## 10. macOS WKWebView와의 차이 (CDP superset)
+
+> [!NOTE]
+> parity 명확화 노트. macOS cmux는 `WKWebView` 기반이라 CDP 전용 명령(`viewport`, `geolocation`, `offline`, `trace`, `screencast`, `network.route/unroute/requests`, `input_mouse/keyboard/touch` 등)에 대해 `not_supported`를 반환한다(`tests_v2/test_browser_api_unsupported_matrix.py`). Windows 포트는 **WebView2 + CDP**이므로 이 명령들을 실제로 지원할 수 있다 — 즉 회귀가 아니라 **capability superset**이다.
+
+- 이 superset은 의도적 차이이며 `17-functional-spec.md §5.7`(CDP automation)과 `18-cmux-parity.md`의 browser 행에 기록한다.
+- macOS 기준 `not_supported` 매트릭스를 Windows에서 "지원"으로 바꾸므로, cmux 참조 테스트(`test_browser_api_unsupported_matrix`)를 Windows에서 그대로 재생하면 결과가 달라진다. 이는 예상된 차이로 취급한다.
+- v1에서 어떤 CDP 전용 명령을 실제 노출할지는 `m4-1`/`m4-4` 범위에서 확정한다.

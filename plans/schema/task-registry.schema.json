@@ -74,7 +74,8 @@
         "depends_on",
         "doc_refs",
         "touches",
-        "acceptance",
+        "acceptance_auto",
+        "acceptance_manual",
         "commands",
         "outputs",
         "blocked_by",
@@ -116,7 +117,13 @@
             "type": "string"
           }
         },
-        "acceptance": {
+        "acceptance_auto": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptance_manual": {
           "type": "array",
           "items": {
             "type": "string"

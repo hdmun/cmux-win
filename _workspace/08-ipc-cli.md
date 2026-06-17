@@ -291,6 +291,26 @@ cmux claude-hook <event> [--workspace <id>] [--surface <id>]
 - `set_status` / `clear_status` 메서드로 workspace 상태 badge를 설정한다.
 - 파일 잠금은 Windows `LockFileEx`를 사용한다.
 
+#### claude-hook event payloads
+
+> [!NOTE]
+> 아래는 5개 이벤트의 stdin JSON payload 계약 **스텁**이다. 필드 타입·필수 여부·에러 처리의 상세 확정은 task `m6-8`(contract freeze)에서 수행한다.
+
+| event | 최소 필드 | 동작 |
+|-------|-----------|------|
+| `session-start` | `version`, `session_id`, `cwd_uri` | 세션 파일에 항목 생성, workspace status를 `running`으로 |
+| `session-stop` | `version`, `session_id` | 세션 항목 제거, status badge `clear_status` |
+| `notification` | `version`, `session_id`, `title`, `body` | 알림 ring에 전달 (stdin JSON) |
+| `active` | `version`, `session_id` | status를 `active`(작업 중)로 `set_status` |
+| `idle` | `version`, `session_id` | status를 `idle`(대기)로 `set_status` |
+
+```json
+{ "version": 2, "event": "session-start", "session_id": "session:<uuid>", "cwd_uri": "file:///C:/..." }
+```
+
+- `session_id` 미존재 시 `invalid_request` 반환.
+- 상태 매핑(`active`/`idle`/`running`)은 `05-sidebar-tabs.md`의 `status_entries`로 투영된다.
+
 ### Browser
 
 browser 명령은 `cmux browser <subcommand>` 형식이다.
@@ -337,3 +357,45 @@ M3 이후 최소 아래 케이스를 자동화한다.
 - browser automation unavailable
 - shell auto-report payload validation
 - shell auto-report version mismatch
+
+## 13. Debug and automation IPC
+
+> [!NOTE]
+> macOS cmux의 `debug.*` / `read_terminal_text` / `simulate_*` 계열 대응. 이 군은 `tests_v2` 류 e2e 검증의 **관찰·주입 백본**이다. 아래는 명령 목록 **스텁**이며, 명령별 request/response 상세는 contract freeze task(`m3-7`)에서 확정한다. `socket_control.mode=readonly`에서 inspect 계열은 허용, simulate 계열은 mutation으로 분류되어 `not_supported`를 반환한다.
+
+### 13.1 inspect (read-only)
+
+| 명령 | 반환 | 비고 |
+|------|------|------|
+| `read_terminal_text` | 활성 surface의 가시 텍스트 | `--surface` 대상 지정 |
+| `read_screen` | 화면 셀 그리드 스냅샷 | 행/열 + 셀 속성 |
+| `render_stats` | 렌더 프레임/언더플로 카운터 | 성능 회귀 검출용 |
+| `layout_debug` | 현재 split/pane 트리 덤프 | `layout_version` 포함 |
+| `panel_snapshot` | panel 상태(타입/포커스/크기) | per-panel |
+| `surface_health` | surface 생존/flash/underflow 상태 | health 진단 |
+
+### 13.2 input simulation (mutation)
+
+| 명령 | 동작 | 비고 |
+|------|------|------|
+| `simulate_type` | 대상 surface에 텍스트 입력 주입 | 테스트 자동화 |
+| `simulate_file_drop` | 파일 드롭 이벤트 주입 | `10 §9` escaping 경유 |
+| `simulate_shortcut` | 단축키 이벤트 주입 | accelerator 경로 |
+| `is_terminal_focused` | 현재 터미널 포커스 여부 | read이나 입력 테스트와 함께 사용 |
+
+## 14. Sidebar and status IPC commands
+
+> [!NOTE]
+> macOS cmux의 v1 sidebar/status 명령 계층 대응. shell integration과 claude-hook이 사용한다. 상세 인자/응답은 구현 task(`m5-6`)에서 확정하며, sidebar 메타데이터 투영은 `05-sidebar-tabs.md`가 소유한다.
+
+| 명령 | 동작 |
+|------|------|
+| `set_status --key <k> --value <v> [--workspace]` | workspace `status_entries[k]` 설정 |
+| `clear_status [--key <k>] [--workspace]` | 상태 항목 제거 (키 없으면 전체) |
+| `report_git_branch --branch <name>` | branch 메타데이터 보고 (shell auto-report와 동일 효과) |
+| `report_ports --ports <csv>` | listening 포트 보고 (백엔드 감지 결과 주입 경로, `10 §7`) |
+| `sidebar_state` | 현재 sidebar 메타데이터 스냅샷 반환 (read-only) |
+
+### 14.1 대상 지정 플래그
+
+`--tab <workspace_ref>` / `--panel <surface_ref>`로 명령 대상을 명시한다. 미지정 시 현재 활성 workspace/surface를 대상으로 한다.
