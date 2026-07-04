@@ -5,6 +5,7 @@ Semantic checks (errors unless noted):
   - no dependency cycles
   - cross-milestone task deps stay within the milestone's transitive gate closure
   - tc-* acceptance has a covering ctest command
+  - non-tc-* acceptance_auto items (literal commands) appear verbatim in `commands`
   - acceptance_auto carries no `manual:` item
   - every doc_ref path exists and every #fragment resolves to a heading (doc-linter)
   - outputs not covered by touches  -> warning
@@ -99,11 +100,15 @@ def validate():
             if not any(o == x or o.startswith(x + "/") for x in touches):
                 warnings.append(f"{tid}: output '{o}' not covered by touches")
         auto = t.get("acceptance_auto", [])
-        if any(a.startswith("tc-") for a in auto) and not any("ctest" in c for c in t.get("commands", [])):
+        commands = t.get("commands", [])
+        if any(a.startswith("tc-") for a in auto) and not any("ctest" in c for c in commands):
             errors.append(f"{tid}: has tc-* acceptance but no ctest in commands")
         for a in auto:
             if a.startswith("manual:"):
                 errors.append(f"{tid}: acceptance_auto contains a 'manual:' item")
+                continue
+            if not a.startswith("tc-") and a not in commands:
+                errors.append(f"{tid}: acceptance_auto item '{a}' not found verbatim in commands")
         if not auto:
             warnings.append(f"{tid}: empty acceptance_auto (not machine-verifiable)")
 

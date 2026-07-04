@@ -22,11 +22,18 @@ scripts — you do only the implementation reasoning and read only the generated
 4. Implement the task, writing only inside its `touches` paths. Honor
    `.rules/repository-scope.md` (no code under `cmux/`, `ghostty/`, `_workspace/`, `plans/`).
 5. `cmux-plan verify <task_id>` → runs `commands`; reports `auto_pass` + `manual_pending`.
-   Iterate until `auto_pass` is true.
+   Iterate until `auto_pass` is true. If the project isn't configured yet (no
+   `CMakeCache.txt`) and `commands` includes a cmake *configure* call (not
+   `cmake --build` / `ctest`), verify runs it anyway — that's how the cache gets
+   created for a bootstrap task. Exit code is 1 when `auto_pass` is false (0 for
+   `--dry-run` or a pass), so you can gate a shell chain on it.
 6. `cmux-plan validate` → must report **0 errors** (schema + deps + gate closure +
-   doc-linter + tc↔ctest).
+   doc-linter + tc↔ctest + acceptance_auto↔commands drift).
 7. `cmux-plan status <task_id> done` → mark done. Milestone rollup, `active_milestone`,
-   pending→ready promotion, and `plans/session-state.md` are all updated for you.
+   pending→ready promotion, and `plans/session-state.md` are all updated for you
+   (its `## Notes for next session` section is preserved, not overwritten). If the
+   task has `commands`, a non-blocking warning reminds you to confirm `verify`
+   reported `auto_pass=true` before this transition — honor system, not a gate.
 8. Handle `manual_pending`: do the checks if you can; otherwise they stay queued in the
    task's `acceptance_manual` for a batched human/AT pass.
 
@@ -57,8 +64,8 @@ scripts — you do only the implementation reasoning and read only the generated
 | `brief <id>` | compact per-task brief (sliced doc_refs) |
 | `validate` | schema (Test-Json) + semantic + doc-linter |
 | `check-docs <id>` | verify one task's doc_refs resolve |
-| `verify <id> [--dry-run]` | run a task's auto acceptance |
-| `status <id> <state> [--dry-run]` | set status + refresh handoff |
+| `verify <id> [--dry-run]` | run a task's auto acceptance; exit 1 if `auto_pass` is false, else 0 |
+| `status <id> <state> [--dry-run]` | set status + refresh handoff (preserves Notes; warns on `done` if unverified) |
 
 Scripts live in `scripts/`; golden tests in `tests/`
 (`python -m unittest discover .claude/skills/cmux-win-autonomous-execution/tests`).

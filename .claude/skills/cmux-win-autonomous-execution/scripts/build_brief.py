@@ -1,10 +1,11 @@
 """Generate a compact per-task brief from the registry. stdlib-only.
 
 The brief is the only context an implementing session needs to read: the task
-fields, the queue-mapped operating rule, and the *sliced* doc_ref sections.
-Whole-file doc_refs are dropped when the same file also has #fragment refs, and
-large whole-file refs collapse to a heading index so a parser-wrapper task does
-not pull all 1000+ lines of the functional spec.
+fields, the queue-mapped operating rule (plus the task's own `authoritative_rules`,
+merged and deduped), and the *sliced* doc_ref sections. Whole-file doc_refs are
+dropped when the same file also has #fragment refs, and large whole-file refs
+collapse to a heading index so a parser-wrapper task does not pull all 1000+
+lines of the functional spec.
 """
 from __future__ import annotations
 
@@ -12,7 +13,11 @@ import sys
 
 import repo
 
-# queue_number -> primary operating rule(s); mirrors .rules/agent-workflow.md table.
+# queue_number -> primary operating rule(s); mirrors the AGENTS.md/.rules/*.md
+# column of the .rules/agent-workflow.md queue table (the table's _workspace/*.md
+# entries are intentionally excluded here — those come in sliced via doc_refs,
+# not inlined whole). tests/test_harness.py parses that table and asserts this
+# stays in sync.
 QUEUE_RULES = {
     1: ["AGENTS.md", ".rules/docs-sync.md"],
     2: [".rules/repository-scope.md"],
@@ -71,7 +76,9 @@ def build(task_id: str) -> str:
         "",
     ]
 
-    for rule in QUEUE_RULES.get(task["queue_number"], []):
+    rules = list(dict.fromkeys(
+        QUEUE_RULES.get(task["queue_number"], []) + task.get("authoritative_rules", [])))
+    for rule in rules:
         rp = repo.ROOT / rule
         if rp.is_file():
             out.append(f"## Operating rule (queue {task['queue_number']}): {rule}")

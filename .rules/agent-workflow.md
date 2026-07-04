@@ -26,6 +26,10 @@ machine-readable source of truth는 `plans\milestones\mN.json`의 `queue_number`
 | **10** | analytics, logging/privacy, graceful degrade, notification 정책 | `.rules/logging-privacy.md`, `.rules/notifications-degrade.md`, `_workspace/07-notification.md` |
 | **11** | 문서 동기화, `_workspace` 문서 갱신, task 상태 반영 | `.rules/docs-sync.md`, `_workspace/12-tasks.md` |
 
+> 이 표의 `AGENTS.md`/`.rules/*.md` 열은 `.claude/skills/cmux-win-autonomous-execution/scripts/build_brief.py`의
+> `QUEUE_RULES`와 동기 상태를 유지해야 한다(`_workspace/*.md` 열은 제외 — brief에는 doc_refs로 슬라이스되어 별도 포함됨).
+> 표를 바꾸면 `QUEUE_RULES`도 갱신한다; golden test(`tests/test_harness.py`)가 드리프트를 검출한다.
+
 ## 작업 작성 원칙
 
 1. 템플릿 안에서 규칙을 다시 길게 복제하지 않는다.

@@ -30,5 +30,5 @@ Claude 자율 구현은 **`cmux-plan`** CLI로 구동한다 (Codex용 `.agents/s
 - 스킬: [`.claude/skills/cmux-win-autonomous-execution/SKILL.md`](.claude/skills/cmux-win-autonomous-execution/SKILL.md)
 - CLI: `python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py <next|brief|validate|check-docs|verify|status>`
 - 루프: `next` → `status … in_progress` → `brief` → 구현 → `verify` → `validate` → `status … done` (핸드오프 자동 갱신)
-- `plans/*.json` 또는 `_workspace/*.md`를 바꾸면 `cmux-plan validate`가 0 error여야 한다 (schema + 의존성 + 전이폐쇄 gate + doc-linter + tc↔ctest).
+- `plans/*.json` 또는 `_workspace/*.md`를 바꾸면 `cmux-plan validate`가 0 error여야 한다 (schema + 의존성 + 전이폐쇄 gate + doc-linter + tc↔ctest + acceptance_auto↔commands drift).
 - acceptance는 `acceptance_auto`(기계 gating) / `acceptance_manual`(사람·AT, 큐잉)로 분리된다.

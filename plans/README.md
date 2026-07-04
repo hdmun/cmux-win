@@ -36,6 +36,7 @@
 - `acceptance_auto`는 **기계 검증 done criteria(gating)**, `acceptance_manual`은 **사람/AT 확인(비-gating, 큐잉)** 이다. 자율 루프는 `acceptance_auto`만으로 done을 판정한다 (`cmux-plan verify`의 `auto_pass`)
 - `acceptance_auto` 항목은 literal command string 또는 `tc-*` test case identifier만 사용한다 (`manual:` 항목 금지 — `validate`가 강제)
 - `tc-*` acceptance를 쓰면 그 test case를 포함해 검증하는 command가 `commands`에 있어야 한다
+- literal command 형태의 `acceptance_auto` 항목은 `commands`에 **같은 문자열 그대로** 존재해야 한다 (`validate`가 강제 — 선언과 실제 실행이 어긋나면 done 판정이 오염되므로). `tc-*` 항목은 이 검사에서 제외된다(위 규칙으로 이미 커버)
 - doc/policy freeze task는 `acceptance_auto`를 `cmux-plan check-docs <task_id>`(doc-linter anchor 검사)로 채우고 완성도는 `acceptance_manual`에 둔다. 이때 `commands`도 같은 check-docs 명령을 가진다
 - release-only task(m7 등)는 외부 CI/CD 파이프라인에서만 실행되는 특성상 `commands`를 비울 수 있다. 이 경우 task의 `notes`에 "commands: [] — release-only task; executed via external CI/CD pipeline" 이유를 명시한다
 

@@ -99,8 +99,9 @@ JSON 필드 이름은 모두 `snake_case`를 사용한다.
 - 현재 `in_progress` 또는 `blocked` task
 - blocker 요약
 - 다음 추천 task
+- `## Notes for next session` (자유 형식 운영 지식 — warning 의도, parity 갭 매핑 등)
 
-세션 상태를 남기지 않고 종료하지 않는다.
+세션 상태를 남기지 않고 종료하지 않는다. `cmux-plan status`는 `## Notes for next session` 섹션을 매 실행마다 파괴하지 않고 기존 내용을 그대로 이어붙인다(`repo.extract_section`) — 이 섹션은 에이전트가 수동으로 편집·정리한다.
 
 ### milestone 완료 시 필수 갱신
 
@@ -137,8 +138,8 @@ phase 1에서는 아래를 도입하지 않는다.
 | `brief <id>` | merged `doc_refs`를 `#fragment` 단위로 슬라이스한 컴팩트 task brief (whole-file은 heading index로 캡) |
 | `validate` | schema(Test-Json) + 의존성·순환·전이폐쇄 gate·outputs⊆touches·tc↔ctest·doc-linter |
 | `check-docs <id>` | 단일 task의 doc_ref `#fragment` 해소 검증 (doc-freeze acceptance) |
-| `verify <id>` | `commands` 실행 → `auto_pass` + `manual_pending` (빌드 부재 시 graceful) |
-| `status <id> <state>` | atomic 상태 변경 + index rollup + pending→ready 승격 + session-state 핸드오프 |
+| `verify <id>` | `commands` 실행 → `auto_pass` + `manual_pending`. 프로젝트가 아직 configure되지 않았고 `commands`에 configure 호출(`cmake --build`/`ctest`가 아닌 cmake 호출)이 없으면 `buildable=false`로 graceful 실패; `commands`에 configure 호출이 있으면(부트스트랩 task) 그 호출부터 실행해 cache를 만든다. `auto_pass=false`면 exit 1(셸 체이닝 게이트 가능), dry-run은 exit 0 |
+| `status <id> <state>` | atomic 상태 변경 + index rollup + pending→ready 승격 + session-state 핸드오프(`## Notes for next session` 섹션은 갱신 시에도 보존됨) |
 
 - 에이전트는 이 명령들을 도구로 호출하고 **구현 단계만 직접 수행**한다 (LLM을 호출하는 자율 daemon이 아니다).
 - `plans/*.json` 또는 `_workspace/*.md`를 수정하면 `cmux-plan validate`가 **0 error**여야 한다.

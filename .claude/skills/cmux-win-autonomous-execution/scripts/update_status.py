@@ -59,7 +59,7 @@ def _promote_tasks(index, milestones):
     return changed
 
 
-def _render_session_state(index, milestones, last_done):
+def _render_session_state(index, milestones, last_done, previous_text=None):
     active = index.get("active_milestone")
     inprog, blocked = [], []
     for data in milestones.values():
@@ -90,7 +90,10 @@ def _render_session_state(index, milestones, last_done):
               "- reason: `status ready, deps done, milestone gate satisfied`"]
     else:
         L += ["- task_id: `-`", "- reason: `no eligible task`"]
-    return "\n".join(L) + "\n"
+    L.append("")
+    notes = repo.extract_section(previous_text, "notes-for-next-session") if previous_text else None
+    L.append(notes if notes else "## Notes for next session\n\n(none)")
+    return "\n".join(L).rstrip() + "\n"
 
 
 def apply(task_id, status, dry_run=False):
@@ -108,12 +111,19 @@ def apply(task_id, status, dry_run=False):
     changed = _promote_tasks(index, milestones)
     changed.add(mid)
     last_done = task_id if status == "done" else None
-    session_text = _render_session_state(index, milestones, last_done)
+    state_path = repo.PLANS / "session-state.md"
+    previous_text = state_path.read_text(encoding="utf-8") if state_path.is_file() else None
+    session_text = _render_session_state(index, milestones, last_done, previous_text)
+    warn = None
+    if status == "done" and task.get("commands"):
+        warn = f"WARNING: {task_id} -> done — confirm `cmux-plan verify {task_id}` reported auto_pass=true before this transition."
     if dry_run:
         print("DRY RUN — no files written")
         print(f"would set {task_id} -> {status}")
         print(f"active_milestone -> {index['active_milestone']}")
         print(f"milestone files that would change: {sorted(changed)}")
+        if warn:
+            print(warn)
         print("--- session-state.md ---")
         print(session_text)
         return 0
@@ -122,6 +132,8 @@ def apply(task_id, status, dry_run=False):
     repo.dump_json_atomic(repo.PLANS / "index.json", index)
     repo.write_text_atomic(repo.PLANS / "session-state.md", session_text)
     print(f"set {task_id} -> {status}; active_milestone={index['active_milestone']}; changed={sorted(changed)}")
+    if warn:
+        print(warn)
     return 0
 
 
