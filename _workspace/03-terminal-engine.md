@@ -122,8 +122,8 @@ v1 terminal은 최소 아래를 만족한다.
 
 ## 9. M2 검증 기준
 
-- Win10: standard ConPTY 동작
-- Win11 22H2+: passthrough gate 판정
+- 기본 경로: passthrough 초기화 성공 + gate 판정 로그 존재 (지원 floor Win11 22H2+)
+- 폴백 경로: passthrough 초기화 실패 또는 `CMUX_CONPTY_MODE=standard` 강제 시 standard ConPTY 동작
 - dirty region 기반 redraw
 - IME candidate window 위치 정상
 - Narrator/NVDA로 텍스트 이동 확인

@@ -430,6 +430,47 @@
       ],
       "blocked_by": [],
       "notes": []
+    },
+    {
+      "task_id": "m6-12",
+      "queue_number": 2,
+      "title": "Milestone AT gate (acceptance_manual drain) — v1 porting completion gate",
+      "status": "pending",
+      "summary": "Human/AT checkpoint: execute every queued acceptance_manual item in this milestone. Passing this gate is the declared 'Windows porting complete' point (18 §1).",
+      "depends_on": [
+        "m6-1",
+        "m6-2",
+        "m6-3",
+        "m6-4",
+        "m6-5",
+        "m6-6",
+        "m6-7",
+        "m6-8",
+        "m6-9",
+        "m6-10",
+        "m6-11"
+      ],
+      "doc_refs": [
+        "plans/README.md#at-gate-규칙",
+        "_workspace/18-cmux-parity.md#1-검토-범위와-판정-기준"
+      ],
+      "touches": [
+        "plans/milestones/m6.json"
+      ],
+      "acceptance_auto": [],
+      "acceptance_manual": [
+        "manual: verify every acceptance_manual item of this milestone's tasks was executed and its result (pass/fail/skip + 사유) recorded in this task's notes",
+        "manual: verify the v1 100% claim per 18 §1 — 46 v1-scope features covered and 18 §7.2 dispositions all closed — before declaring porting complete"
+      ],
+      "commands": [],
+      "outputs": [
+        "plans/milestones/m6.json"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "commands: [] — human/AT gate task; done 전환은 사람 검증으로만 수행한다 (plans/README.md 'AT gate 규칙'). 자율 루프는 이 task를 집지 않는다.",
+        "M6 AT gate 통과 = 'Windows 포팅 완료' 선언 시점 (2026-07-04 grill-me 확정, 18 §1). M7은 별도 배포 게이트."
+      ]
     }
   ]
 }

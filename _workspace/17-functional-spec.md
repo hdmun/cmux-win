@@ -49,20 +49,17 @@
 
 **Windows 구현**:
 - WinUI 3 extended titlebar 커스터마이징
-- Win11: Mica 기본값
-- Win10: Acrylic fallback
+- Mica 기본값 (지원 floor Win11 22H2+, 00 §4)
 - `appearance.titlebar_style` 설정에 따라 `auto`/`mica`/`acrylic`/`none` 적용
 
-**degradation matrix**:
+**degradation matrix** (지원 floor Win11 22H2+ 단일 기준):
 
-| OS | Backdrop setting | Actual effect |
-|----|------------------|---------------|
-| Win11 22H2+ | `mica` | Mica applied |
-| Win11 22H2+ | `acrylic` | Acrylic applied |
-| Win11 22H2+ | `none` | Solid color |
-| Win10 | `mica` | Falls back to `none` (solid) |
-| Win10 | `acrylic` | Acrylic applied (if DWM composition active) |
-| Win10 | `none` | Solid color |
+| Backdrop setting | Actual effect |
+|------------------|---------------|
+| `auto` | Mica 우선, 불가 시 solid |
+| `mica` | Mica applied, 불가 시 solid |
+| `acrylic` | Acrylic applied |
+| `none` | Solid color |
 
 **인수 기준**:
 - backdrop fallback이 지원 매트릭스와 일치함
@@ -289,10 +286,10 @@ v1에서 custom VT parser는 작성하지 않는다.
 
 > **Note**: These values are fixed in the initial process environment block at ConPTY spawn time and are **not reinjected** on pane/workspace moves or reparents.
 
-**passthrough 탐지 (ADR-0002)**:
-- 세션 start 시 1회만 판정
-- Win11 22H2+ (build ≥ 22621): passthrough 초기화 시도
-- 실패하면 standard로 고정 (INFO 로그, UI 없음)
+**passthrough 탐지 (ADR-0002, 2026-07-04 개정)**:
+- 세션 start 시 1회만 판정; 지원 floor(Win11 22H2+, build ≥ 22621)에서 passthrough가 기본 경로
+- OS build gate는 방어적 확인 + 진단 로그로 유지
+- 초기화 실패하면 standard로 고정 (INFO 로그, UI 없음)
 - `CMUX_CONPTY_MODE` 환경변수로 override 가능 (테스트용)
 - `CMUX_CONPTY_MODE=standard` 강제 시 gate 무시
 
@@ -391,8 +388,8 @@ terminal 특이 사항:
 **isDirty 억제**: 항상 `false` 반환 (VT 기반 오탐 방지). 실제 close 확인은 `needsConfirmClose()`.
 
 **인수 기준**:
-- Win10: standard ConPTY 동작
-- Win11 22H2+: passthrough gate 판정 로그 존재
+- 기본 경로: passthrough 초기화 성공 + gate 판정 로그 존재
+- 폴백 경로: 초기화 실패 또는 `CMUX_CONPTY_MODE=standard` 강제 시 standard ConPTY 동작
 - dirty region 기반 redraw (전체 화면 clear 시 변경 없는 셀 재렌더링 금지)
 - IME candidate window 위치 정상 (cursor pixel rect 기준)
 - Narrator/NVDA로 텍스트 이동 확인
@@ -1009,16 +1006,18 @@ src/
 
 ## 12. 플랫폼 지원 매트릭스
 
-| 기능 | Windows 10 1809+ | Windows 11 22H2+ |
-|------|------------------|-----------------|
-| WinUI 3 기본 UI | ✅ | ✅ |
-| Title bar customization | ✅ | ✅ |
-| Acrylic backdrop | ✅ | ✅ |
-| Mica backdrop | ❌ | ✅ |
-| ConPTY standard mode | ✅ | ✅ |
-| ConPTY passthrough | ❌ | ✅ |
-| WebView2 browser panel | ✅ (Evergreen 필요) | ✅ |
-| AppNotification toast | ✅ (실패 시 degrade) | ✅ |
+> 2026-07-04: 지원 floor를 Windows 11 22H2+ (build ≥ 22621)로 상향 (00 §4). Windows 10 지원 주장 제거.
+
+| 기능 | Windows 11 22H2+ | 비고 |
+|------|------------------|------|
+| WinUI 3 기본 UI | ✅ | |
+| Title bar customization | ✅ | |
+| Mica backdrop | ✅ | 기본 backdrop |
+| Acrylic backdrop | ✅ | 설정 선택지 |
+| ConPTY standard mode | ✅ | passthrough 실패 폴백 + env override |
+| ConPTY passthrough | ✅ | 기본 경로 |
+| WebView2 browser panel | ✅ | Evergreen runtime 필요 |
+| AppNotification toast | ✅ | 등록 실패 시 degrade |
 
 ---
 

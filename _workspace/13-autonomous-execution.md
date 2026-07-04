@@ -115,6 +115,8 @@ milestone의 마지막 task가 `done`이 될 때 아래를 모두 반영한다.
 
 `active_milestone`과 milestone `status`는 `plans\index.json`이 authoritative source다. mN.json의 task status와 index.json의 milestone status가 불일치하면 task status를 기준으로 index.json을 수정한다.
 
+milestone의 마지막 task는 항상 **AT gate task**다 (`plans/README.md` 'AT gate 규칙', 2026-07-04 확정). AT gate task는 `acceptance_auto`가 비어 있고 사람 검증으로만 done이 되므로, 자율 루프는 이 task를 집지 않고 사람에게 핸드오프한다. 따라서 milestone rollup은 구조적으로 사람 AT 통과 이후에만 발생한다.
+
 phase 1의 `plans\session-state.md`는 Markdown snapshot을 유지한다. 기계 판독 handoff 레이어를 추가하더라도 phase 2 운영 레이어로 취급하며, 기존 Markdown snapshot을 암묵적으로 대체하지 않는다.
 
 ## 7. phase-1 exclusions

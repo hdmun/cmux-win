@@ -5,6 +5,9 @@
 
 ## 1. 검토 범위와 판정 기준
 
+- **기준 스냅샷 (2026-07-04 확정)**: 패리티의 원본은 `cmux/` = `https://github.com/manaflow-ai/cmux.git` @ `ee5902de` (v1.38.1, 2026-02-17)이며 **git submodule로 pin**한다. 기능 인벤토리(62개)와 "v1 100%" 판정은 이 스냅샷 기준으로만 수행한다. upstream 후속 변경은 post-v1 backlog로 분리한다.
+- **"v1 100%"의 정의 (2026-07-04 확정)**: v1 범위 46개 기능이 전부 task로 커버되고, ⚠️ partial 항목이 §7 재감사로 이분법 처리(계약+task 등록 또는 명시 제외)가 완료된 상태. §4의 v1 제외 항목 16개는 분모에 포함하지 않는다.
+- **완료 선언 시점 (2026-07-04 확정)**: "Windows 포팅 완료"는 **M6 milestone AT gate 통과 시점**에 선언한다. M7(서명/인스톨러/배포)은 외부 인프라 의존의 별도 배포 게이트이며 기능 패리티 판정에 들어가지 않는다.
 - v1 포팅 범위는 `M0~M6`이다. 즉 **bootstrap/app shell(M0~M1) → terminal core(M2) → split/sidebar/IPC foundation(M3) → browser panel(M4) → CLI/automation(M5) → settings/notifications/shell integration(M6)** 까지를 Windows 기본 제품 범위로 본다.
 - 기본 Windows 대체 스택은 **WinUI 3 + `AppWindow` + ConPTY + libvterm + Direct2D/DirectWrite + WebView2 + Named Pipe + `settings.json` + AppNotification** 이다.
 - 명시적 v1 제외 항목은 **Sparkle update stack 전체, PostHog analytics 전송, Finder Services routing, SwiftTerm legacy local-process terminal, UITestRecorder, UpdateTestSupport, `NSStatusItem` menu bar extra** 이다.
@@ -279,3 +282,23 @@
 | Browser CDP capability superset | M4 | m4-4 | — (doc note) | 06 §10, 17 §5.7 |
 
 > 모든 신규 task의 doc_ref `#fragment`는 하네스 doc-linter(`cmux-plan validate` / `check-docs`)로 해소가 검증된다.
+
+## 7. partial 재감사
+
+> 2026-07-04 grill-me 인터뷰 확정: "v1 100%"를 판정 가능한 명제로 만들기 위해 §6.3의 ⚠️ partial 9행을 전수 재감사한다. 실행 task는 `m0-8`(doc-freeze, check-docs gating)이다.
+
+### 7.1 재감사 절차
+
+1. §6.3 각 행에 대해 현행 milestone task 등록 상태를 대조한다 (2026-06-05/06-07 등록분 반영).
+2. 이미 커버된 stale 행은 §3 표의 Gap 상태를 ✅ covered로 정정하고 §2 통계를 재집계한다.
+   - 확인된 stale 후보: Terminal panel wrapper + search state (`m2-6`의 tc-find-state-restore / tc-find-state-survives-reparent가 커버), Ghostty-backed terminal view의 clipboard sub-item (`m6-7`이 커버).
+3. 남은 sub-item은 아래 이분법으로 처리한다.
+   - **UX 가시 항목** → `_workspace` 계약 섹션 추가 + milestone task 등록 (v1 100% 분모에 포함)
+   - **진단성/내부 항목** → §4 범위 제외 목록에 명시 이동 (근거 문장 필수)
+4. 처리 결과를 §7.2 표에 기록하고, 등록된 task는 `cmux-plan validate` 0 error를 확인한다.
+
+### 7.2 disposition 기록 (m0-8이 채움)
+
+| §6.3 행 | sub-item | 처리 (covered 정정 / task 등록 / §4 제외) | 근거 |
+|---------|----------|------------------------------------------|------|
+| (m0-8 실행 시 기록) | — | — | — |

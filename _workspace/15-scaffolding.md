@@ -10,6 +10,7 @@
 | `CMakeLists.txt` | 최상위 configure entrypoint |
 | `CMakePresets.json` | `dev-x64`, `dev-arm64`, `ci-x64`, `ci-arm64` presets |
 | `src/CMakeLists.txt` | 앱/라이브러리 target 집합 정의 |
+| `src/app/cmux_app.vcxproj` | WinUI 3 앱 셸 vcxproj (11 §1.1 하이브리드 계약) |
 | `cli/CMakeLists.txt` | `cmux.exe` target 정의 |
 | `resources/app.manifest` | DPI awareness, compatibility, bootstrap manifest |
 | `Directory.Packages.props` | NuGet pinning |
@@ -23,7 +24,7 @@
 
 | target | 의미 |
 |--------|------|
-| `cmux_app` | WinUI 3 app binary |
+| `cmux_app` | WinUI 3 app binary — vcxproj(`src/app/cmux_app.vcxproj`)를 msbuild로 호출하는 CMake custom target (11 §1.1) |
 | `cmux_cli` | `cmux.exe` CLI |
 | `cmux_core` | 공유 core/model 라이브러리 |
 | `cmux_terminal` | terminal runtime 계층 |

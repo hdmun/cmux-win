@@ -13,7 +13,7 @@
 
 ### 저장소 전환 원칙
 
-1. `cmux\`는 **참조 전용(reference only)** 이다.
+1. `cmux\`는 **참조 전용(reference only)** 이며, **git submodule로 upstream `ee5902de`(v1.38.1)에 고정**한다. 패리티 판정 기준은 `_workspace\18-cmux-parity.md` §1을 따른다.
 2. Windows 구현은 루트 기준 `src\`, `cli\`, `resources\`, `tests\`, `ports\`에만 추가한다.
 3. 포팅 초기에 macOS 코드를 삭제하지 않는다.
 4. 동작 parity 판단은 `cmux\`의 UX와 구조를 참고하되, Windows 설계 결정은 `_workspace\` 문서를 기준으로 한다.
@@ -49,16 +49,18 @@ v1의 기본 패키징 모델은 아래 하나로 고정한다.
 
 ## 4. 지원 범위 매트릭스
 
-| 항목 | Windows 10 1809+ | Windows 11 22H2+ | 비고 |
-|------|------------------|------------------|------|
-| WinUI 3 기본 UI | 지원 | 지원 | 필수 |
-| Title bar customization | 지원 | 지원 | 동일 API 경로 |
-| Acrylic fallback | 지원 | 지원 | Win10 기본 fallback |
-| Mica backdrop | 미지원 | 지원 | Win11 전용 |
-| ConPTY standard mode | 지원 | 지원 | 기본 경로 |
-| ConPTY passthrough | 미지원 | 지원 | OS build gate 필요 |
-| WebView2 browser panel | 지원 | 지원 | Evergreen runtime 필요 |
-| AppNotification toast | 지원 | 지원 | 등록 실패 시 degrade |
+> 2026-07-04: v1 지원 floor를 **Windows 11 22H2+ (build ≥ 22621)** 로 상향했다. Windows 10 지원 주장은 제거한다 (Win10 EOL + AT 검증 환경 부재). ConPTY passthrough가 기본 경로가 되고, standard 모드는 초기화 실패 폴백 및 `CMUX_CONPTY_MODE` override 경로로만 유지한다 (`adr-0002` 개정 참조).
+
+| 항목 | Windows 11 22H2+ | 비고 |
+|------|------------------|------|
+| WinUI 3 기본 UI | 지원 | 필수 |
+| Title bar customization | 지원 | |
+| Mica backdrop | 지원 | 기본 backdrop |
+| Acrylic backdrop | 지원 | `appearance.titlebar_style` 선택지 |
+| ConPTY standard mode | 지원 | passthrough 실패 폴백 + env override 경로 |
+| ConPTY passthrough | 지원 | 기본 경로 |
+| WebView2 browser panel | 지원 | Evergreen runtime 필요 |
+| AppNotification toast | 지원 | 등록 실패 시 degrade |
 
 ## 5. 공통 용어와 명명 규칙
 

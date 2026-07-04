@@ -1,19 +1,21 @@
 # ADR-0002: ConPTY Passthrough Detection and Fallback Policy
 
-- Status: accepted
-- Related docs: `_workspace/03-terminal-engine.md`
+- Status: accepted (2026-07-04 amended: v1 지원 floor Win11 22H2+ 상향 반영)
+- Related docs: `_workspace/03-terminal-engine.md`, `_workspace/00-overview.md`
 - Related tasks: m0-4, m2-1
 
 ## Context
 
 ConPTY는 두 가지 모드로 동작할 수 있다.
 
-- **standard**: Win10 이상에서 지원되는 기본 ConPTY 경로
-- **passthrough**: Win11 22H2 이상에서 지원되는 성능 최적화 경로로, 복잡한 VT 시퀀스를 raw stream으로 전달한다.
+- **standard**: 호환성 우선의 기본 ConPTY 경로
+- **passthrough**: Win11 22H2+ (build ≥ 22621)에서 지원되는 성능 최적화 경로로, 복잡한 VT 시퀀스를 raw stream으로 전달한다.
 
-passthrough 모드를 무조건 시도하거나, 실패 시 에러로 처리하면 다음 문제가 생긴다.
+> 2026-07-04 개정: v1 지원 floor가 Windows 11 22H2+로 상향되어 (00 §4) OS build gate는 항상 충족된다. 따라서 **passthrough가 기본 경로**이고, standard는 초기화 실패 폴백과 `CMUX_CONPTY_MODE` override 경로로만 남는다. gate 판정 자체는 방어적 확인 + 진단 로그 목적으로 유지한다.
 
-- Win10 사용자에게 불필요한 오류 UI 노출
+passthrough 초기화 실패를 에러로 처리하면 다음 문제가 생긴다.
+
+- 사용자에게 불필요한 오류 UI 노출
 - 세션 도중 모드 전환 시도 → ConPTY 상태 불일치
 - 탐지 로직 중복 → 불일치 위험
 
@@ -25,8 +27,8 @@ ConPTY 모드 탐지와 fallback 정책을 아래와 같이 고정한다.
 
 1. 탐지는 **세션 start 시점에 1회만** 수행한다.
 2. 탐지 순서:
-   1. `VerifyVersionInfo` / `IsWindowsVersionOrGreater`로 OS build gate를 확인한다.
-   2. Win11 22H2+ (build ≥ 22621)이면 passthrough 초기화를 시도한다.
+   1. `VerifyVersionInfo` / `IsWindowsVersionOrGreater`로 OS build gate를 확인하고 결과를 로그에 남긴다 (지원 floor상 항상 충족 — 방어적 확인).
+   2. passthrough 초기화를 기본으로 시도한다.
    3. `CreatePseudoConsole` passthrough 초기화가 실패하면 즉시 `standard`로 고정한다.
 3. 결정된 모드는 세션 수명 동안 **재상향(upgrade)하지 않는다**.
 
@@ -49,6 +51,6 @@ ConPTY 모드 탐지와 fallback 정책을 아래와 같이 고정한다.
 
 ## Verification impact
 
-- M2 수락 기준: Win10 환경에서 passthrough fallback이 오류 없이 standard 모드로 동작
-- M2 수락 기준: Win11 22H2+ 환경에서 passthrough gate 판정 로그 존재
+- M2 수락 기준: 기본 경로에서 passthrough 초기화 성공 + gate 판정 로그 존재
+- M2 수락 기준: passthrough 초기화 실패 시 오류 UI 없이 standard 모드로 폴백 (INFO 로그)
 - M2 수락 기준: `CMUX_CONPTY_MODE=standard` 오버라이드 시 gate 무시하고 standard 동작

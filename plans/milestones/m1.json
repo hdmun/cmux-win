@@ -85,7 +85,7 @@
       "queue_number": 4,
       "title": "Titlebar / backdrop / fallback",
       "status": "pending",
-      "summary": "Implement titlebar customization and Win10/Win11 backdrop fallback behavior.",
+      "summary": "Implement titlebar customization and backdrop fallback behavior (Mica default; style-driven fallback per 00 §4 Win11 22H2+ floor).",
       "depends_on": [
         "m1-1"
       ],
@@ -200,6 +200,38 @@
       ],
       "blocked_by": [],
       "notes": []
+    },
+    {
+      "task_id": "m1-6",
+      "queue_number": 2,
+      "title": "Milestone AT gate (acceptance_manual drain)",
+      "status": "pending",
+      "summary": "Human/AT checkpoint: execute every queued acceptance_manual item in this milestone and record results before the milestone rolls up to done.",
+      "depends_on": [
+        "m1-1",
+        "m1-2",
+        "m1-3",
+        "m1-4",
+        "m1-5"
+      ],
+      "doc_refs": [
+        "plans/README.md#at-gate-규칙"
+      ],
+      "touches": [
+        "plans/milestones/m1.json"
+      ],
+      "acceptance_auto": [],
+      "acceptance_manual": [
+        "manual: verify every acceptance_manual item of this milestone's tasks was executed and its result (pass/fail/skip + 사유) recorded in this task's notes"
+      ],
+      "commands": [],
+      "outputs": [
+        "plans/milestones/m1.json"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "commands: [] — human/AT gate task; done 전환은 사람 검증으로만 수행한다 (plans/README.md 'AT gate 규칙'). 자율 루프는 이 task를 집지 않는다."
+      ]
     }
   ]
 }

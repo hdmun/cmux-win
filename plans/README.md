@@ -15,7 +15,7 @@
 ## update rule
 
 1. task 상태가 바뀌면 관련 milestone JSON을 먼저 갱신한다.
-2. milestone이 완료되면 `plans\index.json`의 해당 milestone `status`를 `done`으로, `active_milestone`을 다음 milestone으로 갱신한다.
+2. milestone이 완료되면 `plans\index.json`의 해당 milestone `status`를 `done`으로, `active_milestone`을 다음 milestone으로 갱신한다. 단, milestone의 마지막 task는 항상 AT gate task이므로(아래 'AT gate 규칙') 사람 검증 없이 rollup이 발생하지 않는다.
 3. 계약이나 범위가 바뀌면 `_workspace\` 문서를 함께 갱신한다.
 4. `plans\index.json` 또는 `plans\milestones\*.json`을 바꿨으면 `plans\schema\task-registry.schema.json` 기준 validation을 수행한다.
 5. 세션 종료 전 `plans\session-state.md`를 최신 상태로 남긴다.
@@ -39,6 +39,17 @@
 - literal command 형태의 `acceptance_auto` 항목은 `commands`에 **같은 문자열 그대로** 존재해야 한다 (`validate`가 강제 — 선언과 실제 실행이 어긋나면 done 판정이 오염되므로). `tc-*` 항목은 이 검사에서 제외된다(위 규칙으로 이미 커버)
 - doc/policy freeze task는 `acceptance_auto`를 `cmux-plan check-docs <task_id>`(doc-linter anchor 검사)로 채우고 완성도는 `acceptance_manual`에 둔다. 이때 `commands`도 같은 check-docs 명령을 가진다
 - release-only task(m7 등)는 외부 CI/CD 파이프라인에서만 실행되는 특성상 `commands`를 비울 수 있다. 이 경우 task의 `notes`에 "commands: [] — release-only task; executed via external CI/CD pipeline" 이유를 명시한다
+
+## AT gate 규칙
+
+> 2026-07-04 확정: `acceptance_manual` 큐는 milestone 경계에서 사람이 소진한다.
+
+- 각 기능 milestone(m0~m6)은 **AT gate task**를 하나 가진다: `m0-9`, `m1-6`, `m2-8`, `m3-10`, `m4-5`, `m5-7`, `m6-12`. 이 task는 같은 milestone의 다른 모든 task에 `depends_on`이 걸려 항상 마지막에 ready가 된다.
+- AT gate task의 `done` 전환은 **사람 검증으로만** 수행한다: milestone 내 모든 task의 `acceptance_manual` 항목을 체크리스트로 실행하고, 결과(pass/fail/skip + 사유)를 AT gate task의 `notes`에 기록한 뒤 `cmux-plan status <id> done`.
+- milestone rollup(`index.json` status `done`, `active_milestone` 전진)은 전체 task done을 요구하므로, AT gate task가 done이 되기 전에는 자동으로 발생하지 않는다 — 이것이 gate의 강제 장치다.
+- 자율 루프는 AT gate task를 **집지 않는다**: `acceptance_auto`가 비어 있고 사람 전용임이 notes에 명시되어 있다. `cmux-plan next`가 AT gate task를 추천하면 구현을 멈추고 사람에게 핸드오프한다.
+- m7은 release-only milestone로 전 항목이 이미 수동/외부 CI 검증이므로 별도 AT gate task를 두지 않는다.
+- "포팅 완료" 선언 시점은 **M6 AT gate 통과**다 (`_workspace/18-cmux-parity.md` §1).
 
 ## validation command
 

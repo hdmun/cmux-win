@@ -120,12 +120,14 @@ v1에서 아래 필드는 이름, 타입, 기본값을 고정한다.
 
 ### `appearance.titlebar_style` 해석 규칙
 
-| 값 | Win11 | Win10 | 비고 |
-|----|-------|-------|------|
-| `auto` | Mica 우선 | Acrylic 우선 | 둘 다 불가하면 `none` |
-| `mica` | Mica 강제 | Acrylic로 degrade, 불가 시 `none` | unsupported error로 앱을 막지 않음 |
-| `acrylic` | Acrylic 허용 | Acrylic 허용 | |
-| `none` | effect 비활성화 | effect 비활성화 | |
+> 지원 floor는 Win11 22H2+ (00 §4)이므로 OS 버전 분기는 없다. 아래는 effect 가용성 기준 해석이다.
+
+| 값 | 해석 | 비고 |
+|----|------|------|
+| `auto` | Mica 우선, 불가하면 `none` | |
+| `mica` | Mica 강제, 불가 시 `none` | unsupported error로 앱을 막지 않음 |
+| `acrylic` | Acrylic 적용 | |
+| `none` | effect 비활성화 | |
 
 `support_matrix`는 effect 가능 여부를 계산하지만, `appearance.titlebar_style`의 저장 값 자체를 수정하지는 않는다. 런타임에서만 위 표에 따라 해석한다.
 

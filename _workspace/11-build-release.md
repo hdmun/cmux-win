@@ -7,13 +7,22 @@
 
 v1의 공식 개발/CI 경로는 아래 하나다.
 
-- **Visual Studio 2022**
+- **Visual Studio 2022 이상** (실제 toolset pin은 `CMakePresets.json`이 책임진다)
 - **CMake Presets**
 - **vcpkg manifest mode**
 - **NuGet central package management**
 - **Windows App SDK bootstrap**
 
 즉, "Visual Studio 수동 프로젝트" 또는 "별도 hand-written NuGet restore 흐름"은 공식 경로가 아니다.
+
+### 1.1 하이브리드 빌드 계약 (2026-07-04 확정)
+
+WinUI 3 XAML 마크업 컴파일(XamlCompiler), MIDL(.idl→.winmd), C++/WinRT codegen, PRI 리소스 생성은 **WinAppSDK의 MSBuild targets에서만 공식 지원**된다. 이를 순수 CMake로 재현하지 않는다.
+
+- **`cmux_app` 셸만 vcxproj**(`src/app/cmux_app.vcxproj`)로 빌드한다. NuGet restore(`Directory.Packages.props` pin)와 XAML/winmd/PRI 처리는 WinAppSDK MSBuild targets가 담당한다.
+- CMake의 `cmux_app` target은 **msbuild를 호출하는 custom target**이다. 개발자/CI/하네스의 진입점은 여전히 `cmake --preset dev-x64` 하나다 (§5 명령 불변).
+- `cmux_core` / `cmux_terminal` / `cmux_ipc` / `cmux_cli` / `cmux_tests`는 **순수 CMake 정적 라이브러리/실행 파일**로 유지하고 vcxproj가 이를 소비한다. ctest gating은 순수 CMake 측에서 그대로 동작한다.
+- vcxproj를 CMake와 별개로 직접 빌드하는 것은 공식 경로가 아니다.
 
 ## 2. authoritative build files
 
@@ -26,6 +35,7 @@ v1의 공식 개발/CI 경로는 아래 하나다.
 | `vcpkg-configuration.json` | baseline / registries / overlay 설정 |
 | `Directory.Packages.props` | NuGet package pinning |
 | `NuGet.config` | NuGet source 정책 |
+| `src/app/cmux_app.vcxproj` | WinUI 3 앱 셸 (XAML/winmd/PRI; CMake custom target이 msbuild로 호출, §1.1) |
 
 문서에 버전 문자열을 중복해 적지 않는다. **실제 pin은 위 파일이 책임진다.**
 

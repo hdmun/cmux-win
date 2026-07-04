@@ -148,6 +148,37 @@
       "notes": [
         "doc/policy-freeze task; auto acceptance is the doc-linter anchor check, completeness is manual"
       ]
+    },
+    {
+      "task_id": "m4-5",
+      "queue_number": 2,
+      "title": "Milestone AT gate (acceptance_manual drain)",
+      "status": "pending",
+      "summary": "Human/AT checkpoint: execute every queued acceptance_manual item in this milestone and record results before the milestone rolls up to done.",
+      "depends_on": [
+        "m4-1",
+        "m4-2",
+        "m4-3",
+        "m4-4"
+      ],
+      "doc_refs": [
+        "plans/README.md#at-gate-규칙"
+      ],
+      "touches": [
+        "plans/milestones/m4.json"
+      ],
+      "acceptance_auto": [],
+      "acceptance_manual": [
+        "manual: verify every acceptance_manual item of this milestone's tasks was executed and its result (pass/fail/skip + 사유) recorded in this task's notes"
+      ],
+      "commands": [],
+      "outputs": [
+        "plans/milestones/m4.json"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "commands: [] — human/AT gate task; done 전환은 사람 검증으로만 수행한다 (plans/README.md 'AT gate 규칙'). 자율 루프는 이 task를 집지 않는다."
+      ]
     }
   ]
 }

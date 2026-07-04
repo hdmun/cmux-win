@@ -77,6 +77,12 @@ Markdown 설명과 JSON 상태가 충돌하면, 계약 내용은 `_workspace\*.m
 
 - signing, installer, distribution manifests, updater를 release-only gate로 검토
 
+### milestone AT gate (2026-07-04)
+
+- 각 기능 milestone(M0~M6)은 마지막에 human/AT gate task를 가진다 (`plans/README.md` 'AT gate 규칙').
+- gate task는 해당 milestone의 모든 `acceptance_manual` 항목을 사람이 체크리스트로 소진해야 done이 된다.
+- M6 AT gate 통과 = "Windows 포팅 완료" 선언 시점 (`_workspace/18-cmux-parity.md` §1).
+
 ## 7. release-only backlog
 
 아래 항목은 구현 착수 범위와 분리한다.
