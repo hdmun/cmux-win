@@ -10,6 +10,7 @@ Semantic checks (errors unless noted):
   - every doc_ref path exists and every #fragment resolves to a heading (doc-linter)
   - outputs not covered by touches  -> warning
   - empty acceptance_auto (not machine-verifiable) -> warning
+  - index milestone `status` matches its task rollup (done iff all tasks done)
 """
 from __future__ import annotations
 
@@ -126,6 +127,18 @@ def validate():
         check_refs(mid, data.get("doc_refs", []))
     for tid, t in tasks.items():
         check_refs(tid, t.get("doc_refs", []))
+
+    index_status = {m["milestone_id"]: m["status"] for m in index["milestones"]}
+    for mid, data in milestones.items():
+        if mid not in index_status:
+            continue
+        mtasks = data.get("tasks", [])
+        all_done = bool(mtasks) and all(t["status"] == "done" for t in mtasks)
+        status = index_status[mid]
+        if status == "done" and not all_done:
+            errors.append(f"{mid}: index status 'done' but not all tasks are done")
+        elif status != "done" and all_done:
+            errors.append(f"{mid}: all tasks done but index status is '{status}' not 'done'")
 
     return errors, warnings
 

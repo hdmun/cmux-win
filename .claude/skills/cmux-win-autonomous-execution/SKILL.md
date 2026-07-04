@@ -1,6 +1,6 @@
 ---
 name: cmux-win-autonomous-execution
-description: Resume autonomous cmux-win implementation. Use to pick the next ready task from plans/milestones, build a compact task brief, implement it, verify acceptance, and leave a correct session-state handoff. Backed by the cmux-plan Python CLI (next / brief / validate / check-docs / verify / status).
+description: Resume autonomous cmux-win implementation. Use to pick the next ready task from plans/milestones, build a compact task brief, implement it, verify acceptance, and leave a correct session-state handoff. Backed by the cmux-plan Python CLI (next / brief / validate / check-docs / verify / status). 다음 태스크 진행, 이어서 구현, 자율 실행 계속/재개, cmux-win 구현 계속 등의 요청에도 사용한다.
 ---
 
 # cmux-win Autonomous Execution
@@ -64,7 +64,7 @@ scripts — you do only the implementation reasoning and read only the generated
 | `brief <id>` | compact per-task brief (sliced doc_refs) |
 | `validate` | schema (Test-Json) + semantic + doc-linter |
 | `check-docs <id>` | verify one task's doc_refs resolve |
-| `verify <id> [--dry-run]` | run a task's auto acceptance; exit 1 if `auto_pass` is false, else 0 |
+| `verify <id> [--dry-run]` | run a task's auto acceptance; exit 1 if `auto_pass` is false, else 0 (each command times out after 600s, counted as a failure) |
 | `status <id> <state> [--dry-run]` | set status + refresh handoff (preserves Notes; warns on `done` if unverified) |
 
 Scripts live in `scripts/`; golden tests in `tests/`

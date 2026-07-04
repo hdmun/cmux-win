@@ -2,8 +2,11 @@
 
 Writes go through repo's temp-file + os.replace path so a crash can never leave
 a half-written milestone JSON (the failure mode that once lost m5-2). Milestone
-rollup: a milestone becomes `done` when all its tasks are done; `active_milestone`
-advances to the lowest non-done milestone whose gate is satisfied.
+rollup is fully recomputed from task status every call (not just promoted): a
+milestone is `done` when all its tasks are done, else `ready`/`pending` by gate —
+so reopening a task on a done milestone demotes it back, which cascades into
+downstream gates; `active_milestone` advances to the lowest non-done milestone
+whose gate is satisfied.
 """
 from __future__ import annotations
 
@@ -26,7 +29,7 @@ def _recompute_index(index, milestones):
         cur = {x["milestone_id"]: x["status"] for x in index["milestones"]}
         if tasks and all(t["status"] == "done" for t in tasks):
             m["status"] = "done"
-        elif m["status"] != "done":
+        else:
             m["status"] = "ready" if nt.gate_ok(mid, cur, mdeps) else "pending"
     cur = {x["milestone_id"]: x["status"] for x in index["milestones"]}
     nondone = sorted(

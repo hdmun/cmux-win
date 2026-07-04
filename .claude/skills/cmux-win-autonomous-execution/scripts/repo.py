@@ -12,10 +12,23 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import tempfile
 from pathlib import Path
 
 _HEAD_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
+
+
+def ensure_utf8_stdio() -> None:
+    """Force UTF-8 on stdout/stderr so piped capture never falls back to the
+    host locale encoding (e.g. cp949 on Korean Windows, which lacks U+2014
+    em-dash used in brief/status output and crashes with UnicodeEncodeError)."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
+ensure_utf8_stdio()
 
 
 def find_repo_root(start: str | None = None) -> Path:

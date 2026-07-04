@@ -13,8 +13,10 @@ Run from the repo root or anywhere:
 """
 import contextlib
 import io
+import os
 import pathlib
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -104,6 +106,42 @@ class _SyntheticRegistry(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# CLI encoding regression (P1): piped stdout must not crash under a host
+# locale encoding that lacks the em-dash (U+2014) used in brief/status output
+# (e.g. cp949 on Korean Windows). Forcing PYTHONIOENCODING=cp949 reproduces
+# the crash deterministically regardless of the actual host locale.
+# ---------------------------------------------------------------------------
+
+class TestCliEncodingRegression(unittest.TestCase):
+    @staticmethod
+    def _any_live_task_id():
+        for data in repo.all_milestones().values():
+            for t in data.get("tasks", []):
+                return t["task_id"]
+        raise AssertionError("live registry has no tasks")
+
+    @staticmethod
+    def _run_cli(args):
+        env = dict(os.environ)
+        env["PYTHONIOENCODING"] = "cp949"
+        return subprocess.run(
+            [sys.executable, str(SCRIPTS / "cmux_plan.py"), *args],
+            cwd=str(repo.ROOT), capture_output=True, env=env, timeout=60)
+
+    def test_brief_does_not_crash_under_cp949_pipe_capture(self):
+        tid = self._any_live_task_id()
+        r = self._run_cli(["brief", tid])
+        self.assertEqual(r.returncode, 0, r.stderr.decode("utf-8", "replace"))
+        self.assertIn("Task Brief", r.stdout.decode("utf-8"))
+
+    def test_status_dry_run_does_not_crash_under_cp949_pipe_capture(self):
+        tid = self._any_live_task_id()
+        r = self._run_cli(["status", tid, "in_progress", "--dry-run"])
+        self.assertEqual(r.returncode, 0, r.stderr.decode("utf-8", "replace"))
+        self.assertIn("DRY RUN", r.stdout.decode("utf-8"))
+
+
+# ---------------------------------------------------------------------------
 # next_task logic (synthetic)
 # ---------------------------------------------------------------------------
 
@@ -178,6 +216,75 @@ class TestValidateAcceptanceCommandDrift(_SyntheticRegistry):
         self.write_registry(index, milestones)
         errors, _warnings = validate_plans.validate()
         self.assertEqual(errors, [])
+
+
+class TestCheckDocsDirect(_SyntheticRegistry):
+    """P3: direct golden coverage for check_task_docs / check_docs_main."""
+
+    def test_check_task_docs_resolves_all_refs_returns_no_errors(self):
+        index = _sample_index()
+        milestones = _sample_milestones()
+        (repo.ROOT / "doc.md").write_text("# Title\n\n## Section A\n\nbody\n", encoding="utf-8")
+        milestones["m0"]["tasks"][0]["doc_refs"] = ["doc.md#section-a"]
+        self.write_registry(index, milestones)
+        errs = validate_plans.check_task_docs("m0-1")
+        self.assertEqual(errs, [])
+
+    def test_check_task_docs_reports_unresolved_fragment(self):
+        index = _sample_index()
+        milestones = _sample_milestones()
+        (repo.ROOT / "doc.md").write_text("# Title\n\nbody\n", encoding="utf-8")
+        milestones["m0"]["tasks"][0]["doc_refs"] = ["doc.md#missing-section"]
+        self.write_registry(index, milestones)
+        errs = validate_plans.check_task_docs("m0-1")
+        self.assertTrue(any("fragment unresolved" in e for e in errs), errs)
+
+    def test_check_docs_main_rc_0_when_clean(self):
+        index = _sample_index()
+        milestones = _sample_milestones()
+        (repo.ROOT / "doc.md").write_text("# Title\n\n## Section A\n\nbody\n", encoding="utf-8")
+        milestones["m0"]["tasks"][0]["doc_refs"] = ["doc.md#section-a"]
+        self.write_registry(index, milestones)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = validate_plans.check_docs_main(["m0-1"])
+        self.assertEqual(rc, 0)
+        self.assertIn("OK", buf.getvalue())
+
+    def test_check_docs_main_rc_1_when_broken(self):
+        index = _sample_index()
+        milestones = _sample_milestones()
+        (repo.ROOT / "doc.md").write_text("# Title\n\nbody\n", encoding="utf-8")
+        milestones["m0"]["tasks"][0]["doc_refs"] = ["doc.md#missing-section"]
+        self.write_registry(index, milestones)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = validate_plans.check_docs_main(["m0-1"])
+        self.assertEqual(rc, 1)
+        self.assertIn("ERROR", buf.getvalue())
+
+
+class TestValidateRollupConsistency(_SyntheticRegistry):
+    """P2-b: index milestone status must match its task rollup both ways."""
+
+    def test_done_index_status_with_incomplete_tasks_is_error(self):
+        index = _sample_index()
+        index["milestones"][0]["status"] = "done"
+        milestones = _sample_milestones()  # m0-1 stays "ready"
+        self.write_registry(index, milestones)
+        errors, _warnings = validate_plans.validate()
+        self.assertTrue(
+            any("index status 'done' but not all tasks are done" in e for e in errors), errors)
+
+    def test_all_tasks_done_but_index_not_done_is_error(self):
+        index = _sample_index()  # m0 status stays "ready"
+        milestones = _sample_milestones()
+        milestones["m0"]["tasks"][0]["status"] = "done"
+        milestones["m0"]["tasks"][1]["status"] = "done"
+        self.write_registry(index, milestones)
+        errors, _warnings = validate_plans.validate()
+        self.assertTrue(
+            any("all tasks done but index status is" in e for e in errors), errors)
 
 
 class TestValidateLiveInvariant(unittest.TestCase):
@@ -317,6 +424,80 @@ class TestRunAcceptanceExitCode(_SyntheticRegistry):
         self.assertEqual(rc, 0)
 
 
+class TestRunAcceptanceDryRunAlwaysZero(_SyntheticRegistry):
+    """P2-a: --dry-run must be rc 0 even when the not-buildable short-circuit
+    would otherwise fail the task (dry-run never executes commands)."""
+
+    def test_dry_run_with_unconfigured_cmake_project_is_rc0_and_auto_pass_none(self):
+        index = _sample_index()
+        milestones = _sample_milestones()
+        milestones["m0"]["tasks"][0]["commands"] = ["cmake --build --preset dev-x64"]
+        self.write_registry(index, milestones)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = run_acceptance.main(["m0-1", "--dry-run"])
+        self.assertEqual(rc, 0)
+        self.assertIn("not-buildable", buf.getvalue())
+
+    def test_non_dry_run_with_unconfigured_cmake_project_stays_rc1(self):
+        index = _sample_index()
+        milestones = _sample_milestones()
+        milestones["m0"]["tasks"][0]["commands"] = ["cmake --build --preset dev-x64"]
+        self.write_registry(index, milestones)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = run_acceptance.main(["m0-1"])
+        self.assertEqual(rc, 1)
+
+
+class TestRunAcceptanceTimeout(unittest.TestCase):
+    """P3: a hung command must not wedge the harness — TimeoutExpired is
+    caught and treated as a failed command, not an uncaught exception."""
+
+    def setUp(self):
+        self._orig_run = run_acceptance.subprocess.run
+        self._orig_pwsh = run_acceptance._pwsh_path
+
+    def tearDown(self):
+        run_acceptance.subprocess.run = self._orig_run
+        run_acceptance._pwsh_path = self._orig_pwsh
+
+    def test_run_command_converts_timeout_into_a_failed_result(self):
+        def fake_run(*_args, **_kwargs):
+            raise run_acceptance.subprocess.TimeoutExpired(
+                cmd="x", timeout=run_acceptance.COMMAND_TIMEOUT_SEC)
+        run_acceptance.subprocess.run = fake_run
+        run_acceptance._pwsh_path = lambda: "pwsh"
+        r, warn = run_acceptance._run_command("sleep 9999")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("timed out after 600s", r.stderr)
+        self.assertIsNone(warn)
+
+
+class TestRunAcceptanceTimeoutIntegration(_SyntheticRegistry):
+    def test_run_reports_auto_pass_false_with_timeout_reason(self):
+        index = _sample_index()
+        milestones = _sample_milestones()
+        milestones["m0"]["tasks"][0]["commands"] = ["sleep 9999"]
+        self.write_registry(index, milestones)
+        orig_run = run_acceptance.subprocess.run
+        orig_pwsh = run_acceptance._pwsh_path
+
+        def fake_run(*_args, **_kwargs):
+            raise run_acceptance.subprocess.TimeoutExpired(
+                cmd="x", timeout=run_acceptance.COMMAND_TIMEOUT_SEC)
+
+        run_acceptance.subprocess.run = fake_run
+        run_acceptance._pwsh_path = lambda: "pwsh"
+        try:
+            res = run_acceptance.run("m0-1")
+        finally:
+            run_acceptance.subprocess.run = orig_run
+            run_acceptance._pwsh_path = orig_pwsh
+        self.assertFalse(res["auto_pass"])
+        self.assertIn("timed out after 600s", res["command_results"][0]["stderr"])
+
+
 class TestRunAcceptancePwshExecution(unittest.TestCase):
     class _FakeResult:
         def __init__(self, returncode=0):
@@ -430,6 +611,28 @@ class TestUpdateStatusDoneWarning(_SyntheticRegistry):
         with contextlib.redirect_stdout(buf):
             update_status.apply("m0-1", "in_progress", dry_run=True)
         self.assertNotIn("WARNING", buf.getvalue())
+
+
+class TestMilestoneRollupReversal(_SyntheticRegistry):
+    """P2-b: reopening a task on a done milestone must demote the milestone
+    back (not just promote forward), cascading into dependent gates."""
+
+    def test_reopening_a_task_demotes_a_done_milestone_and_reverts_active_milestone(self):
+        index = _sample_index()
+        index["milestones"][0]["status"] = "done"
+        index["milestones"][1]["status"] = "ready"
+        index["active_milestone"] = "m1"
+        milestones = _sample_milestones()
+        milestones["m0"]["tasks"][0]["status"] = "done"
+        milestones["m0"]["tasks"][1]["status"] = "done"
+        milestones["m1"]["tasks"][0]["status"] = "ready"
+        self.write_registry(index, milestones)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = update_status.apply("m0-1", "in_progress", dry_run=True)
+        out = buf.getvalue()
+        self.assertEqual(rc, 0)
+        self.assertIn("active_milestone -> m0", out)
 
 
 class TestAtomicWrite(unittest.TestCase):
