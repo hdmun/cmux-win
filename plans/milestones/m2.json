@@ -211,7 +211,10 @@
         "manual: verify IME candidate window placement aligns with terminal cursor pixel rect",
         "manual: verify IME rect recalculated immediately on DPI change (DpiChanged event)",
         "manual: verify Narrator or NVDA can read current line text via UIA TextPattern",
-        "manual: verify caret move and viewport change UIA events are raised"
+        "manual: verify caret move and viewport change UIA events are raised",
+        "manual: verify Korean (Hangul) inline composition — composing characters render inline at the terminal cursor cell, not in a separate floating window (03 §7)",
+        "manual: verify Enter/ESC/backspace during composition re-composes correctly (commit, cancel, and delete-last-jamo behavior)",
+        "manual: verify losing focus mid-composition either commits or cancels the composition deterministically (no stuck/duplicated composition state)"
       ],
       "commands": [
         "cmake --build --preset dev-x64 --target cmux_app",
@@ -233,7 +236,8 @@
       "status": "pending",
       "summary": "Implement the terminal find overlay UI and per-panel search state with open/next/prev/close behavior.",
       "depends_on": [
-        "m2-4"
+        "m2-4",
+        "m2-9"
       ],
       "doc_refs": [
         "_workspace/04-split-pane.md",
@@ -311,6 +315,55 @@
       "notes": []
     },
     {
+      "task_id": "m2-9",
+      "queue_number": 5,
+      "title": "Scrollback buffer + mouse selection",
+      "status": "pending",
+      "summary": "Implement the scrollback buffer (sb_pushline/sb_popline, limit, alt-screen viewport restore) and the mouse selection model (drag, rectangular trim, invalidation).",
+      "depends_on": [
+        "m2-2",
+        "m2-4"
+      ],
+      "doc_refs": [
+        "_workspace/03-terminal-engine.md",
+        "_workspace/03-terminal-engine.md#15-scrollback-buffer",
+        "_workspace/03-terminal-engine.md#16-mouse-selection",
+        "_workspace/09-config-settings.md#3-v1-settingsjson-필드-스키마"
+      ],
+      "touches": [
+        "src/terminal/engine/scrollback_buffer.h",
+        "src/terminal/engine/scrollback_buffer.cpp",
+        "src/terminal/engine/selection_model.h",
+        "src/terminal/engine/selection_model.cpp",
+        "tests/unit/terminal"
+      ],
+      "acceptance_auto": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "tc-scrollback-pushline: sb_pushline captures scrolled-off lines and terminal.scrollback_limit caps stored line count",
+        "tc-scrollback-viewport: mouse wheel scroll updates the viewport offset within buffer bounds",
+        "tc-scrollback-altscreen: alt-screen entry/exit restores the viewport offset to its pre-entry value",
+        "tc-selection-drag: a mouse drag returns the selected text via SelectionModel::SelectedText, honoring rectangular trim on Alt+drag",
+        "tc-selection-invalidate: a TerminalBuffer update covering the selection range clears the active selection",
+        "ctest --preset dev-x64 -R scrollback --output-on-failure"
+      ],
+      "acceptance_manual": [],
+      "commands": [
+        "cmake --build --preset dev-x64 --target cmux_app",
+        "ctest --preset dev-x64 -R scrollback --output-on-failure"
+      ],
+      "outputs": [
+        "src/terminal/engine/scrollback_buffer.h",
+        "src/terminal/engine/scrollback_buffer.cpp",
+        "src/terminal/engine/selection_model.h",
+        "src/terminal/engine/selection_model.cpp",
+        "tests/unit/terminal/test_scrollback_selection.cpp"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "2026-07-05 grill-me 확정: libvterm은 scrollback을 제공하지 않으므로(embedder 책임) 신규 등록. m2-6(find overlay 뷰포트 스크롤)과 m6-7(selection copy)이 이 task의 존재를 전제로 한다 (18-cmux-parity.md 의존 역전 발견분)."
+      ]
+    },
+    {
       "task_id": "m2-8",
       "queue_number": 2,
       "title": "Milestone AT gate (acceptance_manual drain)",
@@ -323,7 +376,8 @@
         "m2-4",
         "m2-5",
         "m2-6",
-        "m2-7"
+        "m2-7",
+        "m2-9"
       ],
       "doc_refs": [
         "plans/README.md#at-gate-규칙"

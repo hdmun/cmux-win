@@ -25,147 +25,149 @@
 
 ## 3. 패리티 갭 분석표
 
+> **task-id 컬럼(2026-07-05 grill-me §m0-8 확정)**: `—`는 v1 task 없음(out_of_scope 또는 M7 release-only backlog로 §4/§9 참조)을 뜻한다. 한 행에 task가 여럿이면 대표 구현 task부터 나열한다.
+
 ### 애플리케이션 라이프사이클
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| App bootstrap + env setup | `cmuxApp`, `configureGhosttyEnvironment()`, `UserDefaults` | `wWinMain` + WinUI 3 `App` + `settings.json` + process env block | Med | M1+M2+M6 | 02-core-app, 03-terminal-engine, 09-config-settings, 10-shell-integration | ✅ covered |
-| App commands + auxiliary windows | `SwiftUI Commands`, `SettingsWindowController`, `AboutWindowController` | secondary `AppWindow` + command surface + settings/about windows | Med | M1 | 02-core-app, 17-functional-spec | ✅ covered |
-| App delegate orchestration + shortcut routing | `AppDelegate`, `UNUserNotificationCenterDelegate`, `NSMenuItemValidation` | activation/notification routing + app-wide shortcut router + `DispatcherQueue` | Med | M1+M6 | 02-core-app, 07-notification, 09-config-settings | ⚠️ partial |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| App bootstrap + env setup | `cmuxApp`, `configureGhosttyEnvironment()`, `UserDefaults` | `wWinMain` + WinUI 3 `App` + `settings.json` + process env block | Med | M1+M2+M6 | m1-1, m2-1, m6-2 | 02-core-app, 03-terminal-engine, 09-config-settings, 10-shell-integration | ✅ covered |
+| App commands + auxiliary windows | `SwiftUI Commands`, `SettingsWindowController`, `AboutWindowController` | secondary `AppWindow` + command surface + settings/about windows | Med | M1 | m1-4 | 02-core-app, 17-functional-spec | ✅ covered |
+| App delegate orchestration + shortcut routing | `AppDelegate`, `UNUserNotificationCenterDelegate`, `NSMenuItemValidation` | activation/notification routing + app-wide shortcut router + `DispatcherQueue` | Med | M1+M6 | m1-2, m6-3 | 02-core-app, 07-notification, 09-config-settings | ⚠️ partial |
 
 ### 패널 인프라
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Shared panel abstraction | `Panel` protocol | 공통 panel lifecycle contract + reusable panel host interface | Med | M2 | 03-terminal-engine, 04-split-pane, 06-browser-panel, adr-0004 | ✅ covered |
-| Panel content router | `PanelContentView` | XAML content presenter + panel-type routing layer | Med | M3 | 02-core-app, 04-split-pane | ✅ covered |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Shared panel abstraction | `Panel` protocol | 공통 panel lifecycle contract + reusable panel host interface | Med | M2 | m2-7 | 03-terminal-engine, 04-split-pane, 06-browser-panel, adr-0004 | ✅ covered |
+| Panel content router | `PanelContentView` | XAML content presenter + panel-type routing layer | Med | M3 | m3-6 | 02-core-app, 04-split-pane | ✅ covered |
 
 ### 워크스페이스
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Workspace model + split/tab state | `ObservableObject`, `BonsplitController` | `TabManager` + `BonsplitController` + XAML projection | Med | M3 | 04-split-pane, 05-sidebar-tabs | ✅ covered |
-| Workspace metadata tracking | shell-reported dir / git / progress / status / logs / ports | direct-pipe shell report + `TabManager` metadata batching | Med | M3+M6 | 05-sidebar-tabs, 08-ipc-cli, 10-shell-integration | ✅ covered |
-| Workspace rendering + panel badges | `SwiftUI View`, `BonsplitView` | WinUI 3 sidebar/list item projection + unread ring/badge | Med | M3+M6 | 04-split-pane, 05-sidebar-tabs, 07-notification | ✅ covered |
-| Workspace sidebar / tab selection | `SwiftUI`, `VerticalTabsSidebar` | WinUI 3 `ListView`/custom sidebar + `TabManager` | Med | M3 | 05-sidebar-tabs | ✅ covered |
-| Sidebar selection state | `ObservableObject` | `TabManager` source-of-truth + projected selection state | Low | M3 | 05-sidebar-tabs | ✅ covered |
-| Tab/workspace management | placement/pinning, selection/history, split focus, browser opens, window title updates | `TabManager` + split focus restore + CLI/window routing | High | M3+M5 | 04-split-pane, 05-sidebar-tabs, 08-ipc-cli | ⚠️ partial |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Workspace model + split/tab state | `ObservableObject`, `BonsplitController` | `TabManager` + `BonsplitController` + XAML projection | Med | M3 | m3-2, m3-3 | 04-split-pane, 05-sidebar-tabs | ✅ covered |
+| Workspace metadata tracking | shell-reported dir / git / progress / status / logs / ports | direct-pipe shell report + `TabManager` metadata batching | Med | M3+M6 | m3-3, m6-4 | 05-sidebar-tabs, 08-ipc-cli, 10-shell-integration | ✅ covered |
+| Workspace rendering + panel badges | `SwiftUI View`, `BonsplitView` | WinUI 3 sidebar/list item projection + unread ring/badge | Med | M3+M6 | m3-2, m6-1 | 04-split-pane, 05-sidebar-tabs, 07-notification | ✅ covered |
+| Workspace sidebar / tab selection | `SwiftUI`, `VerticalTabsSidebar` | WinUI 3 `ListView`/custom sidebar + `TabManager` | Med | M3 | m3-3 | 05-sidebar-tabs | ✅ covered |
+| Sidebar selection state | `ObservableObject` | `TabManager` source-of-truth + projected selection state | Low | M3 | m3-3 | 05-sidebar-tabs | ✅ covered |
+| Tab/workspace management | placement/pinning, selection/history, split focus, browser opens, window title updates | `TabManager` + split focus restore + CLI/window routing | High | M3+M5 | m3-4, m5-2 | 04-split-pane, 05-sidebar-tabs, 08-ipc-cli | ⚠️ partial |
 
 ### 터미널 패널
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Terminal panel wrapper + search state | `TerminalSurface`, `ObservableObject` | `terminal_panel` host + overlay state + `reattach_token` | Med | M2 | 03-terminal-engine, 04-split-pane | ⚠️ partial |
-| Terminal panel lifecycle / reattach handling | reattach token, surface reparent | lifecycle state machine + `reattach_token` + `SwapChainPanel` rebind | High | M2 | 03-terminal-engine, 04-split-pane | ✅ covered |
-| Terminal panel rendering | `TerminalPanelView`, unfocused overlay, unread indicator | Direct2D renderer + XAML dim overlay + unread ring | Med | M2+M6 | 03-terminal-engine, 04-split-pane, 07-notification | ✅ covered |
-| Ghostty-backed terminal view | Ghostty C API, clipboard, scroll, focus, lag logging | ConPTY + libvterm + Direct2D/DirectWrite + WinUI host | High | M2 | 03-terminal-engine, 04-split-pane | ⚠️ partial |
-| Terminal IME / text-input support | `NSTextInputClient`, marked text, composition, dead keys | TSF (`CoreTextServicesManager` / `ITfTextEditSink`) + cursor rect updates | High | M2 | 03-terminal-engine | ✅ covered |
-| Legacy local-process terminal view | `SwiftTerm`, `LocalProcessTerminalView` | 없음 (`ConPTY` 단일 경로) | — | — | — | ❌ missing |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Terminal panel wrapper + search state | `TerminalSurface`, `ObservableObject` | `terminal_panel` host + overlay state + `reattach_token` | Med | M2 | m2-4, m2-6 | 03-terminal-engine, 04-split-pane | ⚠️ partial |
+| Terminal panel lifecycle / reattach handling | reattach token, surface reparent | lifecycle state machine + `reattach_token` + `SwapChainPanel` rebind | High | M2 | m2-4 | 03-terminal-engine, 04-split-pane | ✅ covered |
+| Terminal panel rendering | `TerminalPanelView`, unfocused overlay, unread indicator | Direct2D renderer + XAML dim overlay + unread ring | Med | M2+M6 | m2-3, m6-1 | 03-terminal-engine, 04-split-pane, 07-notification | ✅ covered |
+| Ghostty-backed terminal view | Ghostty C API, clipboard, scroll, focus, lag logging | ConPTY + libvterm + Direct2D/DirectWrite + WinUI host | High | M2 | m2-1, m2-2, m2-9 | 03-terminal-engine, 04-split-pane | ⚠️ partial |
+| Terminal IME / text-input support | `NSTextInputClient`, marked text, composition, dead keys | TSF (`CoreTextServicesManager` / `ITfTextEditSink`) + cursor rect updates | High | M2 | m2-5 | 03-terminal-engine | ✅ covered |
+| Legacy local-process terminal view | `SwiftTerm`, `LocalProcessTerminalView` | 없음 (`ConPTY` 단일 경로) | — | — | — | — | ❌ missing |
 
 ### 브라우저 패널
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Browser panel model + navigation | `WKWebView`, history, UA, search settings | `WebView2` panel host + environment pool + navigation state | High | M4 | 06-browser-panel | ✅ covered |
-| Browser history + omnibar suggestions | local history ranking, remote suggestions | JSON history store + frecency + remote suggestion timeout | Med | M4 | 06-browser-panel | ✅ covered |
-| Browser panel UI | address bar, suggestions, navigation buttons, focus flash | WinUI 3 omnibar + nav controls + focus management | Med | M4 | 06-browser-panel | ⚠️ partial |
-| Embedded web view wrapper | `WKWebView` wrapper with shortcut preservation/focus tracking/context tweaks | XAML `WebView2` host wrapper | High | M4 | 06-browser-panel | ⚠️ partial |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Browser panel model + navigation | `WKWebView`, history, UA, search settings | `WebView2` panel host + environment pool + navigation state | High | M4 | m4-1 | 06-browser-panel | ✅ covered |
+| Browser history + omnibar suggestions | local history ranking, remote suggestions | JSON history store + frecency + remote suggestion timeout | Med | M4 | m4-2 | 06-browser-panel | ✅ covered |
+| Browser panel UI | address bar, suggestions, navigation buttons, focus flash | WinUI 3 omnibar + nav controls + focus management | Med | M4 | m4-2 | 06-browser-panel | ⚠️ partial |
+| Embedded web view wrapper | `WKWebView` wrapper with shortcut preservation/focus tracking/context tweaks | XAML `WebView2` host wrapper | High | M4 | m4-1 | 06-browser-panel | ⚠️ partial |
 
 ### 찾기
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| In-terminal find overlay | `SurfaceSearchOverlay`, `TerminalPanel.searchState` | terminal overlay (`Popup`/`Canvas`) + per-panel search state | Med | M2 | 04-split-pane, 17-functional-spec | ✅ covered |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| In-terminal find overlay | `SurfaceSearchOverlay`, `TerminalPanel.searchState` | terminal overlay (`Popup`/`Canvas`) + per-panel search state | Med | M2 | m2-6 | 04-split-pane, 17-functional-spec | ✅ covered |
 
 ### 알림
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Terminal notification store | `TerminalNotificationStore`, `UNUserNotificationCenter` | `NotificationStore` + `AppNotification` + taskbar badge | Med | M6 | 07-notification | ✅ covered |
-| Notifications page | `NotificationsPage` | WinUI 3 notifications page/list view | Med | M6 | 07-notification | ✅ covered |
-| Titlebar notifications popover | `showNotificationsPopover()`, `NSPopover` | `AppWindowTitleBar` anchored flyout/popover | Med | M6 | 07-notification, 02-core-app | ✅ covered |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Terminal notification store | `TerminalNotificationStore`, `UNUserNotificationCenter` | `NotificationStore` + `AppNotification` + taskbar badge | Med | M6 | m6-1 | 07-notification | ✅ covered |
+| Notifications page | `NotificationsPage` | WinUI 3 notifications page/list view | Med | M6 | m6-5 | 07-notification | ✅ covered |
+| Titlebar notifications popover | `showNotificationsPopover()`, `NSPopover` | `AppWindowTitleBar` anchored flyout/popover | Med | M6 | m6-5 | 07-notification, 02-core-app | ✅ covered |
 
 ### 셸 통합
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Shell/terminal environment setup | `TERM`, `TERM_PROGRAM`, `XDG_DATA_DIRS`, `MANPATH`, Ghostty resource path | ConPTY spawn env injection + PowerShell/CMD/WSL scripts | Med | M2+M6 | 03-terminal-engine, 08-ipc-cli, 10-shell-integration | ✅ covered |
-| Ghostty clipboard/pasteboard integration | clipboard mode mapping, file URL shell-escaping | Windows Clipboard + shell-safe file URL escaping | Low | M6 | 03-terminal-engine, 10-shell-integration | ✅ covered |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Shell/terminal environment setup | `TERM`, `TERM_PROGRAM`, `XDG_DATA_DIRS`, `MANPATH`, Ghostty resource path | ConPTY spawn env injection + PowerShell/CMD/WSL scripts | Med | M2+M6 | m2-1, m6-4 | 03-terminal-engine, 08-ipc-cli, 10-shell-integration | ✅ covered |
+| Ghostty clipboard/pasteboard integration | clipboard mode mapping, file URL shell-escaping | Windows Clipboard + shell-safe file URL escaping | Low | M6 | m6-7 | 03-terminal-engine, 10-shell-integration | ✅ covered |
 
 ### 자동화 / IPC
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Socket control settings | socket access mode, path overrides | `socket_control.mode` + Named Pipe naming/override | Med | M0+M3 | 08-ipc-cli, 09-config-settings | ✅ covered |
-| Socket automation / v1+v2 control API | Unix socket server, newline-delimited JSON, text+JSON commands, terminal/browser/window/workspace automation, shell metadata reception | Named Pipe message transport + protocol v2 + CLI + CDP automation + shell auto-report | High | M3+M4+M5+M6 | 06-browser-panel, 08-ipc-cli, 10-shell-integration | ✅ covered |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Socket control settings | socket access mode, path overrides | `socket_control.mode` + Named Pipe naming/override | Med | M0+M3 | m0-6, m3-1 | 08-ipc-cli, 09-config-settings | ✅ covered |
+| Socket automation / v1+v2 control API | Unix socket server, newline-delimited JSON, text+JSON commands, terminal/browser/window/workspace automation, shell metadata reception | Named Pipe message transport + protocol v2 + CLI + CDP automation + shell auto-report | High | M3+M4+M5+M6 | m3-1, m3-5, m4-3, m5-1, m5-2, m6-4 | 06-browser-panel, 08-ipc-cli, 10-shell-integration | ✅ covered |
 
 ### 자동화 / 관찰 / AI 통합 (parity 확장, 2026-06-07)
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Claude Code 통합 (claude-hook) | `claude-hook`, `set_status`/`clear_status`, 세션 파일 | `claude-hook` CLI + Named Pipe + 세션 파일(`LockFileEx`) + status badge | Med | M6 | 08-ipc-cli, 17-functional-spec | ✅ covered |
-| Debug/automation IPC | `debug.*`, `read_terminal_text`, `simulate_*` | inspect + input-sim IPC 명령군 (tests_v2 검증 백본) | High | M3+M5 | 08-ipc-cli, 17-functional-spec | ✅ covered |
-| App-backend 포트 감지 | shell `report_ports` + backend scan | app backend port detector → sidebar `listening_ports` | Med | M6 | 10-shell-integration, 05-sidebar-tabs | ✅ covered |
-| Sidebar/status 명령 계층 | `set_status`, `report_git_branch`, `report_ports`, `sidebar_state`, `--tab`/`--panel` | IPC sidebar/status 명령 + 대상 지정 플래그 | Med | M5 | 08-ipc-cli, 05-sidebar-tabs | ✅ covered |
-| Pane 내 surface 탭 바 | per-pane 가로 탭 바 + `+` 메뉴 | XAML surface 탭 바 + new-surface 메뉴 | Med | M3 | 17-functional-spec, 04-split-pane | ✅ covered |
-| 터미널 파일 드롭 수신 | drag-drop → escaped paste | WinUI Drop 대상 + 경로 추출 + escaping(10 §9) | Med | M6 | 17-functional-spec, 10-shell-integration | ✅ covered |
-| Browser CDP capability superset | WKWebView `not_supported` 매트릭스 | WebView2+CDP 실제 지원 (의도적 superset) | Low | M4 | 06-browser-panel, 17-functional-spec | ✅ covered |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Claude Code 통합 (claude-hook) | `claude-hook`, `set_status`/`clear_status`, 세션 파일 | `claude-hook` CLI + Named Pipe + 세션 파일(`LockFileEx`) + status badge | Med | M6 | m6-8, m6-9 | 08-ipc-cli, 17-functional-spec | ✅ covered |
+| Debug/automation IPC | `debug.*`, `read_terminal_text`, `simulate_*` | inspect + input-sim IPC 명령군 (tests_v2 검증 백본) | High | M3+M5 | m3-7, m3-8, m5-5 | 08-ipc-cli, 17-functional-spec | ✅ covered |
+| App-backend 포트 감지 | shell `report_ports` + backend scan | app backend port detector → sidebar `listening_ports` | Med | M6 | m6-10 | 10-shell-integration, 05-sidebar-tabs | ✅ covered |
+| Sidebar/status 명령 계층 | `set_status`, `report_git_branch`, `report_ports`, `sidebar_state`, `--tab`/`--panel` | IPC sidebar/status 명령 + 대상 지정 플래그 | Med | M5 | m5-6 | 08-ipc-cli, 05-sidebar-tabs | ✅ covered |
+| Pane 내 surface 탭 바 | per-pane 가로 탭 바 + `+` 메뉴 | XAML surface 탭 바 + new-surface 메뉴 | Med | M3 | m3-9 | 17-functional-spec, 04-split-pane | ✅ covered |
+| 터미널 파일 드롭 수신 | drag-drop → escaped paste | WinUI Drop 대상 + 경로 추출 + escaping(10 §9) | Med | M6 | m6-11 | 17-functional-spec, 10-shell-integration | ✅ covered |
+| Browser CDP capability superset | WKWebView `not_supported` 매트릭스 | WebView2+CDP 실제 지원 (의도적 superset) | Low | M4 | m4-4 | 06-browser-panel, 17-functional-spec | ✅ covered |
 
 ### 설정 / 구성
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Keyboard shortcut persistence | `KeyboardShortcutSettings` | `settings.json` shortcut schema + routing engine + accelerator handling | Low | M0+M6 | 02-core-app, 09-config-settings | ✅ covered |
-| Settings window + preferences UI | `SettingsWindowController`, `SettingsView` | WinUI 3 settings window/page | Med | M6 | 17-functional-spec, 09-config-settings | ✅ covered |
-| Ghostty config parsing + theme resolution | `GhosttyConfig` | Ghostty config parser + `settings.json` precedence | Low | M6 | 09-config-settings | ✅ covered |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Keyboard shortcut persistence | `KeyboardShortcutSettings` | `settings.json` shortcut schema + routing engine + accelerator handling | Low | M0+M6 | m0-6, m6-3 | 02-core-app, 09-config-settings | ✅ covered |
+| Settings window + preferences UI | `SettingsWindowController`, `SettingsView` | WinUI 3 settings window/page | Med | M6 | m6-6 | 17-functional-spec, 09-config-settings | ✅ covered |
+| Ghostty config parsing + theme resolution | `GhosttyConfig` | Ghostty config parser + `settings.json` precedence | Low | M6 | m6-2 | 09-config-settings | ✅ covered |
 
 ### 창 관리
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Multi-window support + Finder Services routing | multiple main windows, window↔tab manager mapping, Finder Services open/focus, window close | `WindowManager` + multi-window CLI/window routing | High | M1 | 02-core-app, 08-ipc-cli | ⚠️ partial |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Multi-window support + Finder Services routing | multiple main windows, window↔tab manager mapping, Finder Services open/focus, window close | `WindowManager` + multi-window CLI/window routing | High | M1 | m1-2 | 02-core-app, 08-ipc-cli | ⚠️ partial |
 
 ### 창 장식
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Window chrome customization | glass/blur background, tint fallback | `SystemBackdrop` (Mica/Acrylic) + `AppWindowTitleBar` | Med | M1 | 02-core-app, 09-config-settings | ✅ covered |
-| Draggable titlebar handle | background drag without content interference | custom titlebar drag region | Med | M1 | 02-core-app | ✅ covered |
-| Window accessor hook | underlying window exposure for config | `AppWindow` / `HWND` accessor seam | Low | M1 | 02-core-app | ✅ covered |
-| Titlebar decorations controller | traffic-light hide/offset equivalent | `AppWindowTitleBar` button/title region customization | Med | M1 | 02-core-app, 09-config-settings | ⚠️ partial |
-| Toolbar controller | custom toolbar, command/tab title display | WinUI titlebar command host / toolbar region | Med | M1 | 02-core-app | ✅ covered |
-| Titlebar controls + shortcut hints | sidebar/new-tab/notification buttons, hint placement | titlebar command buttons + keyboard hint layer | Med | M1 | 02-core-app | ✅ covered |
-| Backport helpers | SwiftUI key-press / pointer-style backports | 없음 (WinUI 3 기본 입력 경로) | Low | — | — | ❌ missing |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Window chrome customization | glass/blur background, tint fallback | `SystemBackdrop` (Mica/Acrylic) + `AppWindowTitleBar` | Med | M1 | m1-3 | 02-core-app, 09-config-settings | ✅ covered |
+| Draggable titlebar handle | background drag without content interference | custom titlebar drag region | Med | M1 | m1-5 | 02-core-app | ✅ covered |
+| Window accessor hook | underlying window exposure for config | `AppWindow` / `HWND` accessor seam | Low | M1 | m1-5 | 02-core-app | ✅ covered |
+| Titlebar decorations controller | traffic-light hide/offset equivalent | `AppWindowTitleBar` button/title region customization | Med | M1 | m1-3 | 02-core-app, 09-config-settings | ⚠️ partial |
+| Toolbar controller | custom toolbar, command/tab title display | WinUI titlebar command host / toolbar region | Med | M1 | m1-5 | 02-core-app | ✅ covered |
+| Titlebar controls + shortcut hints | sidebar/new-tab/notification buttons, hint placement | titlebar command buttons + keyboard hint layer | Med | M1 | m1-5 | 02-core-app | ✅ covered |
+| Backport helpers | SwiftUI key-press / pointer-style backports | 없음 (WinUI 3 기본 입력 경로) | Low | — | — | — | ❌ missing |
 
 ### 메뉴 바
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Menu bar extra / unread badge | `NSStatusItem`, unread badge, recent notifications, update/prefs/quit | system tray `SystemTrayIcon` + flyout | — | — | — | ❌ missing |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Menu bar extra / unread badge | `NSStatusItem`, unread badge, recent notifications, update/prefs/quit | system tray `SystemTrayIcon` + flyout | — | — | — | — | ❌ missing |
 
 ### 업데이트
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| Update controller / Sparkle integration | `UpdateController` | WinSparkle/MSIX/custom updater orchestration | — | M7 | 11-build-release | ❌ missing |
-| Sparkle user driver | `UpdateDriver` | WinSparkle/custom event bridge | — | M7 | 11-build-release | ❌ missing |
-| Update state view model | `UpdateViewModel` | WinUI update state VM | — | M7 | 11-build-release | ❌ missing |
-| Update pill | `UpdatePill` | WinUI pill/button | — | M7 | 11-build-release | ❌ missing |
-| Update popover | `UpdatePopoverView` | WinUI flyout/dialog | — | M7 | 11-build-release | ❌ missing |
-| Update badge | `UpdateBadge` | badge/progress ring UI | — | M7 | 11-build-release | ❌ missing |
-| Update channel settings | `UpdateChannelSettings` | settings enum + feed selector | — | M7 | 11-build-release | ❌ missing |
-| Update timing constants | `UpdateTiming` | updater timing config | — | M7 | 11-build-release | ❌ missing |
-| Update log store | `UpdateLogStore` | local update log store | — | M7 | 11-build-release | ❌ missing |
-| Update titlebar accessory integration | `UpdateTitlebarAccessoryController` | titlebar/flyout integration | — | M7 | 11-build-release | ❌ missing |
-| Update test support | `UpdateTestSupport`, `UpdateTestURLProtocol` | updater test harness / mock feed support | — | M7 | 11-build-release | ❌ missing |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| Update controller / Sparkle integration | `UpdateController` | WinSparkle/MSIX/custom updater orchestration | — | M7 | — | 11-build-release | ❌ missing |
+| Sparkle user driver | `UpdateDriver` | WinSparkle/custom event bridge | — | M7 | — | 11-build-release | ❌ missing |
+| Update state view model | `UpdateViewModel` | WinUI update state VM | — | M7 | — | 11-build-release | ❌ missing |
+| Update pill | `UpdatePill` | WinUI pill/button | — | M7 | — | 11-build-release | ❌ missing |
+| Update popover | `UpdatePopoverView` | WinUI flyout/dialog | — | M7 | — | 11-build-release | ❌ missing |
+| Update badge | `UpdateBadge` | badge/progress ring UI | — | M7 | — | 11-build-release | ❌ missing |
+| Update channel settings | `UpdateChannelSettings` | settings enum + feed selector | — | M7 | — | 11-build-release | ❌ missing |
+| Update timing constants | `UpdateTiming` | updater timing config | — | M7 | — | 11-build-release | ❌ missing |
+| Update log store | `UpdateLogStore` | local update log store | — | M7 | — | 11-build-release | ❌ missing |
+| Update titlebar accessory integration | `UpdateTitlebarAccessoryController` | titlebar/flyout integration | — | M7 | — | 11-build-release | ❌ missing |
+| Update test support | `UpdateTestSupport`, `UpdateTestURLProtocol` | updater test harness / mock feed support | — | M7 | — | 11-build-release | ❌ missing |
 
 ### 분석 / 테스트
 
-| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | _workspace 참조 | Gap 상태 |
-|---|---|---|---|---|---|---|
-| PostHog analytics | `PostHogAnalytics` | opt-in telemetry only (`analytics.enabled=false` 기본) | — | M5 | 09-config-settings | ❌ missing |
-| UI test recorder | `UITestRecorder` | 없음 | — | — | — | ❌ missing |
-| Update/focus debug logging | `UpdateLogStore`, focus log hooks | generic logging/redaction policy + debug log hooks | Low | M5 | 07-notification, 09-config-settings | ⚠️ partial |
+| 기능 | macOS 구현 | Windows 대체 | 포팅 난이도 | Milestone | task-id | _workspace 참조 | Gap 상태 |
+|---|---|---|---|---|---|---|---|
+| PostHog analytics | `PostHogAnalytics` | opt-in telemetry only (`analytics.enabled=false` 기본) | — | M5 | — | 09-config-settings | ❌ missing |
+| UI test recorder | `UITestRecorder` | 없음 | — | — | — | — | ❌ missing |
+| Update/focus debug logging | `UpdateLogStore`, focus log hooks | generic logging/redaction policy + debug log hooks | Low | M5 | m5-3 | 07-notification, 09-config-settings | ⚠️ partial |
 
 ## 4. 범위 제외 항목
 
@@ -296,6 +298,7 @@
    - **UX 가시 항목** → `_workspace` 계약 섹션 추가 + milestone task 등록 (v1 100% 분모에 포함)
    - **진단성/내부 항목** → §4 범위 제외 목록에 명시 이동 (근거 문장 필수)
 4. 처리 결과를 §7.2 표에 기록하고, 등록된 task는 `cmux-plan validate` 0 error를 확인한다.
+5. **인벤토리 분모 누수 점검 (2026-07-05 grill-me 확정)**: §3에서 ✅ covered로 표시된 행 중 고위험 그룹(터미널 패널, 브라우저 패널, 창 관리)의 sub-item을 cmux 소스(`ee5902de`, §1 스냅샷)와 1회 대조한다. 표시가 실제 구현 범위를 과대represent하지 않는지(예: 표에는 없지만 macOS에는 있는 하위 동작) 확인하고, 결과를 §7.2에 기록한다. 새로 발견된 gap은 3단계 이분법을 그대로 적용한다.
 
 ### 7.2 disposition 기록 (m0-8이 채움)
 

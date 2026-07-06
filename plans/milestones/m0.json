@@ -51,7 +51,8 @@
       "blocked_by": [],
       "notes": [
         "2026-07-04 하이브리드 빌드 계약 (11 §1.1): cmux_app 셸만 vcxproj(WinAppSDK MSBuild targets — XamlCompiler/winmd/PRI)로 빌드하고 CMake custom target이 msbuild를 호출한다. 나머지 target(core/terminal/ipc/cli/tests)은 순수 CMake. 진입점은 cmake preset 하나로 불변.",
-        "이 task는 빌드 스파이크로 취급한다: CMake↔vcxproj 접합(정적 라이브러리 소비, NuGet restore 순서)이 여기서 처음 검증되므로 실패 시 조기 보고한다."
+        "이 task는 빌드 스파이크로 취급한다: CMake↔vcxproj 접합(정적 라이브러리 소비, NuGet restore 순서)이 여기서 처음 검증되므로 실패 시 조기 보고한다.",
+        "2026-07-05 grill-me 확정 fallback 계약: 타임박스는 자율 세션 2회. 이 접합이 타임박스 내 성공하지 못하면 진입점을 .sln/MSBuild로 반전한다(CMake로 빌드된 core/terminal/ipc/cli/tests를 정적 라이브러리로 소비하는 방향). 반전 시 adr-0005로 11 §1.1을 개정한 뒤 진행한다. 이 task 자체의 구조(task-id, touches, outputs)는 반전 여부와 무관하게 불변이다."
       ]
     },
     {
@@ -260,7 +261,7 @@
       "queue_number": 11,
       "title": "Parity partial re-audit freeze",
       "status": "ready",
-      "summary": "Re-audit the 9 partial rows in 18 §6.3: correct stale rows to covered and disposition every remaining sub-item as contract+task registration or explicit §4 exclusion, per 18 §7.",
+      "summary": "Re-audit the 9 partial rows in 18 §6.3: correct stale rows to covered and disposition every remaining sub-item as contract+task registration or explicit §4 exclusion, per 18 §7. Also spot-check the high-risk ✅ covered rows (terminal panel, browser panel, window management groups) against cmux source ee5902de once, and add a task-id column to 18 §3.",
       "depends_on": [],
       "doc_refs": [
         "_workspace/18-cmux-parity.md#7-partial-재감사",
@@ -276,7 +277,9 @@
       "acceptance_manual": [
         "manual: verify stale rows (terminal search state → m2-6, clipboard sub-item → m6-7) are flipped to covered with justification and §2 통계가 재집계됨",
         "manual: verify every 18 §6.3 sub-item has an explicit disposition (task 등록 또는 §4 제외) recorded in 18 §7.2",
-        "manual: verify newly registered tasks (if any) pass cmux-plan validate and follow doc-freeze/tc conventions"
+        "manual: verify newly registered tasks (if any) pass cmux-plan validate and follow doc-freeze/tc conventions",
+        "manual: verify a one-time spot-check of the ✅ covered high-risk groups (터미널 패널, 브라우저 패널, 창 관리) sub-items against cmux source ee5902de is recorded in 18 §7.2 (2026-07-05 grill-me: 인벤토리 분모 누수 점검)",
+        "manual: verify 18 §3 표의 모든 행에 task-id 컬럼이 추가되어 있고 각 값이 실제 plans/milestones의 task_id와 일치함 (m6-12 판정 기계화 전제)"
       ],
       "commands": [
         "python .claude/skills/cmux-win-autonomous-execution/scripts/cmux_plan.py check-docs m0-8"
@@ -288,6 +291,40 @@
       "notes": [
         "doc/policy-freeze task; auto acceptance is the doc-linter anchor check, completeness is manual",
         "이분법 기준 (2026-07-04 grill-me 확정): UX 가시 sub-item(focus flash, WebView2 shortcut preservation, window title parity, browser-open 라우팅, scroll/focus polish, titlebar button hide/offset 등)은 계약+task 등록, 진단성 sub-item(lag logging, update/focus debug hook 등)은 §4 명시 제외를 기본값으로 한다."
+      ]
+    },
+    {
+      "task_id": "m0-10",
+      "queue_number": 3,
+      "title": "Minimal CI (build + ctest)",
+      "status": "pending",
+      "summary": "Add a minimal GitHub Actions workflow that runs the dev-x64 preset build and ctest with vcpkg binary caching, once the m0-1 build spike is stable. Packaging/signing stays in the separate M7 release lane.",
+      "depends_on": [
+        "m0-1"
+      ],
+      "doc_refs": [
+        "_workspace/11-build-release.md",
+        "_workspace/11-build-release.md#9-release-인프라-분리"
+      ],
+      "touches": [
+        ".github/workflows"
+      ],
+      "acceptance_auto": [
+        "actionlint .github/workflows/ci.yml"
+      ],
+      "acceptance_manual": [
+        "manual: verify the workflow actually runs green on a pushed branch/PR (dev-x64 preset build + ctest)"
+      ],
+      "commands": [
+        "actionlint .github/workflows/ci.yml"
+      ],
+      "outputs": [
+        ".github/workflows/ci.yml"
+      ],
+      "blocked_by": [],
+      "notes": [
+        "2026-07-05 grill-me 확정: m0-1 빌드 스파이크 안정화 직후 최소 CI를 m0에 추가한다. 패키징/서명/updater는 m7-1과 레인 분리 — 이 task는 build+ctest gate만 다룬다.",
+        "actionlint이 로컬에 없으면 정적 YAML 구문 검사로 대체 가능; 실제 그린 여부는 acceptance_manual로 큐잉한다."
       ]
     },
     {
@@ -304,7 +341,8 @@
         "m0-5",
         "m0-6",
         "m0-7",
-        "m0-8"
+        "m0-8",
+        "m0-10"
       ],
       "doc_refs": [
         "plans/README.md#at-gate-규칙"

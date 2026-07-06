@@ -50,6 +50,7 @@
 - 자율 루프는 AT gate task를 **집지 않는다**: `acceptance_auto`가 비어 있고 사람 전용임이 notes에 명시되어 있다. `cmux-plan next`가 AT gate task를 추천하면 구현을 멈추고 사람에게 핸드오프한다.
 - m7은 release-only milestone로 전 항목이 이미 수동/외부 CI 검증이므로 별도 AT gate task를 두지 않는다.
 - "포팅 완료" 선언 시점은 **M6 AT gate 통과**다 (`_workspace/18-cmux-parity.md` §1).
+- **M3 이후 gate 사전 워크스루 (2026-07-05 grill-me 확정)**: M3 이후의 AT gate(`m3-10`, `m4-5`, `m5-7`, `m6-12`)는 사람이 체크리스트를 실행하기 전에, 에이전트가 debug/inspect IPC(`m3-8`)와 input-sim IPC(`m5-5`)를 사용해 해당 milestone의 `acceptance_manual` 항목을 사전 워크스루하고 항목별 증거(스크린샷, `read_terminal_text` 결과 등)를 첨부한다. 사람은 이 증거를 바탕으로 확인·기록만 수행하며, gate의 done 전환 권한은 여전히 사람에게만 있다.
 
 ## validation command
 

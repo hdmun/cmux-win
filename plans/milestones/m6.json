@@ -54,18 +54,22 @@
       "queue_number": 9,
       "title": "Settings persistence and migration",
       "status": "pending",
-      "summary": "Implement settings source of truth, atomic write, and migration behavior.",
+      "summary": "Implement settings source of truth, atomic write, migration behavior, and Ghostty config parsing as a defaults input.",
       "depends_on": [
         "m0-6"
       ],
       "doc_refs": [
-        "_workspace/09-config-settings.md"
+        "_workspace/09-config-settings.md",
+        "_workspace/09-config-settings.md#ghostty-config에서-읽는-보조-필드"
       ],
       "touches": [
         "src/config"
       ],
       "acceptance_auto": [
-        "ctest --preset dev-x64 -R settings --output-on-failure"
+        "ctest --preset dev-x64 -R settings --output-on-failure",
+        "tc-ghostty-discovery: parser probes %APPDATA%\\ghostty\\config then %APPDATA%\\ghostty\\config.ghostty in that order (09 §2)",
+        "tc-ghostty-precedence: an explicit settings.json value overrides the same field parsed from Ghostty config (09 §2)",
+        "tc-ghostty-field-map: each Ghostty key in the 09 §2 field table (font-family, font-size, theme, scrollback-limit, background/foreground, cursor-color/cursor-text, selection-background/selection-foreground, palette, unfocused-split-opacity/-fill, split-divider-color) maps to its terminal-defaults field"
       ],
       "acceptance_manual": [
         "manual: verify backup-on-migration and explicit failure surfacing"
@@ -77,7 +81,9 @@
         "src/config/settings_store.h",
         "src/config/settings_store.cpp",
         "src/config/settings_migration.h",
-        "src/config/settings_migration.cpp"
+        "src/config/settings_migration.cpp",
+        "src/config/ghostty_config_parser.h",
+        "src/config/ghostty_config_parser.cpp"
       ],
       "blocked_by": [],
       "notes": []
@@ -249,6 +255,7 @@
       "summary": "Implement terminal copy/paste over Windows Clipboard (bracketed paste, paste confirm) and per-shell file-URL/path escaping.",
       "depends_on": [
         "m2-4",
+        "m2-9",
         "m6-4"
       ],
       "doc_refs": [

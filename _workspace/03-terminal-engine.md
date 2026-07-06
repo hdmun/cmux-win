@@ -111,6 +111,8 @@ v1은 TSF 우선 경로를 사용한다.
 
 IME 실패 시 조용히 삼키지 않고, fallback 경로로 전환 사실을 로그에 남긴다.
 
+**인라인 조합 필수 (플로팅 창 강등 불허, 2026-07-05 grill-me 확정)**: 한글 등 조합형 IME의 composition string은 candidate window와 별개로 terminal 커서 셀 위치에 인라인으로 표시되어야 한다. TSF composition 실패 시에도 별도 플로팅 조합 창으로 강등(degrade)하지 않고, §9 fallback 경로(standard 모드 등)와 무관하게 인라인 표시 계약을 유지한다.
+
 ## 8. UIA 기준
 
 v1 terminal은 최소 아래를 만족한다.
@@ -368,3 +370,95 @@ macOS Ghostty의 paste 경고에 대응한다.
 - bracketed paste mode 활성 시 paste가 `ESC[200~`/`ESC[201~`로 감싸여 stdin에 전달된다.
 - 개행 포함 + bracketed paste 비활성 시 확인 dialog가 뜨고, `terminal.paste_confirm=false`면 생략된다.
 - paste 데이터 내 `ESC[201~`가 제거되어 전달된다.
+- copy 대상 텍스트는 §16 selection model이 반환하는 selection text를 그대로 사용한다 (§16.3 rectangular trim 규칙 포함).
+
+---
+
+## 15. Scrollback buffer
+
+> M2 구현 계약. 2026-07-05 grill-me 확정: libvterm은 scrollback을 제공하지 않으므로(embedder 책임) 아래를 최소 계약으로 고정한다.
+
+### 15.1 소유권과 API
+
+- scrollback은 libvterm 밖에서 `ScrollbackBuffer`가 소유한다. libvterm의 `screen callbacks` 중 `sb_pushline`/`sb_popline`을 구현해 연결한다.
+
+```cpp
+// src/terminal/engine/scrollback_buffer.h
+class ScrollbackBuffer {
+public:
+    explicit ScrollbackBuffer(size_t limit_lines);
+
+    // vterm_screen_set_callbacks의 sb_pushline에서 호출된다.
+    void PushLine(int cols, const VTermScreenCell* cells);
+    // sb_popline에서 호출된다 (alt-screen 진입/스크롤 역방향 시 libvterm이 요청).
+    bool PopLine(int cols, VTermScreenCell* cells);
+
+    size_t LineCount() const;
+    void SetLimit(size_t limit_lines);  // terminal.scrollback_limit 변경 반영
+};
+```
+
+### 15.2 limit 연결
+
+- 상한은 `terminal.scrollback_limit`(기본 10000, `_workspace/09-config-settings.md` §3)을 그대로 사용한다.
+- limit 초과 시 가장 오래된 라인을 버린다(FIFO). limit이 설정 변경으로 줄어들면 즉시 초과분을 버린다.
+
+### 15.3 alt-screen 규칙
+
+- alt-screen 진입 시 scrollback push를 일시 정지한다(libvterm이 alt-screen 콘텐츠에 대해 `sb_pushline`을 호출하지 않는 것이 기본 동작이므로 별도 억제 로직은 필요 없으나, 뷰포트 상태는 별도로 저장한다).
+- alt-screen에서 primary screen으로 복귀하면 뷰포트 오프셋을 alt-screen 진입 직전 값으로 복원한다.
+
+### 15.4 M2 검증 기준
+
+- `sb_pushline`으로 밀려난 라인이 버퍼에 캡처되고 `terminal.scrollback_limit` 초과분은 버려짐
+- mouse wheel 스크롤이 뷰포트 오프셋을 갱신하고 buffer 범위를 벗어나지 않음
+- alt-screen 전환/복귀 시 뷰포트 오프셋이 진입 전 값으로 복원됨
+
+---
+
+## 16. Mouse selection
+
+> M2 구현 계약. §14 clipboard copy 경로가 이 섹션의 selection text를 소비한다.
+
+### 16.1 선택 모델
+
+```cpp
+// src/terminal/engine/selection_model.h
+struct SelectionRange {
+    int start_row, start_col;
+    int end_row, end_col;
+    bool rectangular;  // Alt+드래그 시 true
+};
+
+class SelectionModel {
+public:
+    void BeginDrag(int row, int col, bool rectangular);
+    void UpdateDrag(int row, int col);
+    void EndDrag();
+    void Clear();
+
+    bool                 HasSelection() const;
+    const SelectionRange& Range() const;
+    std::wstring          SelectedText(const TerminalBuffer& buffer) const;
+};
+```
+
+### 16.2 셀 단위 선택
+
+- 선택은 셀(row, col) 좌표 기준이며, scrollback 라인도 선택 대상에 포함한다(뷰포트가 scrollback을 보고 있을 때).
+- 드래그 중 뷰포트 밖으로 포인터가 나가면 자동 스크롤한다.
+
+### 16.3 rectangular trim 규칙
+
+- 일반 드래그 선택은 라인별 trailing whitespace를 유지한 채 이어붙인다.
+- rectangular(Alt+드래그) 선택은 라인별로 trailing whitespace를 trim한 뒤 개행으로 이어붙인다 (§14.2와 동일 규칙 공유).
+
+### 16.4 무효화 규칙
+
+- `TerminalBuffer`가 갱신되어(새 출력, resize) 선택 범위의 셀 내용이 바뀌면 선택은 즉시 해제된다. stale selection을 유지하지 않는다.
+
+### 16.5 M2 검증 기준
+
+- 드래그로 선택한 텍스트가 `SelectedText()`로 정확히 반환됨 (§16.2)
+- 버퍼 갱신 시 선택이 무효화됨 (§16.4)
+- rectangular 선택의 trim 결과가 §14.2 clipboard copy 규칙과 일치함
